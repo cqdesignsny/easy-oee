@@ -58,8 +58,29 @@ export default async function SummaryPage({
         <LanguageSwitcher />
       </div>
       <div style={{ marginBottom: 24 }}>
-        <div className="app-tag">{t("summary.tag")}</div>
-        <h1 className="app-h1">{t("summary.title")}</h1>
+        <div
+          className="summary-title-row"
+          style={{
+            display: "flex",
+            alignItems: "flex-start",
+            justifyContent: "space-between",
+            gap: 16,
+            flexWrap: "wrap",
+          }}
+        >
+          <div>
+            <div className="app-tag">{t("summary.tag")}</div>
+            <h1 className="app-h1">{t("summary.title")}</h1>
+          </div>
+          <div className="no-print" style={{ display: "flex", gap: 12, flexShrink: 0 }}>
+            <Link href="/operator" className="btn">
+              {t("summary.startNew")}
+            </Link>
+            <Link href="/dashboard" className="btn btn-ghost">
+              {t("summary.dashboard")}
+            </Link>
+          </div>
+        </div>
         <p style={{ color: "var(--muted2)", marginTop: 8, fontSize: 17 }}>
           {data.line?.name} · {t(`operator.shift.${sh.shiftType}`)} · {sh.product}
         </p>
@@ -131,15 +152,6 @@ export default async function SummaryPage({
 
       {/* Export options */}
       <ShiftExportButtons shiftId={id} />
-
-      <div className="no-print" style={{ display: "flex", gap: 12 }}>
-        <Link href="/operator" className="btn" style={{ flex: 1 }}>
-          {t("summary.startNew")}
-        </Link>
-        <Link href="/dashboard" className="btn btn-ghost" style={{ flex: 1 }}>
-          {t("summary.dashboard")}
-        </Link>
-      </div>
     </main>
   );
 }
