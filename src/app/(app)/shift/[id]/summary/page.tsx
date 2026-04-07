@@ -4,7 +4,9 @@ import { getOperatorSession } from "@/lib/auth/operator-session";
 import { getShiftForOperator } from "@/server/actions/shifts";
 import { formatPercent, oeeBucket } from "@/lib/oee";
 import { Logo } from "@/components/Logo";
+import { LanguageSwitcher } from "@/components/i18n/LanguageSwitcher";
 import { getServerT } from "@/components/i18n/server";
+import { ShiftExportButtons } from "./export-buttons";
 
 const STOP_LABEL_KEYS: Record<string, string> = {
   mechanical_failure: "stop.01.label",
@@ -50,9 +52,10 @@ export default async function SummaryPage({
   );
 
   return (
-    <main className="op-shell" style={{ maxWidth: 880, margin: "0 auto", width: "100%" }}>
-      <div style={{ marginBottom: 24 }}>
+    <main className="op-shell summary-print" style={{ maxWidth: 880, margin: "0 auto", width: "100%" }}>
+      <div className="no-print" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 24 }}>
         <Link href="/"><Logo height={42} /></Link>
+        <LanguageSwitcher />
       </div>
       <div style={{ marginBottom: 24 }}>
         <div className="app-tag">{t("summary.tag")}</div>
@@ -126,7 +129,10 @@ export default async function SummaryPage({
         )}
       </div>
 
-      <div style={{ display: "flex", gap: 12 }}>
+      {/* Export options */}
+      <ShiftExportButtons shiftId={id} />
+
+      <div className="no-print" style={{ display: "flex", gap: 12 }}>
         <Link href="/operator" className="btn" style={{ flex: 1 }}>
           {t("summary.startNew")}
         </Link>

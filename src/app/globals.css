@@ -1291,3 +1291,30 @@ input.field, select.field, textarea.field {
 @media (max-width: 480px) {
   .hero.hero-with-gauge .hero-gauge-wrap { max-width: 280px; }
 }
+
+/* Print: clean shift summary export to paper / PDF */
+@media print {
+  body { background: white !important; color: black !important; font-size: 12pt; }
+  .no-print { display: none !important; }
+  .summary-print { max-width: 100% !important; padding: 0 !important; }
+  .summary-print .card,
+  .summary-print .card-lg {
+    background: white !important;
+    border: 1px solid #ccc !important;
+    box-shadow: none !important;
+    page-break-inside: avoid;
+  }
+  .summary-print h1,
+  .summary-print h2,
+  .summary-print h3 { color: black !important; }
+  .summary-print .kpi-big { color: #003038 !important; }
+  .summary-print .kpi-label { color: #555 !important; }
+  .summary-print .app-tag { color: #003038 !important; }
+  .summary-print .app-tag::before { background: #003038 !important; }
+  .summary-print table.app-table th,
+  .summary-print table.app-table td {
+    color: black !important;
+    border-bottom: 1px solid #ccc !important;
+  }
+  a[href]::after { content: "" !important; }
+}

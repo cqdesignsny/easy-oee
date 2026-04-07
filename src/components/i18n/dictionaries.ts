@@ -513,6 +513,15 @@ export const dictionaries: Record<Locale, Dictionary> = {
     "summary.col.started": "Started",
     "summary.col.minutes": "Minutes",
 
+    // EXPORT (shift summary)
+    "export.title": "Export this shift",
+    "export.csv": "Download CSV",
+    "export.print": "Print or save PDF",
+    "export.email": "Email it",
+    "export.emailLabel": "Send to",
+    "export.send": "SEND",
+    "export.sending": "Sending...",
+
     // DASHBOARD
     "dashboard.tag": "Manager Dashboard",
     "dashboard.title": "TODAY",
@@ -1037,6 +1046,14 @@ export const dictionaries: Record<Locale, Dictionary> = {
     "summary.col.started": "Iniciado",
     "summary.col.minutes": "Minutos",
 
+    "export.title": "Exportar este turno",
+    "export.csv": "Descargar CSV",
+    "export.print": "Imprimir o guardar PDF",
+    "export.email": "Enviar por correo",
+    "export.emailLabel": "Enviar a",
+    "export.send": "ENVIAR",
+    "export.sending": "Enviando...",
+
     "dashboard.tag": "Panel del Gerente",
     "dashboard.title": "HOY",
     "dashboard.startShift": "INICIAR TURNO",
@@ -1557,6 +1574,14 @@ export const dictionaries: Record<Locale, Dictionary> = {
     "summary.col.reason": "Raison",
     "summary.col.started": "Démarré",
     "summary.col.minutes": "Minutes",
+
+    "export.title": "Exporter ce quart",
+    "export.csv": "Télécharger CSV",
+    "export.print": "Imprimer ou sauvegarder en PDF",
+    "export.email": "Envoyer par courriel",
+    "export.emailLabel": "Envoyer à",
+    "export.send": "ENVOYER",
+    "export.sending": "Envoi en cours...",
 
     "dashboard.tag": "Tableau de Bord",
     "dashboard.title": "AUJOURD'HUI",

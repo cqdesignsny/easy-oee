@@ -7,6 +7,7 @@ import { logStop, closeStop, updateParts, endShift } from "@/server/actions/shif
 import type { shift as shiftTable, stop as stopTable, line as lineTable } from "@/lib/db/schema";
 import { Logo } from "@/components/Logo";
 import { useT } from "@/components/i18n/LanguageProvider";
+import { LanguageSwitcher } from "@/components/i18n/LanguageSwitcher";
 
 const STOP_LABEL_KEYS: Record<string, string> = {
   mechanical_failure: "stop.01.label",
@@ -101,8 +102,9 @@ export function LiveShift({
 
   return (
     <main className="op-shell" style={{ maxWidth: 880, margin: "0 auto", width: "100%" }}>
-      <div style={{ marginBottom: 24 }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 24 }}>
         <Link href="/"><Logo height={42} /></Link>
+        <LanguageSwitcher />
       </div>
       {/* Header */}
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 24 }}>
