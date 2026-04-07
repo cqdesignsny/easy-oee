@@ -5,6 +5,8 @@ import * as s from "@/lib/db/schema";
 import { formatPercent, oeeBucket } from "@/lib/oee";
 import { getServerT } from "@/components/i18n/server";
 
+type ShiftType = "morning" | "afternoon" | "night";
+
 const STOP_LABEL_KEYS: Record<string, string> = {
   mechanical_failure: "stop.01.label",
   changeover: "stop.02.label",
@@ -126,6 +128,34 @@ export default async function DashboardPage() {
     .sort((a, b) => b.total - a.total);
   const maxStop = stopsSorted[0]?.total ?? 0;
 
+  // Shift-type comparison (last 7 days, average OEE per shift type)
+  const shiftCompareRows = await db
+    .select({
+      shiftType: s.shift.shiftType,
+      avgOee: sql<number>`coalesce(avg(${s.shift.oee}), 0)`,
+      n: sql<number>`count(*)`,
+    })
+    .from(s.shift)
+    .where(
+      and(
+        eq(s.shift.companyId, companyId),
+        eq(s.shift.status, "complete"),
+        gte(s.shift.startedAt, sevenDaysAgo),
+      ),
+    )
+    .groupBy(s.shift.shiftType);
+  const compareMap: Record<ShiftType, { avg: number | null; n: number }> = {
+    morning: { avg: null, n: 0 },
+    afternoon: { avg: null, n: 0 },
+    night: { avg: null, n: 0 },
+  };
+  for (const row of shiftCompareRows) {
+    compareMap[row.shiftType as ShiftType] = {
+      avg: row.n > 0 ? Number(row.avgOee) : null,
+      n: Number(row.n),
+    };
+  }
+
   return (
     <main className="app-shell">
       <div className="app-wrap">
@@ -143,6 +173,25 @@ export default async function DashboardPage() {
             {t("dashboard.todaysOee")} {t("dashboard.todaysOee.sub").replace("{n}", String(todayCompleted.length))}
           </div>
           <div className={`kpi-big ${bucketClass(todayOee)}`}>{formatPercent(todayOee)}</div>
+        </div>
+
+        {/* Shift-type comparison (7-day) */}
+        <div style={{ marginBottom: 24 }}>
+          <div className="kpi-label" style={{ marginBottom: 12 }}>{t("dashboard.shiftCompare")}</div>
+          <div className="shift-compare">
+            {(["morning", "afternoon", "night"] as ShiftType[]).map((type) => {
+              const c = compareMap[type];
+              return (
+                <div className="card" key={type}>
+                  <div className="kpi-label">{t(`operator.shift.${type}`)}</div>
+                  <div className={`kpi-big ${bucketClass(c.avg)}`}>{formatPercent(c.avg)}</div>
+                  <div className="compare-count">
+                    {c.n} {c.n === 1 ? t("dashboard.shiftCompare.shift") : t("dashboard.shiftCompare.shifts")}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
         </div>
 
         {/* Live shifts */}

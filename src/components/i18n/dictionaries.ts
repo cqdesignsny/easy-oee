@@ -565,6 +565,9 @@ export const dictionaries: Record<Locale, Dictionary> = {
     "dashboard.col.good": "Good",
     "dashboard.col.bad": "Bad",
     "dashboard.col.status": "Status",
+    "dashboard.shiftCompare": "Shift Comparison (last 7 days)",
+    "dashboard.shiftCompare.shift": "shift",
+    "dashboard.shiftCompare.shifts": "shifts",
 
     // ADMIN (lines / operators / shifts)
     "admin.lines.tag": "Manage",
@@ -1115,6 +1118,9 @@ export const dictionaries: Record<Locale, Dictionary> = {
     "dashboard.col.good": "Buenas",
     "dashboard.col.bad": "Malas",
     "dashboard.col.status": "Estado",
+    "dashboard.shiftCompare": "Comparación de Turnos (últimos 7 días)",
+    "dashboard.shiftCompare.shift": "turno",
+    "dashboard.shiftCompare.shifts": "turnos",
 
     "admin.lines.tag": "Administrar",
     "admin.lines.title": "LÍNEAS DE PRODUCCIÓN",
@@ -1663,6 +1669,9 @@ export const dictionaries: Record<Locale, Dictionary> = {
     "dashboard.col.good": "Bonnes",
     "dashboard.col.bad": "Mauvaises",
     "dashboard.col.status": "Statut",
+    "dashboard.shiftCompare": "Comparaison des Quarts (7 derniers jours)",
+    "dashboard.shiftCompare.shift": "quart",
+    "dashboard.shiftCompare.shifts": "quarts",
 
     "admin.lines.tag": "Gestion",
     "admin.lines.title": "LIGNES DE PRODUCTION",

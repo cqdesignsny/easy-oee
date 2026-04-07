@@ -9,6 +9,7 @@
 
 import { z } from "zod";
 import bcrypt from "bcryptjs";
+import { randomBytes } from "node:crypto";
 import { and, eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { db } from "@/lib/db/client";
@@ -29,6 +30,7 @@ export async function getManagerCompanyId(): Promise<string> {
 const LineSchema = z.object({
   name: z.string().min(1).max(80),
   idealRate: z.coerce.number().positive().max(100000),
+  targetOee: z.coerce.number().min(0).max(1).optional(),
 });
 
 export async function createLine(formData: FormData) {
@@ -36,11 +38,13 @@ export async function createLine(formData: FormData) {
   const parsed = LineSchema.parse({
     name: formData.get("name"),
     idealRate: formData.get("idealRate"),
+    targetOee: formData.get("targetOee") || undefined,
   });
   await db.insert(s.line).values({
     companyId,
     name: parsed.name,
     idealRate: parsed.idealRate.toFixed(2),
+    targetOee: (parsed.targetOee ?? 0.85).toFixed(4),
   });
   revalidatePath("/dashboard/lines");
 }
@@ -56,6 +60,7 @@ export async function updateLine(formData: FormData) {
     id: formData.get("id"),
     name: formData.get("name"),
     idealRate: formData.get("idealRate"),
+    targetOee: formData.get("targetOee") || undefined,
     active: formData.get("active") === "on",
   });
   await db
@@ -63,9 +68,25 @@ export async function updateLine(formData: FormData) {
     .set({
       name: parsed.name,
       idealRate: parsed.idealRate.toFixed(2),
+      targetOee: (parsed.targetOee ?? 0.85).toFixed(4),
       active: parsed.active ?? true,
     })
     .where(and(eq(s.line.id, parsed.id), eq(s.line.companyId, companyId)));
+  revalidatePath("/dashboard/lines");
+}
+
+/**
+ * Generate (or rotate) a public board token for a line. The token lets the
+ * shop floor TV view at /board/[token] render without a login.
+ */
+export async function regenerateBoardToken(formData: FormData) {
+  const companyId = await getManagerCompanyId();
+  const id = z.string().uuid().parse(formData.get("id"));
+  const token = randomBytes(18).toString("base64url");
+  await db
+    .update(s.line)
+    .set({ boardToken: token })
+    .where(and(eq(s.line.id, id), eq(s.line.companyId, companyId)));
   revalidatePath("/dashboard/lines");
 }
 
