@@ -70,9 +70,8 @@ h3 { font-size: clamp(18px, 2.5vw, 26px); letter-spacing: 1px; }
   border-bottom: 1px solid var(--border);
 }
 .nav-logo {
-  font-family: var(--font-bebas), "Bebas Neue", sans-serif;
-  font-size: 32px; letter-spacing: 3px;
-  color: var(--accent); text-decoration: none;
+  display: inline-flex; align-items: center;
+  text-decoration: none;
 }
 .nav-links { display: flex; gap: 36px; align-items: center; }
 .nav-links a {

@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 
 export function SiteFooter() {
@@ -5,7 +6,14 @@ export function SiteFooter() {
     <footer className="eo-footer">
       <div className="fg">
         <div>
-          <div className="fl">Easy OEE</div>
+          <Image
+            src="/easy-oee-logo.svg"
+            alt="Easy OEE"
+            width={713}
+            height={175}
+            style={{ height: 44, width: "auto", display: "block", marginBottom: 14 }}
+          />
+          <span className="fl" style={{ display: "none" }}>Easy OEE</span>
           <p className="fd">
             Real-time OEE tracking built for Canadian plant managers. No hardware. No
             complexity. Just clarity on the shop floor.

@@ -1,10 +1,18 @@
+import Image from "next/image";
 import Link from "next/link";
 
 export function SiteNav() {
   return (
     <nav className="eo-nav">
-      <Link href="/" className="nav-logo">
-        Easy OEE
+      <Link href="/" className="nav-logo" aria-label="Easy OEE home">
+        <Image
+          src="/easy-oee-logo.svg"
+          alt="Easy OEE"
+          width={713}
+          height={175}
+          priority
+          style={{ height: 38, width: "auto", display: "block" }}
+        />
       </Link>
       <div className="nav-links">
         <Link href="/how-it-works">How It Works</Link>
