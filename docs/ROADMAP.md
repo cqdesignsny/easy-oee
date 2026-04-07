@@ -106,8 +106,15 @@ Legend: 🟢 done · 🟡 in progress · ⚪ queued · 🔵 blocked
   - ⚪ Wire actual Stripe SDK once Stripe account + price IDs are created
   - ⚪ Trial countdown banner + plan limits enforcement
 - ⚪ Manager invitation flow (invite teammate by email)
-- ⚪ Email notifications (shift complete, daily summary) via Resend
-- ⚪ CSV export of shift data
+- 🟡 Email notifications via Resend
+  - 🟢 Server action scaffold (`src/server/actions/shift-export.ts`) — validates email + auth, ready for `resend.emails.send()` swap
+  - 🟢 Inline "Email it" form on shift summary
+  - ⚪ Wire actual Resend SDK (need RESEND_API_KEY + EASY_OEE_FROM_EMAIL env vars)
+  - ⚪ React Email template at `src/emails/ShiftSummary.tsx`
+  - ⚪ Automatic on-shift-end delivery (manager opt-in via settings page)
+  - ⚪ Daily/weekly digest cron
+- 🟢 CSV export of shift data (`/api/shifts/[id]/csv` route handler, downloads a full per-shift CSV)
+- 🟢 Print or save as PDF (browser print + dedicated print stylesheet)
 - ⚪ PWA manifest + install prompt for tablets
 - ⚪ PostHog product analytics
 
@@ -152,6 +159,7 @@ See `docs/HARDWARE-INTEGRATION.md`.
 
 ## Recent activity
 
+- **2026-04-07** — Shift export shipped: CSV download via `/api/shifts/[id]/csv` route handler (auth-scoped, full shift export with OEE metrics + production detail + every downtime event), Print/PDF via `window.print()` with a print stylesheet that hides chrome and switches to white/black, Email-it scaffold via server action `emailShiftSummary` that validates and would call Resend once wired (currently returns a friendly placeholder). Language switcher added to live shift + summary screens (was missing). Operator/live-shift/summary pages now constrained to 880px max-width with auto margins so they don't hug the left edge on big monitors. EN/ES/FR translations for all new export strings.
 - **2026-04-07** — i18n + branding + Stripe prep mega-batch. EN/ES/FR translations across nav, footer, homepage (all sections), how-it-works, roi-calculator, pricing, contact, privacy, terms, sign-in, pin, operator, live shift, summary, dashboard. Server-side getServerT() helper. Cookie-first locale persistence. Language switcher always visible (out of hamburger). Animated hero gauge sized 600-820px desktop. Round buttons globally (pill 999px). Brand SVG logo wired across nav, footer, sidebar, all auth screens + favicon. Mobile hamburger menu with body-scroll lock. /pricing rebuilt with USD primary + CAD reference + line count slider. /sign-up Stripe scaffold page. /api/checkout/session + /api/webhooks/stripe route stubs (501). Schema additions: stripe_subscription_id, stripe_price_id, licensed_lines, subscription_status (pushed to Neon). Removed all "no hardware" copy (hardware will be a future paid upsell).
 - **2026-04-07** — Admin login system shipped (manager /sign-in with email/password, Google/Microsoft SSO buttons placeholder, ADMIN_PASSWORD env var, HMAC cookie 14-day TTL). Site nav got bigger/bolder text (16px white, 56px logo, pill CTAs). Copy cleanup: removed all em/en dashes from user-facing text, replaced ★ stars and ✓ checks with inline SVGs, removed maple leaf emoji from footer.
 - **2026-04-07** — Phase 1 core flow shipped. Neon provisioned via Vercel Marketplace, schema pushed, seed loaded. Operator PIN auth + `/operator` shift setup + `/shift/[id]` live tracking (useOptimistic, 10 stop buttons, parts counters) + `/shift/[id]/summary` (color-coded OEE breakdown) + manager `/dashboard` (Today's OEE, live shifts, recent 10, 7-day Pareto stops) all built and deployed. 11/11 tests pass, lint clean, build clean. Demo creds: operator "Pierre Lavoie" / PIN 1234.

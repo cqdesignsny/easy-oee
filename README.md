@@ -70,6 +70,7 @@ See [`docs/ARCHITECTURE.md`](./docs/ARCHITECTURE.md) for the full rationale.
 - `/shift/[id]/summary` — color-coded OEE breakdown
 - `/dashboard` — manager home: today's OEE, live shifts, recent shifts, 7-day Pareto stops
 - `/dashboard/lines` `/dashboard/operators` `/dashboard/shifts` — admin CRUD pages
+- **Shift export** — Download CSV / Print or save PDF / Email it (scaffold) buttons on `/shift/[id]/summary`. CSV via `/api/shifts/[id]/csv` route handler (auth-scoped, full per-shift export). Print uses a dedicated print stylesheet for clean PDF output.
 - API stubs at `/api/checkout/session` and `/api/webhooks/stripe` (return 501 until Stripe is wired)
 
 ### Internationalization
@@ -108,6 +109,27 @@ pnpm dev              # http://localhost:3000
 **Demo credentials:**
 - Manager: any email + password `EasyOEE2026Admin` at `/sign-in`
 - Operator: pick **Pierre Lavoie**, PIN `1234` at `/pin`
+
+## Resend wiring (when ready)
+
+The shift summary "Email it" button is scaffold-ready. To wire actual email delivery:
+
+1. `pnpm add resend @react-email/components`
+2. Create `src/emails/ShiftSummary.tsx` — a React Email template that takes `{ shift, line, operator, stops }` as props and renders a branded summary
+3. Add to Vercel env: `RESEND_API_KEY`, `EASY_OEE_FROM_EMAIL` (e.g. `Easy OEE <reports@easy-oee.com>`)
+4. In `src/server/actions/shift-export.ts`, replace the `console.log` with:
+   ```ts
+   import { Resend } from "resend";
+   import { ShiftSummary } from "@/emails/ShiftSummary";
+   const resend = new Resend(process.env.RESEND_API_KEY!);
+   await resend.emails.send({
+     from: process.env.EASY_OEE_FROM_EMAIL!,
+     to: parsed.data.email,
+     subject: `Shift summary: ${lineName} ${shiftDate}`,
+     react: <ShiftSummary shift={shiftRow} ... />,
+   });
+   ```
+5. (Optional) Add automatic delivery: in `endShift()`, look up the manager's email preference and fire-and-forget the email.
 
 ## Stripe wiring (when ready)
 

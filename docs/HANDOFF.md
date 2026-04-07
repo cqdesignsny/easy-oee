@@ -326,13 +326,23 @@ After the initial Phase 1 core flow, the following was added in the same day:
 - Footer: maple leaf emoji removed, "Made in Canada" line removed, body text bumped to 17px white, links 16px.
 - Generic emojis ★ ✓ 🍁 replaced with inline SVGs.
 
+## Late additions in the same session (post mega-batch)
+
+- **Operator/live-shift/summary centering** — those three screens were full-width left-aligned (the `.op-shell` class doesn't constrain width). Now wrapped at `maxWidth: 880px` with auto margins so they sit centered on big monitors.
+- **Language switcher on live-shift + summary** — was missing from those two screens, now in the header next to the logo.
+- **Shift export** — new card at the bottom of `/shift/[id]/summary`:
+  - **Download CSV** → `/api/shifts/[id]/csv` route handler (`src/app/api/shifts/[id]/csv/route.ts`). Auth-scoped to operator session OR admin session. Streams a full per-shift CSV: header info, OEE metrics, production detail, every downtime event with timestamps.
+  - **Print or save PDF** → `window.print()`. New `@media print` block in `globals.css` hides `.no-print` chrome, switches body to white background + black text, adds borders to cards, prevents bad page breaks. Browser save-as-PDF gives a clean one-pager.
+  - **Email it** → expands an inline form. Server action `emailShiftSummary` in `src/server/actions/shift-export.ts` validates the email + shift, currently returns a placeholder confirmation. To wire: install Resend, create `src/emails/ShiftSummary.tsx` React Email template, replace the `console.log` with `resend.emails.send()`. Env vars needed: `RESEND_API_KEY`, `EASY_OEE_FROM_EMAIL`.
+- All new export strings translated EN/ES/FR (`export.title`, `export.csv`, `export.print`, `export.email`, `export.send`, `export.sending`, `export.emailLabel`).
+
 ## What's left for the immediate next session
 
 1. **Wire actual Stripe** — create products + prices in your Stripe dashboard, paste the price IDs into `src/lib/pricing.ts`, add `STRIPE_SECRET_KEY` + `STRIPE_WEBHOOK_SECRET` + `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` to Vercel env, replace the 501 stubs in `/api/checkout/session/route.ts` and `/api/webhooks/stripe/route.ts` with real Stripe Checkout Session creation and webhook handling. Schema is already in place.
-2. **Wire actual Clerk** for managers — create Clerk app, paste keys, replace `/sign-in` admin password with Clerk sign-in. Replace `getManagerCompanyId()` (currently the seeded-tenant stub) with a Clerk session lookup. The `(auth)/sign-in` pattern is already set up in the URL.
-3. **Loading and error states** — `loading.tsx`, `error.tsx`, on-brand 404 page.
-4. **Sentry** for error tracking.
-5. **Resend** for transactional emails (welcome, shift summary, password reset when Clerk lands).
+2. **Wire actual Resend** — `pnpm add resend @react-email/components`, create `src/emails/ShiftSummary.tsx`, add `RESEND_API_KEY` + `EASY_OEE_FROM_EMAIL` to Vercel env, swap the `console.log` in `src/server/actions/shift-export.ts` for `resend.emails.send({ from: process.env.EASY_OEE_FROM_EMAIL, to, subject, react: <ShiftSummary {...} /> })`. Then optionally trigger it automatically from `endShift()` for managers who opt in via a settings page.
+3. **Wire actual Clerk** for managers — create Clerk app, paste keys, replace `/sign-in` admin password with Clerk sign-in. Replace `getManagerCompanyId()` (currently the seeded-tenant stub) with a Clerk session lookup. The `(auth)/sign-in` pattern is already set up in the URL.
+4. **Loading and error states** — `loading.tsx`, `error.tsx`, on-brand 404 page.
+5. **Sentry** for error tracking.
 6. **Domain cutover** — point `easy-oee.com` from GitHub Pages to Vercel once you're confident the new app is the better landing.
 
 ## Resume here 👇 (the literal next thing to do — as of 2026-04-07)
