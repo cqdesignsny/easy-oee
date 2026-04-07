@@ -9,13 +9,19 @@ export const metadata = {
 export default function ROIPage() {
   return (
     <>
-      <section className="hero">
+      <section className="sub-hero">
         <div className="hero-glow" />
         <div className="hero-grid" />
-        <div className="hero-content fi" style={{ textAlign: "center", maxWidth: 980, margin: "0 auto" }}>
-          <div className="hero-eyebrow">ROI Calculator</div>
-          <h1>HOW MUCH IS YOUR DOWNTIME COSTING YOU?</h1>
-          <p className="hero-sub">
+        <div className="sub-hero-inner fi">
+          <div className="tag" style={{ justifyContent: "center", display: "inline-flex" }}>
+            ROI Calculator
+          </div>
+          <h1>
+            HOW MUCH IS YOUR
+            <br />
+            <em>DOWNTIME COSTING YOU?</em>
+          </h1>
+          <p className="sub-lead">
             Enter your plant&apos;s numbers. See exactly what your current OEE losses cost — and
             what improving them would return.
           </p>
@@ -25,33 +31,37 @@ export default function ROIPage() {
       <ROICalculator />
 
       <section className="feat-sec">
-        <div className="section-tag tag">Three loss types</div>
-        <h2 className="section-title">WHERE DO OEE LOSSES COME FROM?</h2>
-        <p className="section-intro">All three are measurable — and all three are recoverable.</p>
+        <div className="center-block">
+          <div className="tag">Three loss types</div>
+          <h2>WHERE OEE LOSSES COME FROM.</h2>
+          <p className="how-intro" style={{ marginInline: "auto" }}>
+            All three are measurable — and all three are recoverable.
+          </p>
+        </div>
 
-        <div className="steps" style={{ marginTop: 56 }}>
+        <div className="steps">
           <div className="step">
-            <div className="step-num">A</div>
+            <div className="step-bnum">A</div>
             <h3>AVAILABILITY LOSS</h3>
-            <p style={{ color: "var(--muted2)", marginTop: 12 }}>
+            <p>
               Unplanned downtime: breakdowns, changeovers that ran long, material starvation,
               waiting on operators or maintenance.
             </p>
           </div>
           <div className="step">
-            <div className="step-num">P</div>
+            <div className="step-bnum">P</div>
             <h3>PERFORMANCE LOSS</h3>
-            <p style={{ color: "var(--muted2)", marginTop: 12 }}>
+            <p>
               Speed losses: micro-stops too short to log, running below ideal rate, equipment
               wear slowing the line down.
             </p>
           </div>
           <div className="step">
-            <div className="step-num">Q</div>
+            <div className="step-bnum">Q</div>
             <h3>QUALITY LOSS</h3>
-            <p style={{ color: "var(--muted2)", marginTop: 12 }}>
-              Scrap and rework: parts produced that don&apos;t meet spec the first time and either
-              get tossed or have to be reworked.
+            <p>
+              Scrap and rework: parts produced that don&apos;t meet spec the first time and
+              either get tossed or have to be reworked.
             </p>
           </div>
         </div>

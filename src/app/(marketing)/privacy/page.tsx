@@ -7,14 +7,14 @@ export const metadata = {
 
 export default function PrivacyPage() {
   return (
-    <main style={{ maxWidth: 820, margin: "0 auto", padding: "140px 32px 100px" }}>
+    <main style={{ maxWidth: 820, margin: "0 auto", padding: "180px 32px 120px" }}>
       <div className="tag">Legal</div>
-      <h1 style={{ marginBottom: 12 }}>PRIVACY POLICY</h1>
-      <p style={{ color: "var(--muted)", fontFamily: "var(--font-dm-mono)", fontSize: 12, letterSpacing: 1.5 }}>
+      <h1 style={{ marginBottom: 14, fontSize: "clamp(48px, 7vw, 88px)" }}>PRIVACY POLICY</h1>
+      <p style={{ color: "var(--muted)", fontFamily: "var(--font-dm-mono)", fontSize: 13, letterSpacing: 1.5 }}>
         Last updated: April 2026
       </p>
 
-      <div style={{ marginTop: 48, color: "var(--muted2)", lineHeight: 1.8, fontSize: 15 }}>
+      <div style={{ marginTop: 56, color: "var(--muted2)", lineHeight: 1.8, fontSize: 18 }}>
         <p>
           Easy OEE Inc. (&quot;Easy OEE,&quot; &quot;we,&quot; &quot;us&quot;) operates the Easy
           OEE software-as-a-service platform at easy-oee.com. This Privacy Policy explains what

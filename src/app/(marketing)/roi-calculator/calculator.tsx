@@ -87,9 +87,13 @@ export function ROICalculator() {
 
   return (
     <section className="how-sec">
-      <div className="section-tag tag">Calculator</div>
-      <h2 className="section-title">YOUR PLANT&apos;S NUMBERS.</h2>
-      <p className="section-intro">All figures in CAD. Adjust the sliders to match your operation.</p>
+      <div className="center-block">
+        <div className="tag">Calculator</div>
+        <h2>YOUR PLANT&apos;S NUMBERS.</h2>
+        <p className="how-intro" style={{ marginInline: "auto" }}>
+          All figures in CAD. Adjust the sliders to match your operation.
+        </p>
+      </div>
 
       <div
         style={{

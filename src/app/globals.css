@@ -777,3 +777,152 @@ table.app-table th {
   .mgr-side nav { display: flex; flex-wrap: wrap; gap: 8px; }
   .mgr-side nav a { margin: 0; padding: 8px 12px; }
 }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   2026-04-07 — UI/UX accessibility pass (Pro Max skill: 16px+ body, tighter
+   vertical rhythm, sub-page hero pattern, fix .hero-eyebrow centering)
+═══════════════════════════════════════════════════════════════════════════ */
+
+/* Body baseline up to 17px for readability (was browser default) */
+body { font-size: 17px; line-height: 1.65; }
+
+/* Bump key text utilities */
+.hero-sub { font-size: 20px !important; line-height: 1.7 !important; max-width: 600px !important; }
+.problem-intro { font-size: 18px !important; line-height: 1.75 !important; max-width: 520px !important; }
+.how-intro { font-size: 19px !important; line-height: 1.7 !important; max-width: 560px !important; }
+.pain-text { font-size: 17px !important; line-height: 1.75 !important; }
+.step p { font-size: 16px !important; line-height: 1.75 !important; }
+.feat p { font-size: 16px !important; line-height: 1.75 !important; }
+.pq { font-size: 17px !important; line-height: 1.75 !important; }
+.an { font-size: 15px !important; }
+.ar { font-size: 13px !important; }
+.stat-l { font-size: 15px !important; max-width: 200px !important; }
+.sol-body, .sol-body-strong { font-size: 17px !important; line-height: 1.8 !important; }
+.pt-intro { font-size: 18px !important; line-height: 1.75 !important; }
+.roi-box p { font-size: 16px !important; line-height: 1.8 !important; }
+.cta-band p { font-size: 18px !important; line-height: 1.7 !important; max-width: 480px !important; }
+
+/* Tighten vertical rhythm — 112 → 88 */
+.problem, .how-sec, .feat-sec, .proof-sec, .sol, .pt { padding: 88px 56px !important; }
+.cta-band { padding: 80px 56px !important; }
+
+/* Fix .hero-eyebrow so it can be centered by parent text-align: center */
+.hero-eyebrow { display: inline-flex !important; }
+
+/* Sub-page hero — for pages other than the homepage */
+.sub-hero {
+  position: relative;
+  padding: 180px 56px 80px;
+  text-align: center;
+  overflow: hidden;
+  background: var(--black);
+}
+.sub-hero .hero-glow,
+.sub-hero .hero-grid { position: absolute; inset: 0; pointer-events: none; }
+.sub-hero .hero-glow {
+  background:
+    radial-gradient(ellipse 55% 55% at 50% 30%, rgba(3,191,181,0.08) 0%, transparent 65%),
+    radial-gradient(ellipse 35% 50% at 50% 80%, rgba(1,128,118,0.05) 0%, transparent 60%);
+}
+.sub-hero .hero-grid {
+  background-image:
+    linear-gradient(var(--border) 1px, transparent 1px),
+    linear-gradient(90deg, var(--border) 1px, transparent 1px);
+  background-size: 72px 72px;
+  mask-image: radial-gradient(ellipse 85% 85% at 50% 50%, black 20%, transparent 100%);
+}
+.sub-hero-inner { position: relative; max-width: 920px; margin: 0 auto; }
+.sub-hero h1 {
+  font-size: clamp(44px, 7vw, 96px);
+  line-height: 0.95;
+  margin-top: 22px;
+}
+.sub-hero p.sub-lead {
+  font-size: 21px;
+  line-height: 1.7;
+  color: var(--muted2);
+  max-width: 700px;
+  margin: 32px auto 0;
+}
+.sub-hero .tag { justify-content: center; }
+
+/* Tag centering helper */
+.tag.center { justify-content: center; }
+.tag.center::before { display: none; }
+.tag.center::after { display: none; }
+
+/* Section titles centered helper */
+.center-block { text-align: center; max-width: 920px; margin-left: auto; margin-right: auto; }
+.center-block .tag { display: inline-flex; }
+
+/* Sub-page section spacing slightly looser for readability */
+.sub-section { padding: 96px 56px; }
+.sub-section.dark { background: var(--mid); }
+.sub-section.darker { background: var(--black); }
+
+/* Stops list (10 standardized reasons) */
+.stop-list {
+  max-width: 920px; margin: 56px auto 0;
+  border: 1px solid var(--border); border-radius: 6px;
+  overflow: hidden;
+}
+.stop-list-row {
+  display: grid;
+  grid-template-columns: 70px 1.1fr 2fr;
+  gap: 28px;
+  padding: 22px 32px;
+  align-items: baseline;
+  border-top: 1px solid var(--border);
+}
+.stop-list-row:first-child { border-top: none; }
+.stop-list-row:nth-child(odd) { background: rgba(239,245,249,0.02); }
+.stop-num {
+  font-family: var(--font-dm-mono), "DM Mono", monospace;
+  font-size: 13px; color: var(--accent); letter-spacing: 1px;
+}
+.stop-label { font-size: 17px; font-weight: 500; color: var(--white); }
+.stop-desc { font-size: 16px; color: var(--muted2); line-height: 1.6; }
+
+/* FAQ list */
+.faq-list { max-width: 880px; margin: 48px auto 0; }
+.faq-item {
+  border-top: 1px solid var(--border);
+  padding: 24px 0;
+}
+.faq-item:last-child { border-bottom: 1px solid var(--border); }
+.faq-q {
+  cursor: pointer; list-style: none;
+  font-size: 19px; font-weight: 500; color: var(--white);
+  display: flex; justify-content: space-between; align-items: center;
+}
+.faq-q::-webkit-details-marker { display: none; }
+.faq-q::after { content: "+"; color: var(--accent); font-size: 26px; line-height: 0.8; }
+details[open] .faq-q::after { content: "−"; }
+.faq-a {
+  font-size: 17px; line-height: 1.75;
+  color: var(--muted2); margin-top: 16px;
+}
+
+/* Final formula badge */
+.formula-final {
+  text-align: center; margin: 72px auto 0; max-width: 720px;
+}
+.formula-final h2 { margin-top: 16px; color: var(--accent); }
+.formula-final p {
+  font-family: var(--font-dm-mono), "DM Mono", monospace;
+  font-size: 14px; letter-spacing: 1.5px;
+  color: var(--muted2); margin-top: 22px;
+}
+
+/* Mobile */
+@media (max-width: 880px) {
+  body { font-size: 16px; }
+  .sub-hero { padding: 140px 24px 64px; }
+  .sub-hero h1 { font-size: clamp(40px, 10vw, 64px); }
+  .sub-hero p.sub-lead { font-size: 18px; }
+  .sub-section { padding: 64px 24px; }
+  .stop-list-row { grid-template-columns: 50px 1fr; gap: 12px; padding: 18px 20px; }
+  .stop-list-row .stop-desc { grid-column: 1 / -1; padding-left: 62px; }
+  .problem, .how-sec, .feat-sec, .proof-sec, .sol, .pt { padding: 64px 24px !important; }
+  .cta-band { padding: 56px 24px !important; }
+}

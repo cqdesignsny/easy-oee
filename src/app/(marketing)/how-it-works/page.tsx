@@ -6,7 +6,7 @@ export const metadata = {
     "From operator login to live OEE dashboard in under 60 seconds. See exactly how Easy OEE works on the shop floor.",
 };
 
-const STOPS = [
+const STOPS: [string, string, string][] = [
   ["01", "Mechanical Failure", "Unplanned equipment breakdown or malfunction"],
   ["02", "Changeover", "Product or tooling change between runs"],
   ["03", "No Material", "Waiting for raw materials or components to arrive"],
@@ -46,13 +46,19 @@ export default function HowItWorksPage() {
   return (
     <>
       {/* HERO */}
-      <section className="hero">
+      <section className="sub-hero">
         <div className="hero-glow" />
         <div className="hero-grid" />
-        <div className="hero-content fi" style={{ textAlign: "center", maxWidth: 980, margin: "0 auto" }}>
-          <div className="hero-eyebrow">How it works</div>
-          <h1>FROM ZERO TO LIVE OEE IN ONE SHIFT.</h1>
-          <p className="hero-sub">
+        <div className="sub-hero-inner fi">
+          <div className="tag" style={{ justifyContent: "center", display: "inline-flex" }}>
+            How it works
+          </div>
+          <h1>
+            FROM ZERO TO LIVE OEE
+            <br />
+            <em>IN ONE SHIFT.</em>
+          </h1>
+          <p className="sub-lead">
             Here&apos;s exactly what happens when an operator picks up their phone and starts a
             shift in Easy OEE — and what you see as plant manager while it runs.
           </p>
@@ -61,93 +67,80 @@ export default function HowItWorksPage() {
 
       {/* THREE STEPS */}
       <section className="how-sec">
-        <div className="section-tag tag">3 Steps</div>
-        <h2 className="section-title">START. RUN. END.</h2>
+        <div className="center-block">
+          <div className="tag">3 Steps</div>
+          <h2>START. RUN. END.</h2>
+          <p className="how-intro" style={{ marginInline: "auto" }}>
+            One workflow, three moments. Every Easy OEE shift looks like this.
+          </p>
+        </div>
 
         <div className="steps">
           <div className="step fi">
-            <div className="step-num">01</div>
+            <div className="step-bnum">01</div>
             <h3>SHIFT START</h3>
-            <p style={{ color: "var(--muted2)", marginTop: 8, fontWeight: 500 }}>The operator logs in.</p>
-            <p style={{ color: "var(--muted2)", marginTop: 12 }}>
-              The operator opens Easy OEE on any device — phone, tablet, or shared floor terminal.
-              No app download. No training manual.
+            <p>
+              The operator opens Easy OEE on any device — phone, tablet, or shared floor
+              terminal. No app download. No training manual.
             </p>
-            <p style={{ color: "var(--muted2)", marginTop: 12 }}>
+            <p>
               They sign in, select their production line, choose their shift, enter the product
-              being run, and establish the planned minutes and ideal rate.
+              being run, and set planned minutes and ideal rate.
             </p>
-            <p style={{ color: "var(--accent)", marginTop: 12, fontWeight: 500 }}>
+            <p style={{ color: "var(--accent)", fontWeight: 500 }}>
               Total time: under 60 seconds.
             </p>
           </div>
 
           <div className="step fi d1">
-            <div className="step-num">02</div>
+            <div className="step-bnum">02</div>
             <h3>DURING THE SHIFT</h3>
-            <p style={{ color: "var(--muted2)", marginTop: 8, fontWeight: 500 }}>
-              Stops get logged in real time.
+            <p>
+              When the machine stops, the operator taps the reason. That&apos;s the entire
+              workflow. One tap.
             </p>
-            <p style={{ color: "var(--muted2)", marginTop: 12 }}>
-              When the machine stops, the operator taps the reason. That&apos;s the entire workflow.
-              One tap.
-            </p>
-            <p style={{ color: "var(--muted2)", marginTop: 12 }}>
-              The button turns amber. The timer starts. When the machine restarts, the operator
+            <p>
+              The button turns red. The timer starts. When the machine restarts, the operator
               taps again — the stop closes and the duration is calculated automatically.
             </p>
-            <p style={{ color: "var(--muted2)", marginTop: 12 }}>
-              No paper. No radio calls to the office. No end-of-day reconstruction.
-            </p>
+            <p>No paper. No radio calls to the office. No end-of-day reconstruction.</p>
           </div>
 
           <div className="step fi d2">
-            <div className="step-num">03</div>
+            <div className="step-bnum">03</div>
             <h3>END OF SHIFT</h3>
-            <p style={{ color: "var(--muted2)", marginTop: 8, fontWeight: 500 }}>
-              OEE calculates automatically.
+            <p>
+              The operator records good and bad parts produced. Easy OEE does the rest.
             </p>
-            <p style={{ color: "var(--muted2)", marginTop: 12 }}>
-              When the operator ends the shift, they record the good parts and bad parts produced.
-              Easy OEE does the rest.
-            </p>
-            <p style={{ color: "var(--muted2)", marginTop: 12 }}>
+            <p>
               Availability, Performance, and Quality are calculated instantly. The OEE score
-              appears. The shift summary is generated — every stop, every reason, every minute of
-              lost production.
+              appears. The full shift summary is generated — every stop, every reason, every
+              minute of lost production.
             </p>
-            <p style={{ color: "var(--accent)", marginTop: 12, fontWeight: 500 }}>
+            <p style={{ color: "var(--accent)", fontWeight: 500 }}>
               Zero manual calculation.
             </p>
           </div>
         </div>
       </section>
 
-      {/* STOP REASONS */}
+      {/* 10 STOP REASONS */}
       <section className="feat-sec">
-        <div className="section-tag tag">Standardized</div>
-        <h2 className="section-title">10 STOP REASONS.</h2>
-        <p className="section-intro">
-          Every reason is consistent across all lines and all operators — so when you compare
-          shifts or lines, you&apos;re comparing apples to apples.
-        </p>
+        <div className="center-block">
+          <div className="tag">Standardized</div>
+          <h2>10 STOP REASONS.</h2>
+          <p className="how-intro" style={{ marginInline: "auto" }}>
+            Every reason is consistent across all lines and all operators — so when you compare
+            shifts or lines, you&apos;re comparing apples to apples.
+          </p>
+        </div>
 
-        <div style={{ marginTop: 40, maxWidth: 920, marginInline: "auto", border: "1px solid var(--border)", borderRadius: 12, overflow: "hidden" }}>
-          {STOPS.map(([num, label, desc], i) => (
-            <div
-              key={num}
-              style={{
-                display: "grid",
-                gridTemplateColumns: "60px 1fr 2fr",
-                gap: 24,
-                padding: "20px 28px",
-                borderTop: i === 0 ? "none" : "1px solid var(--border)",
-                background: i % 2 === 0 ? "rgba(239,245,249,0.02)" : "transparent",
-              }}
-            >
-              <span style={{ color: "var(--accent)", fontFamily: "var(--font-dm-mono)", fontSize: 13 }}>{num}</span>
-              <span style={{ fontWeight: 500 }}>{label}</span>
-              <span style={{ color: "var(--muted2)", fontSize: 14 }}>{desc}</span>
+        <div className="stop-list">
+          {STOPS.map(([num, label, desc]) => (
+            <div key={num} className="stop-list-row">
+              <span className="stop-num">{num}</span>
+              <span className="stop-label">{label}</span>
+              <span className="stop-desc">{desc}</span>
             </div>
           ))}
         </div>
@@ -155,53 +148,57 @@ export default function HowItWorksPage() {
 
       {/* OEE MATH */}
       <section className="how-sec">
-        <div className="section-tag tag">The Math</div>
-        <h2 className="section-title">HOW OEE IS CALCULATED.</h2>
-        <p className="section-intro">
-          Easy OEE computes all three components automatically. Here&apos;s what&apos;s happening
-          under the hood.
-        </p>
+        <div className="center-block">
+          <div className="tag">The math</div>
+          <h2>HOW OEE IS CALCULATED.</h2>
+          <p className="how-intro" style={{ marginInline: "auto" }}>
+            Easy OEE computes all three components automatically. Here&apos;s what&apos;s
+            happening under the hood.
+          </p>
+        </div>
 
-        <div className="steps" style={{ marginTop: 56 }}>
+        <div className="steps">
           <div className="step">
-            <div className="step-num">A</div>
+            <div className="step-bnum">A</div>
             <h3>AVAILABILITY</h3>
-            <p style={{ fontFamily: "var(--font-dm-mono)", color: "var(--accent)", marginTop: 12, fontSize: 13 }}>
+            <p style={{ color: "var(--accent)", fontFamily: "var(--font-dm-mono)", fontSize: 14 }}>
               (Planned − Stop) / Planned
             </p>
-            <p style={{ color: "var(--muted2)", marginTop: 12 }}>
+            <p>
               Was the machine running when it was supposed to? Measures unplanned downtime as a
               percentage of scheduled production time.
             </p>
           </div>
           <div className="step">
-            <div className="step-num">P</div>
+            <div className="step-bnum">P</div>
             <h3>PERFORMANCE</h3>
-            <p style={{ fontFamily: "var(--font-dm-mono)", color: "var(--accent)", marginTop: 12, fontSize: 13 }}>
+            <p style={{ color: "var(--accent)", fontFamily: "var(--font-dm-mono)", fontSize: 14 }}>
               Parts / (Ideal Rate × Run Time)
             </p>
-            <p style={{ color: "var(--muted2)", marginTop: 12 }}>
-              Was the machine running at its ideal speed? Captures small stops, speed losses, and
-              micro-stoppages that don&apos;t get recorded as full stops.
+            <p>
+              Was the machine running at its ideal speed? Captures small stops, speed losses,
+              and micro-stoppages that don&apos;t get recorded as full stops.
             </p>
           </div>
           <div className="step">
-            <div className="step-num">Q</div>
+            <div className="step-bnum">Q</div>
             <h3>QUALITY</h3>
-            <p style={{ fontFamily: "var(--font-dm-mono)", color: "var(--accent)", marginTop: 12, fontSize: 13 }}>
+            <p style={{ color: "var(--accent)", fontFamily: "var(--font-dm-mono)", fontSize: 14 }}>
               Good / (Good + Bad)
             </p>
-            <p style={{ color: "var(--muted2)", marginTop: 12 }}>
+            <p>
               Were the parts made right the first time? Measures the percentage of production
               output that meets quality standards without rework.
             </p>
           </div>
         </div>
 
-        <div style={{ marginTop: 60, textAlign: "center" }}>
-          <div className="tag" style={{ justifyContent: "center" }}>Final formula</div>
-          <h2 style={{ marginTop: 12 }}>OEE = A × P × Q</h2>
-          <p style={{ color: "var(--muted2)", marginTop: 18, fontFamily: "var(--font-dm-mono)", fontSize: 13, letterSpacing: 1 }}>
+        <div className="formula-final">
+          <div className="tag" style={{ justifyContent: "center", display: "inline-flex" }}>
+            Final formula
+          </div>
+          <h2>OEE = A × P × Q</h2>
+          <p>
             World class: 85%+ &nbsp;·&nbsp; Typical: 60–75% &nbsp;·&nbsp; Low: below 60%
           </p>
         </div>
@@ -209,11 +206,15 @@ export default function HowItWorksPage() {
 
       {/* GETTING STARTED */}
       <section className="feat-sec">
-        <div className="section-tag tag">Getting started</div>
-        <h2 className="section-title">FOUR STEPS.</h2>
-        <p className="section-intro">No IT department. No hardware. No training sessions.</p>
+        <div className="center-block">
+          <div className="tag">Getting started</div>
+          <h2>FOUR STEPS.</h2>
+          <p className="how-intro" style={{ marginInline: "auto" }}>
+            No IT department. No hardware. No training sessions.
+          </p>
+        </div>
 
-        <div className="steps" style={{ marginTop: 56, gridTemplateColumns: "repeat(4, 1fr)" }}>
+        <div className="steps" style={{ gridTemplateColumns: "repeat(4, 1fr)" }}>
           {[
             ["1", "Create your account", "Sign up at app.easy-oee.com. Enter your company name. Takes 2 minutes. No credit card needed for the trial."],
             ["2", "Add your lines", "Enter each production line and its ideal parts-per-minute rate. Machine 1, Line A, Press 3 — whatever you call them on the floor."],
@@ -221,43 +222,32 @@ export default function HowItWorksPage() {
             ["4", "Start your first shift", "Your first real OEE data will be on your screen before the shift ends. That's the whole onboarding process."],
           ].map(([n, t, d]) => (
             <div className="step" key={n}>
-              <div className="step-num">{n}</div>
+              <div className="step-bnum">{n}</div>
               <h3>{t}</h3>
-              <p style={{ color: "var(--muted2)", marginTop: 12 }}>{d}</p>
+              <p>{d}</p>
             </div>
           ))}
         </div>
 
         <div style={{ textAlign: "center", marginTop: 56 }}>
-          <Link href="/contact" className="btn">Start Your Free Trial — No Credit Card Required →</Link>
+          <Link href="/contact" className="btn-y">
+            Start Your Free Trial — No Credit Card Required →
+          </Link>
         </div>
       </section>
 
       {/* FAQ */}
       <section className="how-sec">
-        <div className="section-tag tag">FAQ</div>
-        <h2 className="section-title">QUICK ANSWERS.</h2>
+        <div className="center-block">
+          <div className="tag">FAQ</div>
+          <h2>QUICK ANSWERS.</h2>
+        </div>
 
-        <div style={{ maxWidth: 880, marginInline: "auto", marginTop: 56 }}>
+        <div className="faq-list">
           {FAQS.map((f) => (
-            <details
-              key={f.q}
-              style={{
-                borderTop: "1px solid var(--border)",
-                padding: "24px 0",
-              }}
-            >
-              <summary
-                style={{
-                  cursor: "pointer",
-                  fontSize: 18,
-                  fontWeight: 500,
-                  listStyle: "none",
-                }}
-              >
-                {f.q}
-              </summary>
-              <p style={{ color: "var(--muted2)", marginTop: 14, lineHeight: 1.7 }}>{f.a}</p>
+            <details className="faq-item" key={f.q}>
+              <summary className="faq-q">{f.q}</summary>
+              <p className="faq-a">{f.a}</p>
             </details>
           ))}
         </div>
@@ -266,14 +256,16 @@ export default function HowItWorksPage() {
       {/* CTA BAND */}
       <section className="cta-band">
         <div>
-          <div className="tag">Want to see it live?</div>
+          <div className="tag" style={{ color: "var(--black)" }}>Want to see it live?</div>
           <h2>BOOK A FREE DEMO.</h2>
-          <p style={{ color: "var(--muted2)", marginTop: 14, maxWidth: 580 }}>
+          <p>
             Thirty minutes. We&apos;ll configure it around your plant and run a live shift
             walkthrough together.
           </p>
         </div>
-        <Link href="/contact" className="btn">Book a Free Demo →</Link>
+        <Link href="/contact" className="btn-y" style={{ background: "var(--black)", color: "var(--accent)" }}>
+          Book a Free Demo →
+        </Link>
       </section>
     </>
   );
