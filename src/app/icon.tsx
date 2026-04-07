@@ -23,7 +23,6 @@ export default function Icon() {
           justifyContent: "center",
         }}
       >
-        {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src={dataUri} width={420} height={103} alt="Easy OEE" />
       </div>
     ),

@@ -23,7 +23,6 @@ export default function AppleIcon() {
           justifyContent: "center",
         }}
       >
-        {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src={dataUri} width={148} height={36} alt="Easy OEE" />
       </div>
     ),

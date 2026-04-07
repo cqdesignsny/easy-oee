@@ -24,7 +24,6 @@ export default function OpengraphImage() {
           justifyContent: "center",
         }}
       >
-        {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src={dataUri} width={820} height={201} alt="Easy OEE" />
       </div>
     ),
