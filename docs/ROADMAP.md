@@ -16,7 +16,7 @@ Legend: 🟢 done · 🟡 in progress · ⚪ queued · 🔵 blocked
 - 🟢 Init git, `.gitignore` properly excluding node_modules / .next / .env*
 - 🟢 GitHub repo: https://github.com/cqdesignsny/easy-oee (private)
 - 🟢 Vercel project linked: `cq-marketings-projects/easy-oee`
-- 🟢 First production deploy: https://easy-fnqyp90da-cq-marketings-projects.vercel.app
+- 🟢 First production deploy: https://easy-oee.vercel.app
 
 ## Phase 1 — MVP
 

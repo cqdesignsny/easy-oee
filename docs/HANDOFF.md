@@ -61,7 +61,7 @@ Then open `docs/ROADMAP.md` and continue from the first 🟡/⚪ task. Or jump s
 | **Domain (live marketing)** | https://easy-oee.com (still serving Louis's static HTML) |
 | **GitHub** | https://github.com/cqdesignsny/easy-oee (private) |
 | **Vercel project** | `cq-marketings-projects/easy-oee` |
-| **Vercel prod URL** | https://easy-fnqyp90da-cq-marketings-projects.vercel.app |
+| **Vercel prod URL** | https://easy-oee.vercel.app |
 | **GitHub account** | cqdesignsny |
 | **Vercel account** | cqdesignsny |
 | **Founder** | Louis (CQ's cousin) |
