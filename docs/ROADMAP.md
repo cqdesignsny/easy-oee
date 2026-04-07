@@ -38,36 +38,27 @@ Legend: 🟢 done · 🟡 in progress · ⚪ queued · 🔵 blocked
 - 🟢 Drizzle schema in `src/lib/db/schema.ts` (company, user, line, shift, stop, device, demo_lead)
 - 🟢 Lazy Neon client in `src/lib/db/client.ts`
 - 🟢 Documented in `docs/SCHEMA.md`
-- ⚪ **Provision Neon Postgres via Vercel Marketplace** (NEXT STEP)
-- ⚪ `vercel env pull .env.local`
-- ⚪ Generate first migration with `pnpm db:generate`
-- ⚪ Push schema with `pnpm db:push`
-- ⚪ Write idempotent seed script `src/lib/db/seed.ts` (Maple Manufacturing + 2 lines + 1 manager + 1 operator + 3 historical shifts)
-- ⚪ `withTenant(companyId)` helper in `src/lib/db/scoped.ts`
+- 🟢 Provision Neon Postgres via Vercel Marketplace (`easy-oee-dev`)
+- 🟢 `vercel env pull .env.local` (DATABASE_URL + Postgres vars)
+- 🟢 Push schema with `pnpm db:push`
+- 🟢 Idempotent seed script `src/lib/db/seed.ts` (Maple Manufacturing + 2 lines + 1 manager + 1 operator + 3 historical shifts)
+- 🟢 `withTenant(companyId)` helper in `src/lib/db/scoped.ts`
 
 ### OEE math
 - 🟢 `src/lib/oee.ts` — `computeOEE()`, `formatPercent()`, `oeeBucket()`
 - 🟢 `src/lib/oee.test.ts` — 11/11 tests passing (happy path, zero planned/parts/rate, over-stop, perf cap, formatting, bucketing)
 
-### Operator flow (THE NEXT BIG THING)
-- ⚪ `/operator` — shift setup form
-  - Server action: `startShift()` → insert Shift, redirect to `/shift/[id]`
-- ⚪ `/shift/[id]` — live shift tracking
-  - 10 stop reason buttons (use `STOP_REASONS` from `src/lib/stop-reasons.ts`)
-  - Good/bad parts +1/+10 counters
-  - End Shift button
-  - `useOptimistic` for tap responsiveness
-  - Server actions: `logStop`, `closeStop`, `updateParts`, `endShift`
-  - `endShift()` MUST call `computeOEE()` and persist the four metrics
-- ⚪ `/shift/[id]/summary` — full OEE breakdown with color-coded factors
-- ⚪ Glove-friendly UI: 56px+ tap targets, big type, high contrast
+### Operator flow
+- 🟢 `/operator` — shift setup form, `startShift()` server action
+- 🟢 `/shift/[id]` — live tracking with 10 stop buttons, parts counters, useOptimistic
+- 🟢 `/shift/[id]/summary` — full OEE breakdown with color-coded factors
+- 🟢 Server actions: `logStop`, `closeStop`, `updateParts`, `endShift` (calls `computeOEE`)
+- 🟢 Glove-friendly UI: 96px stops, 56px+ tap targets, big type, high contrast
+- 🟢 `/pin` — operator PIN login (name picker + 4-digit keypad + bcrypt verify)
+- 🟢 Operator session cookie (HMAC-signed, 12h TTL, OPERATOR_SESSION_SECRET)
 
 ### Manager dashboard
-- ⚪ `/dashboard` — replace placeholder
-  - "Today's OEE" big number
-  - Live shifts panel (polled, `revalidate = 10`)
-  - Recent shifts table (last 10) with color-coded OEE
-  - Top stop reasons today (Pareto-style)
+- 🟢 `/dashboard` — Today's OEE big number, live shifts, recent 10 shifts, 7-day Pareto stops (revalidate=10)
 - ⚪ `/dashboard/lines` — manage lines
 - ⚪ `/dashboard/operators` — create operators + set PINs
 - ⚪ `/dashboard/shifts` — full history with filters
@@ -142,6 +133,7 @@ See `docs/HARDWARE-INTEGRATION.md`.
 
 ## Recent activity
 
-- **2026-04-07** — Repo relocated to portable SSD at `/Volumes/CQ-PRO-4TB/Easy OEE/easy-oee` so it can be worked on from any machine. HANDOFF + PROJECT docs updated with new canonical path. iMac (`cqmarketing`) confirmed bare — toolchain install pending.
+- **2026-04-07** — Phase 1 core flow shipped. Neon provisioned via Vercel Marketplace, schema pushed, seed loaded. Operator PIN auth + `/operator` shift setup + `/shift/[id]` live tracking (useOptimistic, 10 stop buttons, parts counters) + `/shift/[id]/summary` (color-coded OEE breakdown) + manager `/dashboard` (Today's OEE, live shifts, recent 10, 7-day Pareto stops) all built and deployed. 11/11 tests pass, lint clean, build clean. Demo creds: operator "Pierre Lavoie" / PIN 1234.
+- **2026-04-07** — Repo relocated to portable SSD at `/Volumes/CQ-PRO-4TB/Easy OEE/easy-oee` so it can be worked on from any machine. iMac (`cqmarketing`) toolchain installed (Homebrew, node, pnpm, gh, vercel-cli, postgres@16). SSO Deployment Protection disabled — easy-oee.vercel.app now public.
 - **2026-04-06** — Marketing site ported to new teal/cyan palette matching live easy-oee.com. First production deploy on Vercel (currently behind 401 deployment protection). GitHub repo + auto-deploy wired. Handoff doc written for laptop continuation.
 - **2026-04-06** — OEE math + 11 tests + Drizzle schema + initial scaffold.
