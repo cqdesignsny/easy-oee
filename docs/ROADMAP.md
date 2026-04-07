@@ -1,80 +1,146 @@
 # Roadmap
 
-Phased plan from "prototype to demo to prospects" → enterprise + hardware.
+> **Live build plan.** Update as work happens. Tasks at the top are happening now.
+
+Legend: 🟢 done · 🟡 in progress · ⚪ queued · 🔵 blocked
 
 ---
 
-## Phase 0 — Foundation (in progress)
+## Phase 0 — Environment & scaffolding
 
-- [x] Approve stack + repo location
-- [ ] Install macOS dev toolchain (Homebrew, node, pnpm, git, gh)
-- [ ] Scaffold Next.js 16 + TS + Tailwind + shadcn at `~/Code/easy-oee`
-- [ ] Initialize GitHub repo
-- [ ] Connect Vercel + provision Neon via Marketplace
-- [ ] Wire Clerk (dev instance)
-- [ ] Drizzle schema + first migration
-- [ ] `lib/oee.ts` with full unit tests
+- 🟢 Install dev toolchain (Homebrew, node, pnpm, git, gh, vercel-cli)
+- 🟢 Create `~/Code/easy-oee` (outside Dropbox)
+- 🟢 Scaffold Next.js 16 + TS + Tailwind v4 + Turbopack
+- 🟢 Install Drizzle, Zod, Clerk, bcryptjs, Vitest, dotenv, tsx
+- 🟢 Project docs (README, PROJECT, AGENTS/CLAUDE, ARCHITECTURE, SCHEMA, OEE_MATH, ROADMAP, HARDWARE-INTEGRATION, HANDOFF)
+- 🟢 Init git, `.gitignore` properly excluding node_modules / .next / .env*
+- 🟢 GitHub repo: https://github.com/cqdesignsny/easy-oee (private)
+- 🟢 Vercel project linked: `cq-marketings-projects/easy-oee`
+- 🟢 First production deploy: https://easy-fnqyp90da-cq-marketings-projects.vercel.app
 
-## Phase 1 — Prototype for prospect demos (THE GOAL)
+## Phase 1 — MVP
 
-What Louis can show on a Zoom call to a plant manager and have them say "yes, send me a trial."
+### Marketing
+- 🟢 Marketing site ported 1:1 from live easy-oee.com (teal palette)
+  - 🟢 `/` landing page (hero, stats, problem, solution, how, features, proof, pricing teaser, CTA)
+  - 🟢 `/pricing` (Starter / Professional / Enterprise) — basic version, may need teal restyle
+  - 🟢 `/contact` — demo request form with Server Action → `demo_lead` table + Zod validation
+  - 🟢 Bebas Neue / DM Sans / DM Mono via `next/font/google`
+  - 🟢 Fade-in scroll observer (single client component)
+- ⚪ `/how-it-works` page (linked from nav, doesn't exist yet)
+- ⚪ `/roi-calculator` page (linked from nav, doesn't exist yet)
+- ⚪ `/privacy` and `/terms` pages
+- ⚪ Vercel Analytics
+- ⚪ OG images
+- ⚪ Cutover `easy-oee.com` DNS to Vercel (DON'T do until app is ready — Louis's prospects use the static HTML)
 
-- [ ] Marketing site ported into App Router (`/`, `/pricing`, `/contact`)
-- [ ] Demo request form → writes to DB + email notification
-- [ ] Manager signup + company creation (Clerk webhook)
-- [ ] `/team` — manager creates operators + sets PINs
-- [ ] `/lines` — manager creates production lines
-- [ ] `/operator-login` — name picker + PIN
-- [ ] `/shift/new` — shift setup form
-- [ ] `/shift/[id]` — live tracking: machine status, 10 stop buttons, parts counter (+/- big buttons), end shift
-- [ ] `/shift/[id]/summary` — full OEE breakdown with real numbers
-- [ ] `/dashboard` — live shifts across all lines + last 7 days of OEE
-- [ ] Seeded demo company so Louis can log in to a populated account on a call
-- [ ] Deploy to `easy-oee.com` (apex) — marketing + app on one domain
-- [ ] Mobile responsive everything
+### Database
+- 🟢 Drizzle schema in `src/lib/db/schema.ts` (company, user, line, shift, stop, device, demo_lead)
+- 🟢 Lazy Neon client in `src/lib/db/client.ts`
+- 🟢 Documented in `docs/SCHEMA.md`
+- ⚪ **Provision Neon Postgres via Vercel Marketplace** (NEXT STEP)
+- ⚪ `vercel env pull .env.local`
+- ⚪ Generate first migration with `pnpm db:generate`
+- ⚪ Push schema with `pnpm db:push`
+- ⚪ Write idempotent seed script `src/lib/db/seed.ts` (Maple Manufacturing + 2 lines + 1 manager + 1 operator + 3 historical shifts)
+- ⚪ `withTenant(companyId)` helper in `src/lib/db/scoped.ts`
 
-## Phase 2 — MVP (first paying customers)
+### OEE math
+- 🟢 `src/lib/oee.ts` — `computeOEE()`, `formatPercent()`, `oeeBucket()`
+- 🟢 `src/lib/oee.test.ts` — 11/11 tests passing (happy path, zero planned/parts/rate, over-stop, perf cap, formatting, bucketing)
 
-- [ ] Stripe billing (Starter / Pro / Enterprise) with trial flow
-- [ ] `/shifts` history list with filters (line, date range, operator)
-- [ ] CSV export of shifts + stops
-- [ ] Email shift-summary to manager on shift end (Resend)
-- [ ] Downtime Pareto chart on dashboard
-- [ ] Shift-to-shift comparison (morning vs afternoon vs night)
-- [ ] Onboarding flow for new companies (create first line, first operator, sample shift)
-- [ ] Audit log of who-did-what
-- [ ] Production-grade error handling + Sentry
+### Operator flow (THE NEXT BIG THING)
+- ⚪ `/operator` — shift setup form
+  - Server action: `startShift()` → insert Shift, redirect to `/shift/[id]`
+- ⚪ `/shift/[id]` — live shift tracking
+  - 10 stop reason buttons (use `STOP_REASONS` from `src/lib/stop-reasons.ts`)
+  - Good/bad parts +1/+10 counters
+  - End Shift button
+  - `useOptimistic` for tap responsiveness
+  - Server actions: `logStop`, `closeStop`, `updateParts`, `endShift`
+  - `endShift()` MUST call `computeOEE()` and persist the four metrics
+- ⚪ `/shift/[id]/summary` — full OEE breakdown with color-coded factors
+- ⚪ Glove-friendly UI: 56px+ tap targets, big type, high contrast
 
-## Phase 3 — Growth
+### Manager dashboard
+- ⚪ `/dashboard` — replace placeholder
+  - "Today's OEE" big number
+  - Live shifts panel (polled, `revalidate = 10`)
+  - Recent shifts table (last 10) with color-coded OEE
+  - Top stop reasons today (Pareto-style)
+- ⚪ `/dashboard/lines` — manage lines
+- ⚪ `/dashboard/operators` — create operators + set PINs
+- ⚪ `/dashboard/shifts` — full history with filters
+- ⚪ Sidebar nav for manager routes
 
-- [ ] Multi-line comparison view
-- [ ] Weekly/monthly OEE trend charts
-- [ ] Custom stop reasons per company
-- [ ] Plant manager invitation flow (invite team)
-- [ ] PWA install + offline shift logging (sync on reconnect)
-- [ ] French (Quebec) translation
-- [ ] In-app notifications
-- [ ] Public marketing blog (`/blog`) for SEO
+### Auth
+- ⚪ Clerk for managers (`@clerk/nextjs` already installed)
+  - `<ClerkProvider>` in root layout
+  - `src/middleware.ts` scoped to `(app)` routes
+  - `(auth)/sign-in/[[...rest]]` + `(auth)/sign-up/[[...rest]]`
+  - Webhook `api/webhooks/clerk/route.ts`: on `user.created` → create Company, set `publicMetadata.companyId`
+- ⚪ Operator PIN flow
+  - `/pin` name-picker + 4-digit entry
+  - `src/lib/auth/operator-session.ts` — signed HTTP-only cookie
+  - `OPERATOR_SESSION_SECRET` env var
 
-## Phase 4 — Enterprise
+### Polish
+- ⚪ App shell layout with sidebar nav for managers
+- ⚪ Operator-mode layout (full-screen, no chrome)
+- ⚪ `loading.tsx`, `error.tsx`, on-brand 404
+- ⚪ Favicon + OG images
+- ⚪ Sentry error tracking
 
-- [ ] Multi-plant rollup dashboard
-- [ ] Role-based access (operator / supervisor / manager / admin)
-- [ ] SAML / SSO
-- [ ] REST API + API keys
-- [ ] Webhooks
-- [ ] White-label option
-- [ ] SLA + dedicated support tier
+## Phase 2 — Sell
 
-## Phase 5 — Hardware add-on
+- ⚪ Stripe billing (Starter / Professional / Enterprise)
+- ⚪ Trial countdown banner + plan limits enforcement
+- ⚪ Manager invitation flow (invite teammate by email)
+- ⚪ Email notifications (shift complete, daily summary) via Resend
+- ⚪ CSV export of shift data
+- ⚪ PWA manifest + install prompt for tablets
+- ⚪ PostHog product analytics
 
-- [ ] Hardware spec: target PLC protocols (Modbus TCP, OPC UA, digital IO)
-- [ ] Reference device (Raspberry Pi 4 + HAT) running a small ingest agent
-- [ ] `device` table + per-device API keys
-- [ ] `/api/ingest` route accepting signed payloads (count tick, stop start, stop end)
-- [ ] Pairing flow: manager scans QR on device, links it to a line
-- [ ] Mixed-mode shifts (operator manual + device counts) with conflict resolution
-- [ ] OTA firmware update channel
-- [ ] Physical product packaging + Canadian distribution
+## Phase 3 — Insights
 
-See [`HARDWARE.md`](./HARDWARE.md) for the design notes.
+- ⚪ Downtime Pareto chart over date ranges
+- ⚪ Shift-vs-shift comparison (morning / afternoon / night)
+- ⚪ Weekly + monthly OEE trend lines
+- ⚪ Per-line drill-down
+- ⚪ Custom stop reason categories per company
+
+## Phase 4 — Hardware ingest
+
+See `docs/HARDWARE-INTEGRATION.md`.
+
+- ⚪ `/api/ingest` POST endpoint with API-key auth
+- ⚪ `device` table CRUD in dashboard
+- ⚪ Pairing flow (manager generates an API key for a line)
+- ⚪ Reference firmware for Raspberry Pi gateway
+- ⚪ Auto-stop detection rules
+- ⚪ Mixed-mode shifts (manual + device)
+
+## Phase 5 — Enterprise
+
+- ⚪ Multi-plant dashboard
+- ⚪ RBAC (operator / supervisor / manager / admin)
+- ⚪ Audit log
+- ⚪ REST API + API key management
+- ⚪ Postgres Row-Level Security
+- ⚪ SOC2 prep
+- ⚪ French (Quebec) localization
+
+---
+
+## Open questions (also in `PROJECT.md`)
+
+- [ ] Final pricing model with Louis ($49/$129 vs $99/line)
+- [ ] Domain split (`app.easy-oee.com` vs `/app` prefix)
+- [ ] Stripe vs Lemon Squeezy (LS handles Canadian sales tax)
+- [ ] Hardware target (Pi vs ESP32 vs industrial gateway)
+- [ ] French localization timing
+
+## Recent activity
+
+- **2026-04-06** — Marketing site ported to new teal/cyan palette matching live easy-oee.com. First production deploy on Vercel. GitHub repo + auto-deploy wired. Handoff doc written for laptop continuation.
+- **2026-04-06** — OEE math + 11 tests + Drizzle schema + initial scaffold.

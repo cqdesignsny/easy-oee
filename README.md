@@ -2,8 +2,12 @@
 
 > Real-time OEE tracking for Canadian plant managers — no hardware, no IT department, up and running in one shift.
 
-**Domain:** [easy-oee.com](https://easy-oee.com)
+**Domain:** [easy-oee.com](https://easy-oee.com) (currently serving the static marketing HTML)
+**Vercel preview:** https://easy-fnqyp90da-cq-marketings-projects.vercel.app
+**GitHub:** https://github.com/cqdesignsny/easy-oee
 **Status:** In active development — rebuilding from a Bubble prototype to a production Next.js app.
+
+> **Picking this up on a new machine?** Start with [`docs/HANDOFF.md`](./docs/HANDOFF.md) — full continuation guide.
 
 ---
 

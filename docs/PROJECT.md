@@ -5,6 +5,19 @@
 **Last updated:** 2026-04-06
 **Version:** 2.0 (Next.js rebuild)
 
+> **Switching machines mid-build? Read [`HANDOFF.md`](./HANDOFF.md) first.**
+
+## Current state
+
+- ✅ GitHub repo: https://github.com/cqdesignsny/easy-oee
+- ✅ Vercel project: `cq-marketings-projects/easy-oee` (auto-deploy on push)
+- ✅ Production URL: https://easy-fnqyp90da-cq-marketings-projects.vercel.app
+- ✅ Marketing site live (1:1 port of easy-oee.com with new teal palette)
+- ✅ Drizzle schema + 11/11 OEE math tests
+- ⏳ Neon Postgres not yet provisioned (next step)
+- ⏳ Operator flow + manager dashboard not yet built
+- ⏳ Clerk auth not yet wired
+
 ---
 
 ## 1. Product
