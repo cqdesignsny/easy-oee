@@ -157,14 +157,22 @@ Every non-`companies` table has `company_id` and is queried via `withTenant()`.
 
 ## Migration history
 
-Migrations are timestamped and live in `src/db/migrations/`. Generate with:
+Migrations live in `drizzle/` and are applied automatically on every Vercel
+build via `scripts/migrate.mjs` (wired up as `prebuild` in `package.json`).
+The runner tracks applied migrations in a `_eo_migrations` table.
 
 ```bash
 pnpm db:generate     # creates a new migration file from schema diff
-pnpm db:migrate      # applies pending migrations
+pnpm db:migrate      # applies pending migrations locally (runs scripts/migrate.mjs)
+pnpm build           # implicitly runs migrations as `prebuild`
 ```
 
 **Never edit a migration after it's been applied.** Always generate a new one.
+
+The current baseline is `drizzle/0000_baseline_tier_columns.sql` — uses
+`IF NOT EXISTS` so it's safe against databases that already received the
+columns via the manual `scripts/apply-tier-migrations.mjs` runner that
+preceded the auto-migration system.
 
 ---
 

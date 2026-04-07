@@ -1,6 +1,23 @@
 # HANDOFF — Pick this up on a different machine
 
-> **You are switching machines mid-build.** Read this top-to-bottom before doing anything else. Everything you need to continue is in this repo. Last updated: 2026-04-07 (auto-sync + sudo-free toolchain + branded favicon/OG).
+> **You are switching machines mid-build.** Read this top-to-bottom before doing anything else. Everything you need to continue is in this repo. Last updated: 2026-04-07 (Tier 1-4 product upgrades + auto-migration runner).
+
+## State of the world right now
+
+- ✅ App is **deployed and working** at https://easy-oee.vercel.app
+- ✅ Schema is **in sync with Neon** (auto-applied via `prebuild` migration runner)
+- ✅ All Tier 1-4 product upgrades are **live in production**: live shift timers, live OEE estimate, downtime card, long-stop notes, hand-off, dashboard shift comparison, loss tree on summary, calendar grid, edit-shift workflow, TV Board mode, daily digest cron, weekly anomaly scan cron, PWA manifest
+- ✅ `pnpm test` 13/13 · `pnpm typecheck` clean · `pnpm lint` clean · `pnpm build` clean
+- 🟡 Stripe still on stub (501) — next biggest swing
+- 🟡 Resend still on stub — next biggest swing after Stripe
+- 🟡 Clerk still on stub (admin password gate) — needed before real customer pilots
+- 🟡 Loading/error/404 states + Sentry still pending
+
+**To test the live app:**
+1. Visit https://easy-oee.vercel.app/sign-in
+2. Email: anything · Password: `EasyOEE2026Admin`
+3. Land on `/dashboard`
+4. To try the operator side: visit `/pin`, pick "Pierre Lavoie", PIN `1234`
 
 ---
 
@@ -386,6 +403,26 @@ After the initial Phase 1 core flow, the following was added in the same day:
 - Hero eyebrow: "Built for Canadian manufacturers" → "Built for smart manufacturers" (US launch incoming).
 - Footer: maple leaf emoji removed, "Made in Canada" line removed, body text bumped to 17px white, links 16px.
 - Generic emojis ★ ✓ 🍁 replaced with inline SVGs.
+
+## Database migrations are now automatic
+
+Anytime you change `src/lib/db/schema.ts`:
+
+```bash
+pnpm db:generate              # writes drizzle/000N_*.sql
+git add drizzle/ && git commit -m "..."
+git push                      # auto-sync handles this
+```
+
+On the next Vercel build, the `prebuild` script (`scripts/migrate.mjs`) walks
+`drizzle/*.sql` in order, applies anything not yet recorded in `_eo_migrations`,
+**then** runs `next build`. Atomic. Safe. The dashboard 500-on-deploy that
+happened earlier today will not happen again.
+
+To apply migrations manually (e.g. on a fresh dev branch):
+```bash
+pnpm db:migrate    # = node --env-file=.env.local scripts/migrate.mjs
+```
 
 ## 2026-04-07 — Tier 1-4 product upgrades (live shift, dashboard, board mode, polish)
 
