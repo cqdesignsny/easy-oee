@@ -1,6 +1,6 @@
 # HANDOFF — Pick this up on a different machine
 
-> **You are switching machines mid-build.** Read this top-to-bottom before doing anything else. Everything you need to continue is in this repo. Last updated: 2026-04-07 (i18n + Stripe scaffold + animated gauge).
+> **You are switching machines mid-build.** Read this top-to-bottom before doing anything else. Everything you need to continue is in this repo. Last updated: 2026-04-07 (auto-sync + sudo-free toolchain + branded favicon/OG).
 
 ---
 
@@ -24,32 +24,70 @@ The project now lives on the **CQ-PRO-4TB external SSD** so it's portable across
 
 ## TL;DR — what to do on a new machine
 
+**Auto-sync is live.** Every commit auto-pushes; every 3 minutes the SSD pulls
+from origin. You don't need `git pull`/`git push` manually — just work.
+
 ```bash
-# 1. Make sure you have the toolchain (skip any you already have)
-brew install node pnpm git gh vercel-cli postgresql@16
-
-# 2. Authenticate
-gh auth login          # GitHub  → cqdesignsny account
-vercel login           # Vercel → cqdesignsny account
-
-# 3. Go to the repo on the SSD (it's already cloned there)
+# 1. Plug in CQ-PRO-4TB SSD, cd into the repo
 cd "/Volumes/CQ-PRO-4TB/Easy OEE/easy-oee"
-git pull               # sync any changes from other machines
 
-# 4. Install deps
+# 2. Install the auto-sync hook + launchd agent (one-shot)
+./scripts/install-sync.sh
+
+# 3. Install the Node toolchain — sudo-free, into ~/.local
+#    (No Homebrew, no admin rights, no touching system paths.)
+mkdir -p ~/.local && cd ~/.local
+curl -fsSL https://nodejs.org/dist/v22.20.0/node-v22.20.0-darwin-arm64.tar.xz -o n.tar.xz
+tar -xf n.tar.xz && rm n.tar.xz && mv node-v22.20.0-darwin-arm64 node
+cat >> ~/.zshrc <<'EOF'
+
+# Easy OEE toolchain (user-local, no sudo)
+export PATH="$HOME/.local/node/bin:$PATH"
+export npm_config_cache="$HOME/.local/npm-cache"
+EOF
+source ~/.zshrc
+mkdir -p ~/.local/npm-cache
+
+# 4. Install pnpm + vercel globally via the bundled npm
+#    (Use the direct npm-cli.js path to bypass the corepack shim.)
+node ~/.local/node/lib/node_modules/npm/bin/npm-cli.js install -g pnpm@10 vercel
+
+# 5. Back to the repo, install project deps, run verification
+cd "/Volumes/CQ-PRO-4TB/Easy OEE/easy-oee"
 pnpm install
+pnpm test       # → 11/11 OEE math tests
+pnpm typecheck  # → clean
+pnpm lint       # → clean
+pnpm build      # → full production build clean
 
-# 5. (Optional, if you want the contact form to actually save) — pull env vars from Vercel
+# 6. (Optional) pull env vars from Vercel for local dev against Neon
 vercel link --yes --project easy-oee
 vercel env pull .env.local
 
-# 6. Run it
-pnpm dev    # → http://localhost:3000
-pnpm test   # → 11 OEE math tests should pass
-pnpm build  # → production build should pass clean
+# 7. Run it
+pnpm dev        # → http://localhost:3000
 ```
 
 Then open `docs/ROADMAP.md` and continue from the first 🟡/⚪ task. Or jump straight to the **"Resume here"** section at the bottom of this file.
+
+### Why the toolchain dance?
+
+Homebrew wants sudo. This project ships on a **bare user account without admin
+rights**, so we install Node directly from the nodejs.org tarball into `~/.local`.
+Three gotchas that will waste your time if you don't know about them:
+
+1. **Node version matters:** you need **22.20+** (or any ≥ 22.12). Node 22.11
+   doesn't allow `require(esm)`, which makes `pnpm test` crash inside vitest's
+   `std-env` import. 22.20 is the known-good version.
+2. **`~/.npm` is probably broken** (owned by uid 501:20 from a previous admin
+   install). Don't `sudo chown` it — just set `npm_config_cache=~/.local/npm-cache`
+   in your shell profile, which we do above.
+3. **Corepack shim breaks the pnpm install.** Node's bundled `npm` is a corepack
+   shim that tries to fetch a newer pnpm version and fails on signature
+   verification. Bypass it by calling `node ~/.local/node/lib/node_modules/npm/bin/npm-cli.js`
+   directly (as shown in step 4).
+
+Once the toolchain is up, everything in `package.json` Just Works.
 
 ---
 
@@ -79,6 +117,29 @@ Then open `docs/ROADMAP.md` and continue from the first 🟡/⚪ task. Or jump s
 Read `AGENTS.md` (= `CLAUDE.md`) for coding conventions before changing code. Read `PROJECT.md` for the full product context.
 
 ---
+
+## Cross-machine sync
+
+The SSD working copy is kept continuously in sync with `origin/main`:
+
+- **Post-commit hook** (`.git/hooks/post-commit`) — every `git commit` triggers
+  `scripts/auto-sync.sh` in the background, which pushes immediately.
+- **launchd agent** (`~/Library/LaunchAgents/com.cqdesigns.easyoee.autosync.plist`)
+  — runs `scripts/auto-sync.sh` every 3 minutes and once at login.
+- **`scripts/auto-sync.sh`** (in repo, travels with the SSD):
+  PID-locked single-instance, auto-commits stray local changes as
+  `auto-sync: working changes from <hostname>`, runs
+  `git pull --rebase --autostash`, pushes if ahead, logs to `.git/auto-sync.log`,
+  pops a macOS notification on failure.
+- **`scripts/install-sync.sh`** — one-command setup for a new Mac. Installs the
+  hook, copies + loads the launchd plist, sets `git config --global
+  credential.helper osxkeychain`, runs an initial sync.
+
+Just plug the SSD into either Mac, run `./scripts/install-sync.sh` once, and
+forget about `git pull`/`git push` forever. Both machines stay in sync within 3
+minutes of any change.
+
+If something goes sideways: `tail -f "/Volumes/CQ-PRO-4TB/Easy OEE/easy-oee/.git/auto-sync.log"`.
 
 ## What's done ✅
 
@@ -326,6 +387,30 @@ After the initial Phase 1 core flow, the following was added in the same day:
 - Footer: maple leaf emoji removed, "Made in Canada" line removed, body text bumped to 17px white, links 16px.
 - Generic emojis ★ ✓ 🍁 replaced with inline SVGs.
 
+## Late additions (2026-04-07 evening)
+
+- **Cross-machine auto-sync** — see "Cross-machine sync" section above. Hook +
+  launchd agent + `install-sync.sh`. Lives in `scripts/`.
+- **Sudo-free toolchain** — Node 22.20 / pnpm 10 / Vercel CLI installed into
+  `~/.local` on the bare iMac without Homebrew or admin rights. PATH persisted
+  in `~/.zshrc`. See the "Why the toolchain dance?" callout in the TL;DR for
+  the three gotchas (Node ≥ 22.12 required, broken `~/.npm` perms, corepack
+  shim conflict).
+- **Branded favicon + OG image** — `src/app/icon.tsx`, `apple-icon.tsx`,
+  `opengraph-image.tsx` use `next/og` `ImageResponse` to generate PNGs at build
+  time: the `easy-oee-logo.svg` centered on the `#003038` teal background.
+  Sizes: 512×512 (favicon), 180×180 (Apple touch icon), 1200×630 (Open Graph
+  for Slack/iMessage/Twitter/LinkedIn previews). The old default
+  `src/app/favicon.ico` was deleted so the new icon convention wins everywhere.
+- **Shift summary header buttons** — "Start New Shift" + "Dashboard" buttons
+  moved from the bottom of `/shift/[id]/summary` to a flex row next to the
+  page title for one-tap post-shift navigation. Wraps cleanly on phones; hidden
+  in print output.
+- **Vitest fix** — `@rolldown/binding-darwin-arm64` added as an explicit
+  devDependency because pnpm 10 was filtering it out of rolldown's optional
+  deps on Apple Silicon, breaking `pnpm test` startup. Lockfile now ships the
+  binding so any arm64 Mac is good immediately.
+
 ## Late additions in the same session (post mega-batch)
 
 - **Operator/live-shift/summary centering** — those three screens were full-width left-aligned (the `.op-shell` class doesn't constrain width). Now wrapped at `maxWidth: 880px` with auto margins so they sit centered on big monitors.
@@ -347,20 +432,20 @@ After the initial Phase 1 core flow, the following was added in the same day:
 
 ## Resume here 👇 (the literal next thing to do — as of 2026-04-07)
 
-**Current machine state:** the iMac (`cqmarketing`) is a **bare machine** — no Homebrew, no node, no pnpm, no gh, no vercel CLI installed yet. Only `git` is present. The repo is cloned to `/Volumes/CQ-PRO-4TB/Easy OEE/easy-oee` but no deps have been installed.
+**Current machine state (iMac `cqmarketing`):** Toolchain is now **fully
+installed and verified** — Node 22.20 + pnpm 10 + Vercel CLI in `~/.local`,
+auto-sync hook + launchd agent active, project deps installed, all
+verification commands green (`pnpm test` 11/11, `pnpm typecheck` clean,
+`pnpm lint` clean, `pnpm build` clean). Just plug in the SSD and start
+working.
 
-**Unblock sequence:**
+**On a fresh Mac that doesn't have any of this yet:** follow the TL;DR at the
+top of this file (auto-sync setup → Node tarball → pnpm via direct npm-cli →
+`pnpm install` → verify). It's a copy-paste sequence, no admin rights needed.
 
-1. Plug in the CQ-PRO-4TB SSD
-2. `cd "/Volumes/CQ-PRO-4TB/Easy OEE/easy-oee"` and `git pull`
-3. Install Homebrew if missing: `/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"`
-4. `brew install node pnpm gh vercel-cli postgresql@16`
-5. `gh auth login` (cqdesignsny) and `vercel login` (cqdesignsny)
-6. `pnpm install`
-7. `pnpm test` → expect 11/11 OEE tests passing
-8. `pnpm build` → expect clean
-9. `vercel link --yes --project easy-oee` → `vercel env pull .env.local`
-10. **Then:** Provision Neon Postgres via Vercel Marketplace (see "Open work" Step 1 above), `pnpm db:push`, write `src/lib/db/seed.ts`, then start the operator flow.
+**Then:** Provision Neon Postgres via Vercel Marketplace (see "Open work" Step
+1 below), `pnpm db:push`, write `src/lib/db/seed.ts`, then start the operator
+flow.
 
 **Known issues to investigate after auth:**
 - Vercel preview URL `https://easy-fnqyp90da-cq-marketings-projects.vercel.app` returns **HTTP 401** — likely Vercel deployment protection / SSO. Disable in project Settings → Deployment Protection if you want public preview.
