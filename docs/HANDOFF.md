@@ -1,6 +1,6 @@
 # HANDOFF — Pick this up on a different machine
 
-> **You are switching machines mid-build.** Read this top-to-bottom before doing anything else. Everything you need to continue is in this repo. Last updated: 2026-04-07.
+> **You are switching machines mid-build.** Read this top-to-bottom before doing anything else. Everything you need to continue is in this repo. Last updated: 2026-04-07 (i18n + Stripe scaffold + animated gauge).
 
 ---
 
@@ -285,6 +285,55 @@ vercel logs           # tail production logs
 ```
 
 ---
+
+## What got shipped today (2026-04-07 mega-batch)
+
+After the initial Phase 1 core flow, the following was added in the same day:
+
+**i18n (EN / ES / FR)**
+- Full translation system: dictionaries (~200 keys × 3 languages), `LanguageProvider` (`useSyncExternalStore`-based, SSR-safe), server-side `getServerT()` helper that reads the `eo-locale` cookie, language switcher dropdown.
+- Switching language calls `router.refresh()` so server components re-render with the new cookie.
+- Wired into: nav, footer, homepage (all sections), how-it-works, roi-calculator, pricing, contact, privacy, terms, sign-in, pin, operator, live shift, summary, dashboard, manager nav.
+- Switcher always visible in nav (desktop AND mobile next to hamburger), dashboard sidebar, sign-in page.
+
+**Branding**
+- `public/easy-oee-logo.svg` wired across nav (56px), footer (72px), dashboard sidebar (42px), sign-in (56px), pin (56px), operator pages (42–48px).
+- Favicon points to the same SVG.
+- Animated hero gauge (`src/components/marketing/HeroGauge.tsx`) — pure SVG with CSS keyframe needle revving from 0 to max, bouncing twice, then resetting. Sized 600px (default) → 660px (1280+) → 720px (1440+) → 800px (1800+) on desktop, stacks above text on mobile (380px / 280px on small phones). Respects `prefers-reduced-motion`.
+- All buttons rounded to full pill (999px), card-style operator/parts/pin keys at 22px.
+
+**Mobile**
+- Hamburger menu in `SiteNav` with full-screen overlay, body scroll lock, closes on route change.
+- Tables wrapped in `.card { overflow-x: auto }` so they scroll horizontally.
+- Body baseline 17px, drops to 16px on mobile per ui-ux-pro-max.
+- Sub-hero h1 clamps further on phones.
+
+**Auth (temporary, until Clerk lands)**
+- `/sign-in` admin login: email + password (any email, password from `ADMIN_PASSWORD` env var), Google/Microsoft SSO buttons present as disabled placeholders. HMAC cookie session, 14-day TTL.
+- Demo password: `EasyOEE2026Admin` (in Vercel env vars across all 3 environments).
+
+**Stripe scaffold**
+- `src/lib/pricing.ts` — single source of truth: USD prices, USD→CAD conversion (1.37), per-plan stripePriceId slot, monthlyCostUSD function.
+- `/pricing` rebuilt: line-count slider, 3 tiers, USD primary with CAD reference shown as `≈ $X CAD/mo`, "Start Free Trial" buttons link to `/sign-up?plan=pro&lines=3`.
+- `/sign-up` page (client component) with plan toggle, line slider, company name, work email, "START FREE TRIAL" button. Currently shows a "you're on the list" success state instead of redirecting to Stripe.
+- `/api/checkout/session` and `/api/webhooks/stripe` route stubs returning 501. Documented exactly what to wire when Stripe is added.
+- Schema additions: `company.stripe_subscription_id`, `stripe_price_id`, `licensed_lines`, `subscription_status`. Already pushed to Neon.
+
+**Copy cleanup**
+- All em/en dashes removed from user-facing strings.
+- "No hardware" mentions removed across all 3 locales (hardware is now a future paid upsell — see new "Works on Any Device" feature card teasing it).
+- Hero eyebrow: "Built for Canadian manufacturers" → "Built for smart manufacturers" (US launch incoming).
+- Footer: maple leaf emoji removed, "Made in Canada" line removed, body text bumped to 17px white, links 16px.
+- Generic emojis ★ ✓ 🍁 replaced with inline SVGs.
+
+## What's left for the immediate next session
+
+1. **Wire actual Stripe** — create products + prices in your Stripe dashboard, paste the price IDs into `src/lib/pricing.ts`, add `STRIPE_SECRET_KEY` + `STRIPE_WEBHOOK_SECRET` + `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` to Vercel env, replace the 501 stubs in `/api/checkout/session/route.ts` and `/api/webhooks/stripe/route.ts` with real Stripe Checkout Session creation and webhook handling. Schema is already in place.
+2. **Wire actual Clerk** for managers — create Clerk app, paste keys, replace `/sign-in` admin password with Clerk sign-in. Replace `getManagerCompanyId()` (currently the seeded-tenant stub) with a Clerk session lookup. The `(auth)/sign-in` pattern is already set up in the URL.
+3. **Loading and error states** — `loading.tsx`, `error.tsx`, on-brand 404 page.
+4. **Sentry** for error tracking.
+5. **Resend** for transactional emails (welcome, shift summary, password reset when Clerk lands).
+6. **Domain cutover** — point `easy-oee.com` from GitHub Pages to Vercel once you're confident the new app is the better landing.
 
 ## Resume here 👇 (the literal next thing to do — as of 2026-04-07)
 

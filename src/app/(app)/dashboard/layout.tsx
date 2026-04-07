@@ -5,10 +5,12 @@ import { getAdminSession } from "@/lib/auth/admin-session";
 import { signOutAdmin } from "@/server/actions/admin-auth";
 import { Logo } from "@/components/Logo";
 import { LanguageSwitcher } from "@/components/i18n/LanguageSwitcher";
+import { getServerT } from "@/components/i18n/server";
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
   const session = await getAdminSession();
   if (!session) redirect("/sign-in");
+  const t = await getServerT();
 
   return (
     <div className="mgr-shell">
@@ -28,14 +30,14 @@ export default async function DashboardLayout({ children }: { children: React.Re
               border: "1px solid var(--border2)",
               color: "var(--muted2)",
               padding: "10px 14px",
-              borderRadius: 6,
+              borderRadius: 999,
               cursor: "pointer",
               width: "100%",
               fontSize: 14,
               fontFamily: "inherit",
             }}
           >
-            Sign out
+            {t("mgr.nav.signOut")}
           </button>
         </form>
       </aside>

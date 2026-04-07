@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { getServerT } from "@/components/i18n/server";
 
 export const metadata = {
   title: "How Easy OEE Works | Real-Time OEE in 3 Steps",
@@ -6,245 +7,175 @@ export const metadata = {
     "From operator login to live OEE dashboard in under 60 seconds. See exactly how Easy OEE works on the shop floor.",
 };
 
-const STOPS: [string, string, string][] = [
-  ["01", "Mechanical Failure", "Unplanned equipment breakdown or malfunction"],
-  ["02", "Changeover", "Product or tooling change between runs"],
-  ["03", "No Material", "Waiting for raw materials or components to arrive"],
-  ["04", "Quality Check", "Inspection, measurement, or quality hold requiring stoppage"],
-  ["05", "Scheduled Break", "Meal breaks, shift meetings, planned pauses"],
-  ["06", "No Operator", "Waiting for an available qualified operator"],
-  ["07", "Maintenance", "Planned preventive maintenance activities"],
-  ["08", "Training", "Operator training activities during production hours"],
-  ["09", "No Production Scheduled", "Planned idle time. Line is not scheduled to run."],
-  ["10", "Other", "Anything not captured by the above categories"],
-];
+const STOP_NUMS = ["01", "02", "03", "04", "05", "06", "07", "08", "09", "10"] as const;
 
-const FAQS = [
-  {
-    q: "Do operators need smartphones?",
-    a: "No. Easy OEE runs in any browser. Smartphones, tablets, shared floor terminals, or a PC. Most plants put a cheap wall-mounted tablet at the operator station and call it a day.",
-  },
-  {
-    q: "What if an operator forgets to log a stop?",
-    a: "Stops can be added or adjusted within the active shift. The plant manager can also review and edit shift data from the management view before the shift record is finalized.",
-  },
-  {
-    q: "How long does operator training take?",
-    a: "Most operators understand the interface within 5 minutes without any formal training. The workflow is: start shift, tap when machine stops, tap when it restarts, end shift. That's it.",
-  },
-  {
-    q: "What if we have multiple shifts on the same line?",
-    a: "Each shift is a separate record. Morning, Afternoon, and Night shifts on the same line are tracked independently and can be compared side by side in the management dashboard.",
-  },
-  {
-    q: "What happens if the internet goes down on the floor?",
-    a: "Easy OEE requires an internet connection to save data in real time. Most plants use a reliable WiFi network or mobile hotspot at the operator station. Offline mode is on the product roadmap.",
-  },
-];
+export default async function HowItWorksPage() {
+  const t = await getServerT();
 
-export default function HowItWorksPage() {
+  const stops = STOP_NUMS.map((n) => ({
+    n,
+    label: t(`stop.${n}.label`),
+    desc: t(`stop.${n}.desc`),
+  }));
+
+  const faqs = [
+    { q: t("how.faq.q1"), a: t("how.faq.a1") },
+    { q: t("how.faq.q2"), a: t("how.faq.a2") },
+    { q: t("how.faq.q3"), a: t("how.faq.a3") },
+    { q: t("how.faq.q4"), a: t("how.faq.a4") },
+    { q: t("how.faq.q5"), a: t("how.faq.a5") },
+  ];
+
   return (
     <>
-      {/* HERO */}
       <section className="sub-hero">
         <div className="hero-glow" />
         <div className="hero-grid" />
         <div className="sub-hero-inner fi">
           <div className="tag" style={{ justifyContent: "center", display: "inline-flex" }}>
-            How it works
+            {t("how.eyebrow")}
           </div>
           <h1>
-            FROM ZERO TO LIVE OEE
+            {t("how.h1.line1")}
             <br />
-            <em>IN ONE SHIFT.</em>
+            <em>{t("how.h1.line2")}</em>
           </h1>
-          <p className="sub-lead">
-            Here&apos;s exactly what happens when an operator picks up their phone and starts a
-            shift in Easy OEE, and what you see as plant manager while it runs.
-          </p>
+          <p className="sub-lead">{t("how.sub")}</p>
         </div>
       </section>
 
-      {/* THREE STEPS */}
       <section className="how-sec">
         <div className="center-block">
-          <div className="tag">3 Steps</div>
-          <h2>START. RUN. END.</h2>
-          <p className="how-intro" style={{ marginInline: "auto" }}>
-            One workflow, three moments. Every Easy OEE shift looks like this.
-          </p>
+          <div className="tag">{t("how.steps.tag")}</div>
+          <h2>{t("how.steps.title")}</h2>
+          <p className="how-intro" style={{ marginInline: "auto" }}>{t("how.steps.intro")}</p>
         </div>
 
         <div className="steps">
           <div className="step fi">
             <div className="step-bnum">01</div>
-            <h3>SHIFT START</h3>
-            <p>
-              The operator opens Easy OEE on any device. Phone, tablet, or a shared floor
-              terminal. No app download. No training manual.
-            </p>
-            <p>
-              They sign in, select their production line, choose their shift, enter the product
-              being run, and set planned minutes and ideal rate.
-            </p>
-            <p style={{ color: "var(--accent)", fontWeight: 500 }}>
-              Total time: under 60 seconds.
-            </p>
+            <h3>{t("how.s1.title")}</h3>
+            <p>{t("how.s1.p1")}</p>
+            <p>{t("how.s1.p2")}</p>
+            <p style={{ color: "var(--accent)", fontWeight: 500 }}>{t("how.s1.p3")}</p>
           </div>
 
           <div className="step fi d1">
             <div className="step-bnum">02</div>
-            <h3>DURING THE SHIFT</h3>
-            <p>
-              When the machine stops, the operator taps the reason. That&apos;s the entire
-              workflow. One tap.
-            </p>
-            <p>
-              The button turns red. The timer starts. When the machine restarts, the operator
-              taps again. The stop closes and the duration is calculated automatically.
-            </p>
-            <p>No paper. No radio calls to the office. No end-of-day reconstruction.</p>
+            <h3>{t("how.s2.title")}</h3>
+            <p>{t("how.s2.p1")}</p>
+            <p>{t("how.s2.p2")}</p>
+            <p>{t("how.s2.p3")}</p>
           </div>
 
           <div className="step fi d2">
             <div className="step-bnum">03</div>
-            <h3>END OF SHIFT</h3>
-            <p>
-              The operator records good and bad parts produced. Easy OEE does the rest.
-            </p>
-            <p>
-              Availability, Performance, and Quality are calculated instantly. The OEE score
-              appears. The full shift summary is generated. Every stop, every reason, every
-              minute of lost production.
-            </p>
-            <p style={{ color: "var(--accent)", fontWeight: 500 }}>
-              Zero manual calculation.
-            </p>
+            <h3>{t("how.s3.title")}</h3>
+            <p>{t("how.s3.p1")}</p>
+            <p>{t("how.s3.p2")}</p>
+            <p style={{ color: "var(--accent)", fontWeight: 500 }}>{t("how.s3.p3")}</p>
           </div>
         </div>
       </section>
 
-      {/* 10 STOP REASONS */}
       <section className="feat-sec">
         <div className="center-block">
-          <div className="tag">Standardized</div>
-          <h2>10 STOP REASONS.</h2>
-          <p className="how-intro" style={{ marginInline: "auto" }}>
-            Every reason is the same across every line and every operator. When you compare
-            shifts or lines, you&apos;re comparing apples to apples.
-          </p>
+          <div className="tag">{t("how.stops.tag")}</div>
+          <h2>{t("how.stops.title")}</h2>
+          <p className="how-intro" style={{ marginInline: "auto" }}>{t("how.stops.intro")}</p>
         </div>
 
         <div className="stop-list">
-          {STOPS.map(([num, label, desc]) => (
-            <div key={num} className="stop-list-row">
-              <span className="stop-num">{num}</span>
-              <span className="stop-label">{label}</span>
-              <span className="stop-desc">{desc}</span>
+          {stops.map((s) => (
+            <div key={s.n} className="stop-list-row">
+              <span className="stop-num">{s.n}</span>
+              <span className="stop-label">{s.label}</span>
+              <span className="stop-desc">{s.desc}</span>
             </div>
           ))}
         </div>
       </section>
 
-      {/* OEE MATH */}
       <section className="how-sec">
         <div className="center-block">
-          <div className="tag">The math</div>
-          <h2>HOW OEE IS CALCULATED.</h2>
-          <p className="how-intro" style={{ marginInline: "auto" }}>
-            Easy OEE computes all three components automatically. Here&apos;s what&apos;s
-            happening under the hood.
-          </p>
+          <div className="tag">{t("how.math.tag")}</div>
+          <h2>{t("how.math.title")}</h2>
+          <p className="how-intro" style={{ marginInline: "auto" }}>{t("how.math.intro")}</p>
         </div>
 
         <div className="steps">
           <div className="step">
             <div className="step-bnum">A</div>
-            <h3>AVAILABILITY</h3>
+            <h3>{t("how.math.a.title")}</h3>
             <p style={{ color: "var(--accent)", fontFamily: "var(--font-dm-mono)", fontSize: 14 }}>
-              (Planned − Stop) / Planned
+              {t("how.math.a.formula")}
             </p>
-            <p>
-              Was the machine running when it was supposed to? Measures unplanned downtime as a
-              percentage of scheduled production time.
-            </p>
+            <p>{t("how.math.a.body")}</p>
           </div>
           <div className="step">
             <div className="step-bnum">P</div>
-            <h3>PERFORMANCE</h3>
+            <h3>{t("how.math.p.title")}</h3>
             <p style={{ color: "var(--accent)", fontFamily: "var(--font-dm-mono)", fontSize: 14 }}>
-              Parts / (Ideal Rate × Run Time)
+              {t("how.math.p.formula")}
             </p>
-            <p>
-              Was the machine running at its ideal speed? Captures small stops, speed losses,
-              and micro-stoppages that don&apos;t get recorded as full stops.
-            </p>
+            <p>{t("how.math.p.body")}</p>
           </div>
           <div className="step">
             <div className="step-bnum">Q</div>
-            <h3>QUALITY</h3>
+            <h3>{t("how.math.q.title")}</h3>
             <p style={{ color: "var(--accent)", fontFamily: "var(--font-dm-mono)", fontSize: 14 }}>
-              Good / (Good + Bad)
+              {t("how.math.q.formula")}
             </p>
-            <p>
-              Were the parts made right the first time? Measures the percentage of production
-              output that meets quality standards without rework.
-            </p>
+            <p>{t("how.math.q.body")}</p>
           </div>
         </div>
 
         <div className="formula-final">
           <div className="tag" style={{ justifyContent: "center", display: "inline-flex" }}>
-            Final formula
+            {t("how.math.final.tag")}
           </div>
-          <h2>OEE = A × P × Q</h2>
-          <p>
-            World class: 85%+ &nbsp;·&nbsp; Typical: 60 to 75% &nbsp;·&nbsp; Low: below 60%
-          </p>
+          <h2>{t("how.math.final.title")}</h2>
+          <p>{t("how.math.final.scale")}</p>
         </div>
       </section>
 
-      {/* GETTING STARTED */}
       <section className="feat-sec">
         <div className="center-block">
-          <div className="tag">Getting started</div>
-          <h2>FOUR STEPS.</h2>
-          <p className="how-intro" style={{ marginInline: "auto" }}>
-            No IT department. No setup project. No training sessions.
-          </p>
+          <div className="tag">{t("how.start.tag")}</div>
+          <h2>{t("how.start.title")}</h2>
+          <p className="how-intro" style={{ marginInline: "auto" }}>{t("how.start.intro")}</p>
         </div>
 
         <div className="steps" style={{ gridTemplateColumns: "repeat(4, 1fr)" }}>
           {[
-            ["1", "Create your account", "Sign up at app.easy-oee.com. Enter your company name. Takes 2 minutes. No credit card needed for the trial."],
-            ["2", "Add your lines", "Enter each production line and its ideal parts-per-minute rate. Machine 1, Line A, Press 3, whatever you call them on the floor."],
-            ["3", "Invite operators", "Add operators by email. They get a login link. No training required. The interface explains itself the first time they use it."],
-            ["4", "Start your first shift", "Your first real OEE data will be on your screen before the shift ends. That's the whole onboarding process."],
-          ].map(([n, t, d]) => (
-            <div className="step" key={n}>
-              <div className="step-bnum">{n}</div>
-              <h3>{t}</h3>
-              <p>{d}</p>
+            { n: "1", title: t("how.start.s1.title"), body: t("how.start.s1.body") },
+            { n: "2", title: t("how.start.s2.title"), body: t("how.start.s2.body") },
+            { n: "3", title: t("how.start.s3.title"), body: t("how.start.s3.body") },
+            { n: "4", title: t("how.start.s4.title"), body: t("how.start.s4.body") },
+          ].map((s) => (
+            <div className="step" key={s.n}>
+              <div className="step-bnum">{s.n}</div>
+              <h3>{s.title}</h3>
+              <p>{s.body}</p>
             </div>
           ))}
         </div>
 
         <div style={{ textAlign: "center", marginTop: 56 }}>
-          <Link href="/contact" className="btn-y">
-            Start Your Free Trial. No Credit Card Required.
+          <Link href="/sign-up" className="btn-y">
+            {t("how.start.cta")}
           </Link>
         </div>
       </section>
 
-      {/* FAQ */}
       <section className="how-sec">
         <div className="center-block">
-          <div className="tag">FAQ</div>
-          <h2>QUICK ANSWERS.</h2>
+          <div className="tag">{t("how.faq.tag")}</div>
+          <h2>{t("how.faq.title")}</h2>
         </div>
 
         <div className="faq-list">
-          {FAQS.map((f) => (
+          {faqs.map((f) => (
             <details className="faq-item" key={f.q}>
               <summary className="faq-q">{f.q}</summary>
               <p className="faq-a">{f.a}</p>
@@ -253,18 +184,14 @@ export default function HowItWorksPage() {
         </div>
       </section>
 
-      {/* CTA BAND */}
       <section className="cta-band">
         <div>
-          <div className="tag" style={{ color: "var(--black)" }}>Want to see it live?</div>
-          <h2>BOOK A FREE DEMO.</h2>
-          <p>
-            Thirty minutes. We&apos;ll configure it around your plant and run a live shift
-            walkthrough together.
-          </p>
+          <div className="tag" style={{ color: "var(--black)" }}>{t("how.ctaBand.tag")}</div>
+          <h2>{t("how.ctaBand.title")}</h2>
+          <p>{t("how.ctaBand.body")}</p>
         </div>
         <Link href="/contact" className="btn-y" style={{ background: "var(--black)", color: "var(--accent)" }}>
-          Book a Free Demo →
+          {t("how.ctaBand.button")} →
         </Link>
       </section>
     </>

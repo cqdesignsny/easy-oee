@@ -1,17 +1,19 @@
 import Link from "next/link";
+import { getServerT } from "@/components/i18n/server";
 
 export const metadata = {
   title: "Privacy Policy | Easy OEE",
   description: "How Easy OEE collects, uses, and protects your data.",
 };
 
-export default function PrivacyPage() {
+export default async function PrivacyPage() {
+  const t = await getServerT();
   return (
     <main style={{ maxWidth: 820, margin: "0 auto", padding: "180px 32px 120px" }}>
-      <div className="tag">Legal</div>
-      <h1 style={{ marginBottom: 14, fontSize: "clamp(48px, 7vw, 88px)" }}>PRIVACY POLICY</h1>
+      <div className="tag">{t("legal.tag")}</div>
+      <h1 style={{ marginBottom: 14, fontSize: "clamp(48px, 7vw, 88px)" }}>{t("legal.privacy.title")}</h1>
       <p style={{ color: "var(--muted)", fontFamily: "var(--font-dm-mono)", fontSize: 13, letterSpacing: 1.5 }}>
-        Last updated: April 2026
+        {t("legal.lastUpdated")}
       </p>
 
       <div style={{ marginTop: 56, color: "var(--muted2)", lineHeight: 1.8, fontSize: 18 }}>
@@ -75,7 +77,7 @@ export default function PrivacyPage() {
       </div>
 
       <p style={{ marginTop: 64 }}>
-        <Link href="/" style={{ color: "var(--accent)" }}>← Back home</Link>
+        <Link href="/" style={{ color: "var(--accent)" }}>← {t("legal.back")}</Link>
       </p>
     </main>
   );

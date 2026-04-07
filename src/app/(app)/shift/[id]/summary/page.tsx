@@ -3,8 +3,21 @@ import { notFound, redirect } from "next/navigation";
 import { getOperatorSession } from "@/lib/auth/operator-session";
 import { getShiftForOperator } from "@/server/actions/shifts";
 import { formatPercent, oeeBucket } from "@/lib/oee";
-import { stopReasonLabel } from "@/lib/stop-reasons";
 import { Logo } from "@/components/Logo";
+import { getServerT } from "@/components/i18n/server";
+
+const STOP_LABEL_KEYS: Record<string, string> = {
+  mechanical_failure: "stop.01.label",
+  changeover: "stop.02.label",
+  no_material: "stop.03.label",
+  quality_check: "stop.04.label",
+  scheduled_break: "stop.05.label",
+  no_operator: "stop.06.label",
+  maintenance: "stop.07.label",
+  training: "stop.08.label",
+  no_production_scheduled: "stop.09.label",
+  other: "stop.10.label",
+};
 
 export const metadata = { title: "Shift Summary | Easy OEE" };
 export const dynamic = "force-dynamic";
@@ -23,6 +36,7 @@ export default async function SummaryPage({
   const { id } = await params;
   const data = await getShiftForOperator(id);
   if (!data || !data.shift) notFound();
+  const t = await getServerT();
 
   const sh = data.shift;
   const oeeNum = sh.oee != null ? Number(sh.oee) : null;
@@ -41,25 +55,25 @@ export default async function SummaryPage({
         <Link href="/"><Logo height={42} /></Link>
       </div>
       <div style={{ marginBottom: 24 }}>
-        <div className="app-tag">Shift Complete</div>
-        <h1 className="app-h1">SHIFT SUMMARY</h1>
-        <p style={{ color: "var(--muted2)", marginTop: 8 }}>
-          {data.line?.name} · {sh.shiftType} · {sh.product}
+        <div className="app-tag">{t("summary.tag")}</div>
+        <h1 className="app-h1">{t("summary.title")}</h1>
+        <p style={{ color: "var(--muted2)", marginTop: 8, fontSize: 17 }}>
+          {data.line?.name} · {t(`operator.shift.${sh.shiftType}`)} · {sh.product}
         </p>
       </div>
 
       {/* Big OEE */}
       <div className="card card-lg" style={{ textAlign: "center", marginBottom: 24 }}>
-        <div className="kpi-label">Overall OEE</div>
+        <div className="kpi-label">{t("summary.overallOee")}</div>
         <div className={`kpi-big ${bucketClass(oeeNum)}`}>{formatPercent(oeeNum)}</div>
       </div>
 
       {/* Three components */}
       <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 16, marginBottom: 24 }}>
         {[
-          { label: "Availability", value: av },
-          { label: "Performance", value: pf },
-          { label: "Quality", value: ql },
+          { label: t("summary.availability"), value: av },
+          { label: t("summary.performance"), value: pf },
+          { label: t("summary.quality"), value: ql },
         ].map((m) => (
           <div className="card" key={m.label} style={{ textAlign: "center" }}>
             <div className="kpi-label">{m.label}</div>
@@ -75,34 +89,34 @@ export default async function SummaryPage({
 
       {/* Numbers */}
       <div className="card" style={{ marginBottom: 24 }}>
-        <div className="kpi-label" style={{ marginBottom: 12 }}>Production Detail</div>
+        <div className="kpi-label" style={{ marginBottom: 12 }}>{t("summary.production")}</div>
         <table className="app-table">
           <tbody>
-            <tr><td>Good parts</td><td>{sh.goodParts.toLocaleString()}</td></tr>
-            <tr><td>Bad parts</td><td>{sh.badParts.toLocaleString()}</td></tr>
-            <tr><td>Total parts</td><td>{(sh.goodParts + sh.badParts).toLocaleString()}</td></tr>
-            <tr><td>Planned minutes</td><td>{sh.plannedMinutes}</td></tr>
-            <tr><td>Stop minutes</td><td>{totalStopMin.toFixed(1)}</td></tr>
-            <tr><td>Run minutes</td><td>{(sh.plannedMinutes - totalStopMin).toFixed(1)}</td></tr>
-            <tr><td>Ideal rate</td><td>{Number(sh.idealRate).toFixed(0)} parts/min</td></tr>
+            <tr><td>{t("summary.row.good")}</td><td>{sh.goodParts.toLocaleString()}</td></tr>
+            <tr><td>{t("summary.row.bad")}</td><td>{sh.badParts.toLocaleString()}</td></tr>
+            <tr><td>{t("summary.row.total")}</td><td>{(sh.goodParts + sh.badParts).toLocaleString()}</td></tr>
+            <tr><td>{t("summary.row.planned")}</td><td>{sh.plannedMinutes}</td></tr>
+            <tr><td>{t("summary.row.stop")}</td><td>{totalStopMin.toFixed(1)}</td></tr>
+            <tr><td>{t("summary.row.run")}</td><td>{(sh.plannedMinutes - totalStopMin).toFixed(1)}</td></tr>
+            <tr><td>{t("summary.row.ideal")}</td><td>{Number(sh.idealRate).toFixed(0)} parts/min</td></tr>
           </tbody>
         </table>
       </div>
 
       {/* Stops list */}
       <div className="card" style={{ marginBottom: 24 }}>
-        <div className="kpi-label" style={{ marginBottom: 12 }}>Downtime Events ({data.stops.length})</div>
+        <div className="kpi-label" style={{ marginBottom: 12 }}>{t("summary.downtime")} ({data.stops.length})</div>
         {data.stops.length === 0 ? (
-          <p style={{ color: "var(--muted2)" }}>No stops recorded.</p>
+          <p style={{ color: "var(--muted2)" }}>{t("summary.noStops")}</p>
         ) : (
           <table className="app-table">
             <thead>
-              <tr><th>Reason</th><th>Started</th><th>Minutes</th></tr>
+              <tr><th>{t("summary.col.reason")}</th><th>{t("summary.col.started")}</th><th>{t("summary.col.minutes")}</th></tr>
             </thead>
             <tbody>
               {data.stops.map((s) => (
                 <tr key={s.id}>
-                  <td>{stopReasonLabel(s.reason)}</td>
+                  <td>{t(STOP_LABEL_KEYS[s.reason] ?? s.reason)}</td>
                   <td>{new Date(s.startedAt).toLocaleTimeString()}</td>
                   <td>{s.minutes ? Number(s.minutes).toFixed(1) : "..."}</td>
                 </tr>
@@ -114,10 +128,10 @@ export default async function SummaryPage({
 
       <div style={{ display: "flex", gap: 12 }}>
         <Link href="/operator" className="btn" style={{ flex: 1 }}>
-          START NEW SHIFT
+          {t("summary.startNew")}
         </Link>
         <Link href="/dashboard" className="btn btn-ghost" style={{ flex: 1 }}>
-          DASHBOARD
+          {t("summary.dashboard")}
         </Link>
       </div>
     </main>

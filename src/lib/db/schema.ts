@@ -48,7 +48,13 @@ export const company = pgTable("company", {
   slug: text("slug").notNull().unique(),
   plan: planEnum("plan").notNull().default("trial"),
   trialEndsAt: timestamp("trial_ends_at", { withTimezone: true }),
+  // Stripe billing — populated after the user completes Stripe Checkout.
   stripeCustomerId: text("stripe_customer_id"),
+  stripeSubscriptionId: text("stripe_subscription_id"),
+  stripePriceId: text("stripe_price_id"),
+  // Number of licensed production lines (drives Stripe quantity / overage).
+  licensedLines: integer("licensed_lines").notNull().default(1),
+  subscriptionStatus: text("subscription_status"), // trialing | active | past_due | canceled
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
 });

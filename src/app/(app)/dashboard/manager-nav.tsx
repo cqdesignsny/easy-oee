@@ -2,20 +2,21 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-
-const LINKS = [
-  { href: "/dashboard", label: "Dashboard", exact: true },
-  { href: "/dashboard/shifts", label: "Shifts" },
-  { href: "/dashboard/lines", label: "Lines" },
-  { href: "/dashboard/operators", label: "Operators" },
-  { href: "/operator", label: "Start Shift →" },
-];
+import { useT } from "@/components/i18n/LanguageProvider";
 
 export function ManagerNav() {
+  const t = useT();
   const pathname = usePathname();
+  const links = [
+    { href: "/dashboard", label: t("mgr.nav.dashboard"), exact: true },
+    { href: "/dashboard/shifts", label: t("mgr.nav.shifts") },
+    { href: "/dashboard/lines", label: t("mgr.nav.lines") },
+    { href: "/dashboard/operators", label: t("mgr.nav.operators") },
+    { href: "/operator", label: `${t("mgr.nav.startShift")} →` },
+  ];
   return (
     <nav>
-      {LINKS.map((l) => {
+      {links.map((l) => {
         const active = l.exact ? pathname === l.href : pathname?.startsWith(l.href);
         return (
           <Link key={l.href} href={l.href} className={active ? "active" : ""}>

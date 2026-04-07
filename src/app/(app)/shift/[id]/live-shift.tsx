@@ -6,6 +6,20 @@ import { STOP_REASONS, type StopReasonValue } from "@/lib/stop-reasons";
 import { logStop, closeStop, updateParts, endShift } from "@/server/actions/shifts";
 import type { shift as shiftTable, stop as stopTable, line as lineTable } from "@/lib/db/schema";
 import { Logo } from "@/components/Logo";
+import { useT } from "@/components/i18n/LanguageProvider";
+
+const STOP_LABEL_KEYS: Record<string, string> = {
+  mechanical_failure: "stop.01.label",
+  changeover: "stop.02.label",
+  no_material: "stop.03.label",
+  quality_check: "stop.04.label",
+  scheduled_break: "stop.05.label",
+  no_operator: "stop.06.label",
+  maintenance: "stop.07.label",
+  training: "stop.08.label",
+  no_production_scheduled: "stop.09.label",
+  other: "stop.10.label",
+};
 
 type ShiftRow = typeof shiftTable.$inferSelect;
 type StopRow = typeof stopTable.$inferSelect;
@@ -28,6 +42,7 @@ export function LiveShift({
   line: LineRow | undefined;
   stops: StopRow[];
 }) {
+  const t = useT();
   const initialActive =
     stops.find((s) => s.endedAt == null)?.reason as StopReasonValue | undefined;
 
@@ -75,7 +90,7 @@ export function LiveShift({
   };
 
   const finish = () => {
-    if (!confirm("End this shift? Final OEE will be calculated and saved.")) return;
+    if (!confirm(t("shift.confirmEnd"))) return;
     setEndingShift(true);
     startTx(async () => {
       await endShift(shiftId);
@@ -93,20 +108,20 @@ export function LiveShift({
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 24 }}>
         <div>
           <div className="app-tag">
-            {line?.name ?? "Line"} · {initialShift.shiftType} · {initialShift.product}
+            {line?.name ?? "Line"} · {t(`operator.shift.${initialShift.shiftType}`)} · {initialShift.product}
           </div>
-          <h1 className="app-h2">LIVE SHIFT</h1>
+          <h1 className="app-h2">{t("shift.live")}</h1>
         </div>
         <span className={`pill ${optimistic.activeStop ? "" : "pill-live"}`}
               style={optimistic.activeStop ? { background: "#c84141", color: "white", borderColor: "#c84141" } : {}}>
-          {optimistic.activeStop ? "STOPPED" : "RUNNING"}
+          {optimistic.activeStop ? t("shift.stopped") : t("shift.running")}
         </span>
       </div>
 
       {/* Parts counters */}
       <div className="parts-row" style={{ marginBottom: 24 }}>
         <div className="parts-counter">
-          <div className="kpi-label">Good Parts</div>
+          <div className="kpi-label">{t("shift.goodParts")}</div>
           <div className="parts-num">{optimistic.goodParts.toLocaleString()}</div>
           <div className="parts-controls">
             <button className="parts-btn" onClick={() => setParts("good", 1)}>+1</button>
@@ -114,7 +129,7 @@ export function LiveShift({
           </div>
         </div>
         <div className="parts-counter">
-          <div className="kpi-label">Bad Parts</div>
+          <div className="kpi-label">{t("shift.badParts")}</div>
           <div className="parts-num bad">{optimistic.badParts.toLocaleString()}</div>
           <div className="parts-controls">
             <button className="parts-btn" onClick={() => setParts("bad", 1)}>+1</button>
@@ -124,7 +139,7 @@ export function LiveShift({
       </div>
 
       <div style={{ marginBottom: 12, color: "var(--muted2)", fontFamily: "var(--font-dm-mono)", fontSize: 11, letterSpacing: 2.5, textTransform: "uppercase" }}>
-        Tap a reason to log a stop · Tap again to resume
+        {t("shift.tapHint")}
       </div>
 
       <div className="op-grid-stops" style={{ marginBottom: 24 }}>
@@ -134,7 +149,7 @@ export function LiveShift({
             className={`stop-btn ${optimistic.activeStop === r.value ? "active" : ""}`}
             onClick={() => tapStop(r.value)}
           >
-            {r.label}
+            {t(STOP_LABEL_KEYS[r.value] ?? r.value)}
           </button>
         ))}
       </div>
@@ -146,12 +161,12 @@ export function LiveShift({
           onClick={finish}
           disabled={endingShift}
         >
-          {endingShift ? "ENDING…" : "END SHIFT"}
+          {endingShift ? t("shift.ending") : t("shift.endShift")}
         </button>
       </div>
 
-      <div style={{ marginTop: 24, color: "var(--muted2)", fontSize: 13 }}>
-        Total produced: {totalParts.toLocaleString()} · Planned: {initialShift.plannedMinutes} min · Ideal rate: {Number(initialShift.idealRate).toFixed(0)}/min
+      <div style={{ marginTop: 24, color: "var(--muted2)", fontSize: 14 }}>
+        {t("shift.totalProduced")}: {totalParts.toLocaleString()} · {t("shift.planned")}: {initialShift.plannedMinutes} min · {t("shift.idealRate")}: {Number(initialShift.idealRate).toFixed(0)}/min
       </div>
     </main>
   );

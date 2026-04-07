@@ -12,7 +12,7 @@ This version has breaking changes — APIs, conventions, and file structure may 
 
 ## Project in one paragraph
 
-Easy OEE is a SaaS app for Canadian SME manufacturers to track Overall Equipment Effectiveness (OEE) in real time. Operators tap a tablet on the shop floor to log shift data and machine stops; plant managers see live dashboards. We are rebuilding a buggy Bubble prototype as a production Next.js app on Vercel + Neon Postgres + Clerk. The founder is Louis (CQ's cousin); CQ is the engineering lead. Domain: easy-oee.com.
+Easy OEE is a SaaS app for SME manufacturers (Canada + US) to track Overall Equipment Effectiveness (OEE) in real time. Operators tap a tablet on the shop floor to log shift data and machine stops; plant managers see live dashboards. We are rebuilding a buggy Bubble prototype as a production Next.js app on Vercel + Neon Postgres. The founder is Louis (CQ's cousin); CQ Marketing is the engineering lead. Domain: easy-oee.com. Site is in three languages: EN / ES / FR.
 
 ## Required reading order
 
@@ -28,7 +28,9 @@ Easy OEE is a SaaS app for Canadian SME manufacturers to track Overall Equipment
 - **Next.js 16** App Router + **TypeScript** strict
 - **Tailwind v4** + **shadcn/ui** for all UI primitives
 - **Drizzle ORM** + **Neon Postgres** (Vercel Marketplace)
-- **Clerk** for manager auth; **custom PIN-login** for operators on shared tablets
+- **Clerk** planned for manager auth (currently a temporary HMAC-cookie admin password from `ADMIN_PASSWORD`); **custom PIN-login** for operators on shared tablets
+- **Stripe** for payments — scaffold ready in `src/lib/pricing.ts`, `/sign-up`, and `/api/checkout/session` and `/api/webhooks/stripe` route stubs (return 501 until wired)
+- **i18n via React Context** — EN/ES/FR dictionaries in `src/components/i18n/dictionaries.ts`. Client components use `useT()`, server components use `await getServerT()`. Locale persisted in `eo-locale` cookie. **When adding user-facing copy, add the key in all 3 languages.**
 - **Server Actions** over API routes for mutations whenever possible
 - **Zod** for validation at all server boundaries
 - **pnpm** as the package manager (never npm/yarn)

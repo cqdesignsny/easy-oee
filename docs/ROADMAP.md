@@ -76,16 +76,35 @@ Legend: 🟢 done · 🟡 in progress · ⚪ queued · 🔵 blocked
   - `OPERATOR_SESSION_SECRET` env var
 
 ### Polish
-- ⚪ App shell layout with sidebar nav for managers
-- ⚪ Operator-mode layout (full-screen, no chrome)
+- 🟢 App shell layout with sidebar nav for managers
+- 🟢 Operator-mode layout (full-screen, no chrome)
+- 🟢 Favicon (uses easy-oee-logo.svg)
+- 🟢 Mobile hamburger nav + body scroll lock + close-on-route
+- 🟢 Animated hero gauge graphic (responsive 280-820px)
+- 🟢 Round buttons across the entire app (pill style, 999px radius)
+- 🟢 Brand logo wired across nav, footer, sidebar, all auth screens
 - ⚪ `loading.tsx`, `error.tsx`, on-brand 404
-- ⚪ Favicon + OG images
+- ⚪ OG images
 - ⚪ Sentry error tracking
+
+### Internationalization (NEW — shipped 2026-04-07)
+- 🟢 EN/ES/FR dictionaries (~200 keys per locale)
+- 🟢 React Context provider via `useSyncExternalStore` (SSR-safe)
+- 🟢 Cookie-first persistence with browser-language fallback on first visit
+- 🟢 Server-side `getServerT()` helper for server components
+- 🟢 Switching language calls `router.refresh()` to re-render server components
+- 🟢 Language switcher in nav (always visible, mobile + desktop) + dashboard sidebar + sign-in
+- 🟢 Wired surfaces: nav, footer, homepage (hero + all sections), how-it-works, roi-calculator, pricing, contact, privacy, terms, sign-in, pin, operator, live shift, summary, dashboard, manager nav
 
 ## Phase 2 — Sell
 
-- ⚪ Stripe billing (Starter / Professional / Enterprise)
-- ⚪ Trial countdown banner + plan limits enforcement
+- 🟡 Stripe billing scaffold (Starter $39 / Professional $99 USD/mo with line overage / Enterprise custom)
+  - 🟢 `src/lib/pricing.ts` config with USD prices and CAD reference
+  - 🟢 `/sign-up` page with plan + line count + email capture
+  - 🟢 `/api/checkout/session` and `/api/webhooks/stripe` route stubs (return 501)
+  - 🟢 Schema fields: company.stripe_subscription_id / stripe_price_id / licensed_lines / subscription_status
+  - ⚪ Wire actual Stripe SDK once Stripe account + price IDs are created
+  - ⚪ Trial countdown banner + plan limits enforcement
 - ⚪ Manager invitation flow (invite teammate by email)
 - ⚪ Email notifications (shift complete, daily summary) via Resend
 - ⚪ CSV export of shift data
@@ -119,7 +138,7 @@ See `docs/HARDWARE-INTEGRATION.md`.
 - ⚪ REST API + API key management
 - ⚪ Postgres Row-Level Security
 - ⚪ SOC2 prep
-- ⚪ French (Quebec) localization
+- 🟢 French (Quebec) localization (shipped early as part of EN/ES/FR i18n)
 
 ---
 
@@ -133,6 +152,8 @@ See `docs/HARDWARE-INTEGRATION.md`.
 
 ## Recent activity
 
+- **2026-04-07** — i18n + branding + Stripe prep mega-batch. EN/ES/FR translations across nav, footer, homepage (all sections), how-it-works, roi-calculator, pricing, contact, privacy, terms, sign-in, pin, operator, live shift, summary, dashboard. Server-side getServerT() helper. Cookie-first locale persistence. Language switcher always visible (out of hamburger). Animated hero gauge sized 600-820px desktop. Round buttons globally (pill 999px). Brand SVG logo wired across nav, footer, sidebar, all auth screens + favicon. Mobile hamburger menu with body-scroll lock. /pricing rebuilt with USD primary + CAD reference + line count slider. /sign-up Stripe scaffold page. /api/checkout/session + /api/webhooks/stripe route stubs (501). Schema additions: stripe_subscription_id, stripe_price_id, licensed_lines, subscription_status (pushed to Neon). Removed all "no hardware" copy (hardware will be a future paid upsell).
+- **2026-04-07** — Admin login system shipped (manager /sign-in with email/password, Google/Microsoft SSO buttons placeholder, ADMIN_PASSWORD env var, HMAC cookie 14-day TTL). Site nav got bigger/bolder text (16px white, 56px logo, pill CTAs). Copy cleanup: removed all em/en dashes from user-facing text, replaced ★ stars and ✓ checks with inline SVGs, removed maple leaf emoji from footer.
 - **2026-04-07** — Phase 1 core flow shipped. Neon provisioned via Vercel Marketplace, schema pushed, seed loaded. Operator PIN auth + `/operator` shift setup + `/shift/[id]` live tracking (useOptimistic, 10 stop buttons, parts counters) + `/shift/[id]/summary` (color-coded OEE breakdown) + manager `/dashboard` (Today's OEE, live shifts, recent 10, 7-day Pareto stops) all built and deployed. 11/11 tests pass, lint clean, build clean. Demo creds: operator "Pierre Lavoie" / PIN 1234.
 - **2026-04-07** — Repo relocated to portable SSD at `/Volumes/CQ-PRO-4TB/Easy OEE/easy-oee` so it can be worked on from any machine. iMac (`cqmarketing`) toolchain installed (Homebrew, node, pnpm, gh, vercel-cli, postgres@16). SSO Deployment Protection disabled — easy-oee.vercel.app now public.
 - **2026-04-06** — Marketing site ported to new teal/cyan palette matching live easy-oee.com. First production deploy on Vercel (currently behind 401 deployment protection). GitHub repo + auto-deploy wired. Handoff doc written for laptop continuation.

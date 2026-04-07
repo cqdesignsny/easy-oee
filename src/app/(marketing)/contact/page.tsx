@@ -2,6 +2,7 @@ import { db } from "@/lib/db/client";
 import { demoLead } from "@/lib/db/schema";
 import { z } from "zod";
 import { redirect } from "next/navigation";
+import { getServerT } from "@/components/i18n/server";
 
 export const metadata = { title: "Book a Demo | Easy OEE" };
 
@@ -79,6 +80,7 @@ export default async function ContactPage({
 }) {
   const sp = await searchParams;
   const isSuccess = sp.success === "1";
+  const t = await getServerT();
 
   return (
     <>
@@ -87,13 +89,10 @@ export default async function ContactPage({
         <div className="hero-grid" />
         <div className="sub-hero-inner fi">
           <div className="tag" style={{ justifyContent: "center", display: "inline-flex" }}>
-            Book a Demo
+            {t("contact.eyebrow")}
           </div>
-          <h1>SEE YOUR REAL OEE.</h1>
-          <p className="sub-lead">
-            30-minute walkthrough on Zoom. We&apos;ll show you the platform with sample plant
-            data and answer your questions.
-          </p>
+          <h1>{t("contact.h1")}</h1>
+          <p className="sub-lead">{t("contact.sub")}</p>
         </div>
       </section>
 
@@ -118,54 +117,51 @@ export default async function ContactPage({
                   letterSpacing: 1,
                 }}
               >
-                REQUEST RECEIVED
+                {t("contact.success.title")}
               </div>
               <p style={{ color: "var(--muted2)", lineHeight: 1.7, fontSize: 18 }}>
-                Thanks. We&apos;ll be in touch within one business day to schedule your demo.
+                {t("contact.success.body")}
               </p>
             </div>
           ) : (
             <form action={submitLead} style={{ display: "grid", gap: 24 }}>
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 24 }}>
                 <div>
-                  <label style={labelStyle}>First name</label>
+                  <label style={labelStyle}>{t("contact.firstName")}</label>
                   <input style={inputStyle} name="firstName" required />
                 </div>
                 <div>
-                  <label style={labelStyle}>Last name</label>
+                  <label style={labelStyle}>{t("contact.lastName")}</label>
                   <input style={inputStyle} name="lastName" required />
                 </div>
               </div>
               <div>
-                <label style={labelStyle}>Work email</label>
+                <label style={labelStyle}>{t("contact.email")}</label>
                 <input style={inputStyle} name="email" type="email" required />
               </div>
               <div>
-                <label style={labelStyle}>Company</label>
+                <label style={labelStyle}>{t("contact.company")}</label>
                 <input style={inputStyle} name="companyName" required />
               </div>
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 24 }}>
                 <div>
-                  <label style={labelStyle}>Province</label>
+                  <label style={labelStyle}>{t("contact.province")}</label>
                   <select style={inputStyle} name="province">
-                    <option value="">Select...</option>
+                    <option value="">{t("contact.select")}</option>
                     <option>Ontario</option>
                     <option>Quebec</option>
                     <option>British Columbia</option>
                     <option>Alberta</option>
-                    <option>Manitoba</option>
-                    <option>Saskatchewan</option>
-                    <option>Nova Scotia</option>
-                    <option>New Brunswick</option>
-                    <option>Newfoundland and Labrador</option>
-                    <option>Prince Edward Island</option>
+                    <option>California</option>
+                    <option>Texas</option>
+                    <option>New York</option>
                     <option>Other</option>
                   </select>
                 </div>
                 <div>
-                  <label style={labelStyle}>Number of lines</label>
+                  <label style={labelStyle}>{t("contact.numLines")}</label>
                   <select style={inputStyle} name="numLines">
-                    <option value="">Select...</option>
+                    <option value="">{t("contact.select")}</option>
                     <option>1</option>
                     <option>2 to 5</option>
                     <option>6 to 10</option>
@@ -174,31 +170,31 @@ export default async function ContactPage({
                 </div>
               </div>
               <div>
-                <label style={labelStyle}>Current OEE method</label>
+                <label style={labelStyle}>{t("contact.method")}</label>
                 <select style={inputStyle} name="currentMethod">
-                  <option value="">Select...</option>
-                  <option>Not tracking yet</option>
-                  <option>Paper or whiteboard</option>
-                  <option>Excel or spreadsheets</option>
-                  <option>MES or enterprise system</option>
-                  <option>Other</option>
+                  <option value="">{t("contact.select")}</option>
+                  <option>{t("contact.method.none")}</option>
+                  <option>{t("contact.method.paper")}</option>
+                  <option>{t("contact.method.excel")}</option>
+                  <option>{t("contact.method.mes")}</option>
+                  <option>{t("contact.method.other")}</option>
                 </select>
               </div>
               <div>
-                <label style={labelStyle}>Notes (optional)</label>
+                <label style={labelStyle}>{t("contact.notes")}</label>
                 <textarea
                   style={{ ...inputStyle, minHeight: 140, fontFamily: "inherit" }}
                   name="notes"
                 />
               </div>
               <button type="submit" className="btn-y" style={{ justifySelf: "start" }}>
-                Request Demo
+                {t("contact.submit")}
               </button>
               {sp.error && (
                 <p style={{ color: "#ff7a7a", fontSize: 15 }}>
                   {sp.error === "invalid"
-                    ? "Please check your inputs and try again."
-                    : "Something went wrong on our side. Please try again or email hello@easy-oee.com."}
+                    ? t("contact.error.invalid")
+                    : t("contact.error.server")}
                 </p>
               )}
             </form>

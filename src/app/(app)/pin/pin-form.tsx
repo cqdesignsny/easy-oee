@@ -2,10 +2,12 @@
 
 import { useActionState, useState } from "react";
 import { verifyPin, type PinState } from "@/server/actions/operator-auth";
+import { useT } from "@/components/i18n/LanguageProvider";
 
 type Operator = { id: string; fullName: string };
 
 export function PinForm({ operators }: { operators: Operator[] }) {
+  const t = useT();
   const [operatorId, setOperatorId] = useState<string>(operators[0]?.id ?? "");
   const [pin, setPin] = useState("");
   const [state, formAction, pending] = useActionState<PinState, FormData>(verifyPin, {});
@@ -19,7 +21,7 @@ export function PinForm({ operators }: { operators: Operator[] }) {
 
   return (
     <form action={formAction}>
-      <label className="field-label">Operator</label>
+      <label className="field-label">{t("pin.operator")}</label>
       <select
         className="field"
         name="operatorId"
@@ -59,7 +61,7 @@ export function PinForm({ operators }: { operators: Operator[] }) {
         disabled={pending || pin.length !== 4 || !operatorId}
         style={{ width: "100%", marginTop: 24, opacity: pin.length === 4 && !pending ? 1 : 0.5 }}
       >
-        {pending ? "Signing in…" : "SIGN IN"}
+        {pending ? t("pin.signingIn") : t("pin.signIn")}
       </button>
     </form>
   );

@@ -7,6 +7,8 @@ import * as s from "@/lib/db/schema";
 import { startShift } from "@/server/actions/shifts";
 import { logoutOperator } from "@/server/actions/operator-auth";
 import { Logo } from "@/components/Logo";
+import { LanguageSwitcher } from "@/components/i18n/LanguageSwitcher";
+import { getServerT } from "@/components/i18n/server";
 
 export const metadata = { title: "Start Shift | Easy OEE" };
 export const dynamic = "force-dynamic";
@@ -14,6 +16,8 @@ export const dynamic = "force-dynamic";
 export default async function OperatorPage() {
   const session = await getOperatorSession();
   if (!session) redirect("/pin");
+
+  const t = await getServerT();
 
   const lines = await db
     .select()
@@ -26,7 +30,6 @@ export default async function OperatorPage() {
     .where(eq(s.user.id, session.operatorId))
     .limit(1);
 
-  // If there's an in-progress shift for this operator, jump to it
   const [openShift] = await db
     .select()
     .from(s.shift)
@@ -43,23 +46,26 @@ export default async function OperatorPage() {
 
   return (
     <main className="op-shell">
-      <div style={{ marginBottom: 28 }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 28 }}>
         <Link href="/"><Logo height={48} /></Link>
+        <LanguageSwitcher />
       </div>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 32 }}>
         <div>
-          <div className="app-tag">Operator</div>
-          <h1 className="app-h1">START A SHIFT</h1>
-          <p style={{ color: "var(--muted2)", marginTop: 8 }}>Signed in as {operator?.fullName}</p>
+          <div className="app-tag">{t("operator.tag")}</div>
+          <h1 className="app-h1">{t("operator.title")}</h1>
+          <p style={{ color: "var(--muted2)", marginTop: 8, fontSize: 17 }}>
+            {t("operator.signedInAs")} {operator?.fullName}
+          </p>
         </div>
         <form action={logoutOperator}>
-          <button className="btn btn-ghost" type="submit">Sign out</button>
+          <button className="btn btn-ghost" type="submit">{t("operator.signOut")}</button>
         </form>
       </div>
 
       <form action={startShift} className="card card-lg" style={{ maxWidth: 640 }}>
         <div style={{ marginBottom: 20 }}>
-          <label className="field-label">Production Line</label>
+          <label className="field-label">{t("operator.line")}</label>
           <select name="lineId" className="field" required>
             {lines.map((l) => (
               <option key={l.id} value={l.id}>
@@ -70,21 +76,21 @@ export default async function OperatorPage() {
         </div>
 
         <div style={{ marginBottom: 20 }}>
-          <label className="field-label">Shift</label>
+          <label className="field-label">{t("operator.shift")}</label>
           <select name="shiftType" className="field" defaultValue="morning" required>
-            <option value="morning">Morning</option>
-            <option value="afternoon">Afternoon</option>
-            <option value="night">Night</option>
+            <option value="morning">{t("operator.shift.morning")}</option>
+            <option value="afternoon">{t("operator.shift.afternoon")}</option>
+            <option value="night">{t("operator.shift.night")}</option>
           </select>
         </div>
 
         <div style={{ marginBottom: 20 }}>
-          <label className="field-label">Product</label>
-          <input name="product" className="field" placeholder="e.g. Widget A" required />
+          <label className="field-label">{t("operator.product")}</label>
+          <input name="product" className="field" placeholder={t("operator.productPlaceholder")} required />
         </div>
 
         <div style={{ marginBottom: 28 }}>
-          <label className="field-label">Planned Minutes</label>
+          <label className="field-label">{t("operator.plannedMinutes")}</label>
           <input
             name="plannedMinutes"
             className="field"
@@ -97,13 +103,13 @@ export default async function OperatorPage() {
         </div>
 
         <button className="btn" type="submit" style={{ width: "100%" }}>
-          START SHIFT →
+          {t("operator.start")} →
         </button>
       </form>
 
       <p style={{ marginTop: 32 }}>
-        <Link href="/dashboard" style={{ color: "var(--muted2)", fontSize: 13 }}>
-          ← Manager dashboard
+        <Link href="/dashboard" style={{ color: "var(--muted2)", fontSize: 14 }}>
+          ← {t("operator.managerLink")}
         </Link>
       </p>
     </main>

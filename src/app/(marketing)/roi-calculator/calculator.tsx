@@ -2,23 +2,14 @@
 
 import Link from "next/link";
 import { useMemo, useState } from "react";
+import { useT } from "@/components/i18n/LanguageProvider";
 
-const EASY_OEE_COST = 2988; // CAD/year, Professional plan reference
+const EASY_OEE_COST_USD = 1188; // USD/year, Professional plan reference (5 lines)
 
-const fmtCAD = (n: number) =>
-  n.toLocaleString("en-CA", { style: "currency", currency: "CAD", maximumFractionDigits: 0 });
+const fmtUSD = (n: number) =>
+  n.toLocaleString("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 });
 const fmtNum = (n: number) =>
-  n.toLocaleString("en-CA", { maximumFractionDigits: 0 });
-
-type Slider = {
-  key: keyof Inputs;
-  label: string;
-  min: number;
-  max: number;
-  step: number;
-  unit: string;
-  hint?: string;
-};
+  n.toLocaleString("en-US", { maximumFractionDigits: 0 });
 
 type Inputs = {
   lines: number;
@@ -29,16 +20,27 @@ type Inputs = {
   oee: number;
 };
 
-const SLIDERS: Slider[] = [
-  { key: "lines", label: "Production lines", min: 1, max: 20, step: 1, unit: "" },
-  { key: "shifts", label: "Shifts per day", min: 1, max: 3, step: 1, unit: "" },
-  { key: "days", label: "Working days per week", min: 1, max: 7, step: 1, unit: "" },
-  { key: "mins", label: "Minutes per shift", min: 60, max: 720, step: 10, unit: "min" },
-  { key: "rate", label: "Throughput value", min: 5, max: 1000, step: 5, unit: "$/min", hint: "Estimate: hourly revenue ÷ 60" },
-  { key: "oee", label: "Current OEE estimate", min: 30, max: 90, step: 1, unit: "%", hint: "World class is 85%+. SME average is 60 to 70%." },
+type SliderConfig = {
+  key: keyof Inputs;
+  labelKey: string;
+  hintKey?: string;
+  min: number;
+  max: number;
+  step: number;
+  unit: string;
+};
+
+const SLIDERS: SliderConfig[] = [
+  { key: "lines", labelKey: "roi.input.lines", min: 1, max: 20, step: 1, unit: "" },
+  { key: "shifts", labelKey: "roi.input.shifts", min: 1, max: 3, step: 1, unit: "" },
+  { key: "days", labelKey: "roi.input.days", min: 1, max: 7, step: 1, unit: "" },
+  { key: "mins", labelKey: "roi.input.mins", min: 60, max: 720, step: 10, unit: "min" },
+  { key: "rate", labelKey: "roi.input.rate", hintKey: "roi.input.rate.hint", min: 5, max: 1000, step: 5, unit: "$/min" },
+  { key: "oee", labelKey: "roi.input.oee", hintKey: "roi.input.oee.hint", min: 30, max: 90, step: 1, unit: "%" },
 ];
 
 export function ROICalculator() {
+  const t = useT();
   const [inputs, setInputs] = useState<Inputs>({
     lines: 2,
     shifts: 2,
@@ -60,18 +62,16 @@ export function ROICalculator() {
     const gainPerWeek = gainMinPerShift * inputs.rate * inputs.lines * inputs.shifts * inputs.days;
     const gainPerYear = gainPerWeek * 52;
 
-    const paybackDaysRaw = gainPerYear > 0 ? (EASY_OEE_COST / gainPerYear) * 365 : Infinity;
-    const roi = gainPerYear > 0 ? gainPerYear / EASY_OEE_COST : 0;
+    const paybackDaysRaw = gainPerYear > 0 ? (EASY_OEE_COST_USD / gainPerYear) * 365 : Infinity;
+    const roi = gainPerYear > 0 ? gainPerYear / EASY_OEE_COST_USD : 0;
     const paybackDisplay =
       paybackDaysRaw === Infinity || paybackDaysRaw > 365
-        ? "> 1 year"
+        ? t("roi.payback.over1y")
         : `${Math.max(1, Math.ceil(paybackDaysRaw))} days`;
     const barWidth = Math.min(100, Math.max(3, (1 - paybackDaysRaw / 365) * 100));
 
     return {
-      lossPct,
       lostMinPerShift,
-      costPerShift,
       costPerWeek,
       costPerYear,
       gainMinPerShift,
@@ -80,7 +80,7 @@ export function ROICalculator() {
       roi,
       barWidth,
     };
-  }, [inputs, improve]);
+  }, [inputs, improve, t]);
 
   const update = (key: keyof Inputs, value: number) =>
     setInputs((prev) => ({ ...prev, [key]: value }));
@@ -88,11 +88,9 @@ export function ROICalculator() {
   return (
     <section className="how-sec">
       <div className="center-block">
-        <div className="tag">Calculator</div>
-        <h2>YOUR PLANT&apos;S NUMBERS.</h2>
-        <p className="how-intro" style={{ marginInline: "auto" }}>
-          All figures in CAD. Adjust the sliders to match your operation.
-        </p>
+        <div className="tag">{t("roi.calc.tag")}</div>
+        <h2>{t("roi.calc.title")}</h2>
+        <p className="how-intro" style={{ marginInline: "auto" }}>{t("roi.calc.intro")}</p>
       </div>
 
       <div
@@ -129,15 +127,9 @@ export function ROICalculator() {
                       color: "var(--muted2)",
                     }}
                   >
-                    {s.label}
+                    {t(s.labelKey)}
                   </label>
-                  <span
-                    style={{
-                      fontFamily: "var(--font-bebas)",
-                      color: "var(--accent)",
-                      fontSize: 28,
-                    }}
-                  >
+                  <span style={{ fontFamily: "var(--font-bebas)", color: "var(--accent)", fontSize: 28 }}>
                     {s.key === "rate" ? `$${value}` : value}
                     {s.unit && s.key !== "rate" ? ` ${s.unit}` : ""}
                     {s.key === "rate" ? "/min" : ""}
@@ -152,8 +144,8 @@ export function ROICalculator() {
                   onChange={(e) => update(s.key, Number(e.target.value))}
                   style={{ width: "100%", accentColor: "var(--accent)", marginTop: 6 }}
                 />
-                {s.hint && (
-                  <p style={{ color: "var(--muted)", fontSize: 12, marginTop: 4 }}>{s.hint}</p>
+                {s.hintKey && (
+                  <p style={{ color: "var(--muted)", fontSize: 12, marginTop: 4 }}>{t(s.hintKey)}</p>
                 )}
               </div>
             );
@@ -171,7 +163,7 @@ export function ROICalculator() {
                 marginBottom: 10,
               }}
             >
-              Target OEE improvement
+              {t("roi.target")}
             </label>
             <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 10 }}>
               {[5, 10, 15].map((v) => (
@@ -208,14 +200,14 @@ export function ROICalculator() {
                 color: "#ff7a7a",
               }}
             >
-              You&apos;re losing
+              {t("roi.losing")}
             </div>
             <div className="kpi-big" style={{ color: "#ff7a7a", fontSize: "clamp(56px, 9vw, 96px)" }}>
-              {fmtCAD(out.costPerYear)}
+              {fmtUSD(out.costPerYear)}
             </div>
             <div style={{ color: "var(--muted2)", fontSize: 14 }}>
-              per year at {inputs.oee}% OEE · {fmtNum(out.lostMinPerShift)} min lost / shift /
-              line · {fmtCAD(out.costPerWeek)} per week
+              per year at {inputs.oee}% OEE · {fmtNum(out.lostMinPerShift)} min lost / shift / line
+              · {fmtUSD(out.costPerWeek)} per week
             </div>
           </div>
 
@@ -236,10 +228,10 @@ export function ROICalculator() {
                 color: "var(--accent)",
               }}
             >
-              Recover with +{improve}% OEE
+              {t("roi.recover").replace("{pct}", String(improve))}
             </div>
             <div className="kpi-big" style={{ fontSize: "clamp(56px, 9vw, 96px)" }}>
-              {fmtCAD(out.gainPerYear)}
+              {fmtUSD(out.gainPerYear)}
             </div>
             <div style={{ color: "var(--muted2)", fontSize: 14 }}>
               gained per year · +{fmtNum(out.gainMinPerShift)} min / shift / line
@@ -247,7 +239,7 @@ export function ROICalculator() {
           </div>
 
           <div className="card">
-            <div className="kpi-label" style={{ marginBottom: 8 }}>Easy OEE payback</div>
+            <div className="kpi-label" style={{ marginBottom: 8 }}>{t("roi.payback.label")}</div>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
               <span className="kpi-big" style={{ fontSize: 56 }}>{out.paybackDisplay}</span>
               <span style={{ fontFamily: "var(--font-bebas)", fontSize: 32, color: "var(--accent)" }}>
@@ -273,14 +265,11 @@ export function ROICalculator() {
                 }}
               />
             </div>
-            <p style={{ color: "var(--muted)", fontSize: 12, marginTop: 8 }}>
-              Reference: Easy OEE Professional at $249 CAD/month ({fmtCAD(EASY_OEE_COST)}/year, 5
-              lines).
-            </p>
+            <p style={{ color: "var(--muted)", fontSize: 12, marginTop: 8 }}>{t("roi.payback.refLine")}</p>
           </div>
 
           <Link href="/contact" className="btn" style={{ marginTop: 4 }}>
-            Book a Free Demo →
+            {t("roi.cta")} →
           </Link>
         </div>
       </div>

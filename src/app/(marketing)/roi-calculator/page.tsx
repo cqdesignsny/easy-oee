@@ -1,4 +1,5 @@
 import { ROICalculator } from "./calculator";
+import { getServerT } from "@/components/i18n/server";
 
 export const metadata = {
   title: "OEE ROI Calculator | How Much Is Your Downtime Costing You?",
@@ -6,7 +7,8 @@ export const metadata = {
     "Enter your plant's numbers. See exactly what your current OEE losses cost, and what improving them would return.",
 };
 
-export default function ROIPage() {
+export default async function ROIPage() {
+  const t = await getServerT();
   return (
     <>
       <section className="sub-hero">
@@ -14,17 +16,14 @@ export default function ROIPage() {
         <div className="hero-grid" />
         <div className="sub-hero-inner fi">
           <div className="tag" style={{ justifyContent: "center", display: "inline-flex" }}>
-            ROI Calculator
+            {t("roi.eyebrow")}
           </div>
           <h1>
-            HOW MUCH IS YOUR
+            {t("roi.h1.line1")}
             <br />
-            <em>DOWNTIME COSTING YOU?</em>
+            <em>{t("roi.h1.line2")}</em>
           </h1>
-          <p className="sub-lead">
-            Enter your plant&apos;s numbers. See exactly what your current OEE losses cost, and
-            what fixing them would put back in your pocket.
-          </p>
+          <p className="sub-lead">{t("roi.sub")}</p>
         </div>
       </section>
 
@@ -32,37 +31,26 @@ export default function ROIPage() {
 
       <section className="feat-sec">
         <div className="center-block">
-          <div className="tag">Three loss types</div>
-          <h2>WHERE OEE LOSSES COME FROM.</h2>
-          <p className="how-intro" style={{ marginInline: "auto" }}>
-            All three are measurable. All three are recoverable.
-          </p>
+          <div className="tag">{t("roi.losses.tag")}</div>
+          <h2>{t("roi.losses.title")}</h2>
+          <p className="how-intro" style={{ marginInline: "auto" }}>{t("roi.losses.intro")}</p>
         </div>
 
         <div className="steps">
           <div className="step">
             <div className="step-bnum">A</div>
-            <h3>AVAILABILITY LOSS</h3>
-            <p>
-              Unplanned downtime. Breakdowns, changeovers that ran long, material starvation,
-              waiting on operators or maintenance.
-            </p>
+            <h3>{t("roi.losses.a.title")}</h3>
+            <p>{t("roi.losses.a.body")}</p>
           </div>
           <div className="step">
             <div className="step-bnum">P</div>
-            <h3>PERFORMANCE LOSS</h3>
-            <p>
-              Speed losses. Micro-stops too short to log, running below ideal rate, equipment
-              wear slowing the line down.
-            </p>
+            <h3>{t("roi.losses.p.title")}</h3>
+            <p>{t("roi.losses.p.body")}</p>
           </div>
           <div className="step">
             <div className="step-bnum">Q</div>
-            <h3>QUALITY LOSS</h3>
-            <p>
-              Scrap and rework. Parts that don&apos;t meet spec the first time and either get
-              tossed or have to be fixed.
-            </p>
+            <h3>{t("roi.losses.q.title")}</h3>
+            <p>{t("roi.losses.q.body")}</p>
           </div>
         </div>
       </section>

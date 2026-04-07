@@ -987,11 +987,16 @@ details[open] .faq-q::after { content: "−"; }
    Mobile nav (hamburger + slide-down menu)
 ═══════════════════════════════════════════════════════════════════════════ */
 
-.nav-burger {
+.nav-mobile-cluster {
   display: none;
+  align-items: center;
+  gap: 8px;
+}
+.nav-burger {
   background: transparent; border: none;
   width: 44px; height: 44px;
   cursor: pointer;
+  display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
@@ -1046,8 +1051,10 @@ details[open] .faq-q::after { content: "−"; }
 }
 
 @media (max-width: 960px) {
-  .nav-burger { display: flex; }
-  .eo-nav { padding: 16px 24px; }
+  .nav-mobile-cluster { display: flex; }
+  .nav-links { display: none; }
+  .eo-nav { padding: 16px 20px; }
+  .nav-mobile-cluster .lang-trigger { padding: 8px 12px; font-size: 13px; }
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -1183,10 +1190,13 @@ input.field, select.field, textarea.field {
 .hero-gauge-wrap {
   position: relative;
   width: 100%;
-  max-width: 460px;
+  max-width: 600px;
   aspect-ratio: 1 / 1;
   margin-left: auto;
 }
+@media (min-width: 1280px) { .hero-gauge-wrap { max-width: 660px; } }
+@media (min-width: 1440px) { .hero-gauge-wrap { max-width: 720px; } }
+@media (min-width: 1800px) { .hero-gauge-wrap { max-width: 800px; } }
 
 .hero-gauge svg { width: 100%; height: 100%; display: block; }
 
@@ -1246,8 +1256,24 @@ input.field, select.field, textarea.field {
   justify-content: space-between;
   padding: 140px 56px 88px;
 }
-.hero.hero-with-gauge .hero-content { flex: 1; max-width: 720px; }
-.hero.hero-with-gauge .hero-gauge-wrap { flex: 0 0 460px; max-width: 460px; }
+.hero.hero-with-gauge .hero-content { flex: 1; max-width: 720px; min-width: 0; }
+.hero.hero-with-gauge .hero-gauge-wrap {
+  flex: 0 0 600px;
+  max-width: 600px;
+}
+@media (min-width: 1280px) {
+  .hero.hero-with-gauge .hero-gauge-wrap { flex-basis: 660px; max-width: 660px; }
+}
+@media (min-width: 1440px) {
+  .hero.hero-with-gauge .hero-gauge-wrap { flex-basis: 720px; max-width: 720px; }
+}
+@media (min-width: 1800px) {
+  .hero.hero-with-gauge .hero-gauge-wrap { flex-basis: 800px; max-width: 800px; }
+}
+
+@media (max-width: 1180px) {
+  .hero.hero-with-gauge .hero-gauge-wrap { flex-basis: 480px; max-width: 480px; }
+}
 
 @media (max-width: 1024px) {
   .hero.hero-with-gauge {
@@ -1256,5 +1282,12 @@ input.field, select.field, textarea.field {
     padding: 132px 24px 64px;
   }
   .hero.hero-with-gauge .hero-content { max-width: 100%; }
-  .hero.hero-with-gauge .hero-gauge-wrap { max-width: 320px; margin: 0 auto; }
+  .hero.hero-with-gauge .hero-gauge-wrap {
+    flex: 0 0 auto;
+    max-width: 380px;
+    margin: 0 auto;
+  }
+}
+@media (max-width: 480px) {
+  .hero.hero-with-gauge .hero-gauge-wrap { max-width: 280px; }
 }

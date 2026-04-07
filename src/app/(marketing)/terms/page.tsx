@@ -1,17 +1,19 @@
 import Link from "next/link";
+import { getServerT } from "@/components/i18n/server";
 
 export const metadata = {
   title: "Terms of Service | Easy OEE",
   description: "The terms governing use of the Easy OEE platform.",
 };
 
-export default function TermsPage() {
+export default async function TermsPage() {
+  const t = await getServerT();
   return (
     <main style={{ maxWidth: 820, margin: "0 auto", padding: "180px 32px 120px" }}>
-      <div className="tag">Legal</div>
-      <h1 style={{ marginBottom: 14, fontSize: "clamp(48px, 7vw, 88px)" }}>TERMS OF SERVICE</h1>
+      <div className="tag">{t("legal.tag")}</div>
+      <h1 style={{ marginBottom: 14, fontSize: "clamp(48px, 7vw, 88px)" }}>{t("legal.terms.title")}</h1>
       <p style={{ color: "var(--muted)", fontFamily: "var(--font-dm-mono)", fontSize: 13, letterSpacing: 1.5 }}>
-        Last updated: April 2026
+        {t("legal.lastUpdated")}
       </p>
 
       <div style={{ marginTop: 56, color: "var(--muted2)", lineHeight: 1.8, fontSize: 18 }}>
@@ -85,7 +87,7 @@ export default function TermsPage() {
       </div>
 
       <p style={{ marginTop: 64 }}>
-        <Link href="/" style={{ color: "var(--accent)" }}>← Back home</Link>
+        <Link href="/" style={{ color: "var(--accent)" }}>← {t("legal.back")}</Link>
       </p>
     </main>
   );
