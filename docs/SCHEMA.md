@@ -1,6 +1,13 @@
 # Database Schema
 
-> Source of truth: `src/db/schema.ts`. This doc is the human-readable mirror — keep it in sync.
+> **Source of truth:** `src/lib/db/schema.ts` (Drizzle). This doc is the
+> human-readable mirror — when in doubt, the TypeScript file wins.
+>
+> **2026-04-07:** Real schema collapsed `users` + `operators` into a single
+> `user` table with `role` enum (`manager` | `operator`) — older sections
+> below describe a 2-table model that no longer exists. Rewrite scheduled.
+> All new columns added in 2026-04-07 are listed in the "Recent additions"
+> section at the bottom.
 
 ## Tables
 
@@ -158,3 +165,25 @@ pnpm db:migrate      # applies pending migrations
 ```
 
 **Never edit a migration after it's been applied.** Always generate a new one.
+
+---
+
+## Recent additions (2026-04-07 — Tier 1-4 batch)
+
+| Table | Column | Type | Purpose |
+|---|---|---|---|
+| `company` | `timezone` | `text NOT NULL DEFAULT 'America/Toronto'` | IANA TZ for "today" boundary math |
+| `line` | `target_oee` | `numeric(5,4) NOT NULL DEFAULT 0.85` | Per-line OEE goal, drives goal lines on dashboard + live shift |
+| `line` | `board_token` | `text UNIQUE` | Public token for `/board/[token]` shop-floor TV view; manager rotates from `/dashboard/lines` |
+| `shift` | `ending_operator_id` | `uuid REFERENCES user(id)` | Set when shift is handed off mid-run to a different operator |
+
+To apply on Neon:
+
+```bash
+pnpm db:push   # dev shortcut, no migration file
+# or properly:
+pnpm db:generate && pnpm db:migrate
+```
+
+The 4 columns are all backwards-compatible (defaults / nullable), so the
+deploy can ship before the migration runs without breaking reads.

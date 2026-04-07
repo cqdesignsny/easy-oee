@@ -115,16 +115,24 @@ Legend: 🟢 done · 🟡 in progress · ⚪ queued · 🔵 blocked
   - ⚪ Daily/weekly digest cron
 - 🟢 CSV export of shift data (`/api/shifts/[id]/csv` route handler, downloads a full per-shift CSV)
 - 🟢 Print or save as PDF (browser print + dedicated print stylesheet)
-- ⚪ PWA manifest + install prompt for tablets
+- 🟢 PWA manifest (`src/app/manifest.ts`) — operators can Add to Home Screen on a tablet, launches /pin standalone with no chrome
 - ⚪ PostHog product analytics
 
 ## Phase 3 — Insights
 
-- ⚪ Downtime Pareto chart over date ranges
-- ⚪ Shift-vs-shift comparison (morning / afternoon / night)
+- 🟢 Downtime Pareto chart (already on `/dashboard`, last 7 days)
+- 🟢 Shift-vs-shift comparison (morning/afternoon/night cards on `/dashboard`, 7-day avg)
+- 🟢 Loss-tree stacked bar on shift summary (good / quality / speed / downtime)
+- 🟢 Calendar grid view (last 14 days × 3 shift types) on `/dashboard/shifts`
+- 🟢 Live OEE estimate ticking on `/shift/[id]` during the shift
+- 🟢 Edit-shift workflow with audit reason field (`/dashboard/shifts/[id]/edit`)
+- 🟢 Daily digest cron (`/api/cron/daily-digest`) — assembles per-line OEE, top stops, 7-day delta. Optional Anthropic-powered summary if `ANTHROPIC_API_KEY` is set. Logs today; flip to `resend.emails.send()` once Resend is wired.
+- 🟢 Weekly anomaly scan cron (`/api/cron/anomaly-scan`) — flags lines whose 7-day avg dropped > 5pp vs 4-week baseline.
+- 🟢 Public TV Board view (`/board/[token]`) — read-only fullscreen for shop floor displays, no login, manager rotates token from `/dashboard/lines`.
 - ⚪ Weekly + monthly OEE trend lines
 - ⚪ Per-line drill-down
 - ⚪ Custom stop reason categories per company
+- ⚪ Operator leaderboard (manager-toggled setting)
 
 ## Phase 4 — Hardware ingest
 
@@ -159,6 +167,23 @@ See `docs/HARDWARE-INTEGRATION.md`.
 
 ## Recent activity
 
+- **2026-04-07 (evening)** — Massive operator + manager UX upgrade batch (Tiers 1-4):
+  - **Live shift screen v2:** big elapsed/projected/stop-time timers, live OEE estimate ticking once per second with target delta + color buckets, pulsing red downtime card with the current-stop clock, long-stop note prompt that fires after 10+ minute stops, and a new Hand-Off button that lets the next operator slide in with their PIN mid-shift (records `shift.endingOperatorId`, rotates the cookie).
+  - **Schema:** `line.targetOee` (per-line goal, default 0.85), `line.boardToken` (public TV view token), `shift.endingOperatorId` (handoff), `company.timezone` (plant TZ for "today" math).
+  - **OEE math:** new `computeLossTree()` partitions planned minutes into Good/Quality/Speed/Downtime. 13/13 tests pass.
+  - **Manager dashboard:** shift-type comparison cards (morning/afternoon/night, 7-day avg, color-coded). Pareto stayed.
+  - **Lines admin:** target OEE column on create + edit forms. Per-line "TV Board" panel with Generate / Rotate Token + Open ↗.
+  - **Shift summary:** new "Where the Time Went" stacked-bar loss-tree card above the production detail table.
+  - **Shifts admin:** "Last 14 Days · Calendar" grid above the table (3 shift types × 14 days, color-coded). "Edit" button on every row → `/dashboard/shifts/[id]/edit` with audit-reason field. Edit recomputes OEE if shift is complete.
+  - **TV Board mode:** public route `/board/[token]` — fullscreen 55"-display layout with massive OEE numeral, RUNNING/STOPPED pill, operator + product subtitle, side panel with parts/elapsed/top-stops, idle state when no shift. Server revalidates every 10s, client keeps timers smooth and triggers `router.refresh()` between pulls.
+  - **Daily digest:** `/api/cron/daily-digest` (vercel.json registers it for 11:00 UTC) — per-company yesterday rollup, best/worst line, top 3 stops, 7-day delta per line. Optional Claude Haiku 4.5 narrative summary if `ANTHROPIC_API_KEY` is set. `renderDigestText()` plaintext fallback in `src/lib/digest-render.ts` (split out so it can be imported outside `"use server"` files).
+  - **Weekly anomaly scan:** `/api/cron/anomaly-scan` (Mondays 12:00 UTC) — flags lines whose 7-day avg OEE dropped > 5pp vs the prior 4-week baseline.
+  - **PWA:** `src/app/manifest.ts` — operators can Add to Home Screen on a tablet, launches `/pin` standalone with the teal background and branded icons.
+  - **i18n:** ~40 new keys × 3 languages (EN/ES/FR) covering all the new live shift, dashboard, and summary strings.
+  - **CSS:** new sections for `.timer-row`, `.progress-track`, `.liveoee-*`, `.downtime-card` (reduced-motion-aware pulse), `.app-input`, `.loss-tree`, `.board-*`, `.shift-compare`, `.calendar-grid`, `.cal-cell`.
+  - **Cron auth:** `vercel.json` crons + `CRON_SECRET` Bearer fallback for manual triggers.
+  - **Schema migration:** `line.target_oee`, `line.board_token`, `shift.ending_operator_id`, `company.timezone` need to be pushed (`pnpm db:push`) on next deploy.
+  - **Verified clean:** `pnpm test` 13/13, `pnpm typecheck`, `pnpm lint`, `pnpm build` all green.
 - **2026-04-07** — Shift export shipped: CSV download via `/api/shifts/[id]/csv` route handler (auth-scoped, full shift export with OEE metrics + production detail + every downtime event), Print/PDF via `window.print()` with a print stylesheet that hides chrome and switches to white/black, Email-it scaffold via server action `emailShiftSummary` that validates and would call Resend once wired (currently returns a friendly placeholder). Language switcher added to live shift + summary screens (was missing). Operator/live-shift/summary pages now constrained to 880px max-width with auto margins so they don't hug the left edge on big monitors. EN/ES/FR translations for all new export strings.
 - **2026-04-07** — i18n + branding + Stripe prep mega-batch. EN/ES/FR translations across nav, footer, homepage (all sections), how-it-works, roi-calculator, pricing, contact, privacy, terms, sign-in, pin, operator, live shift, summary, dashboard. Server-side getServerT() helper. Cookie-first locale persistence. Language switcher always visible (out of hamburger). Animated hero gauge sized 600-820px desktop. Round buttons globally (pill 999px). Brand SVG logo wired across nav, footer, sidebar, all auth screens + favicon. Mobile hamburger menu with body-scroll lock. /pricing rebuilt with USD primary + CAD reference + line count slider. /sign-up Stripe scaffold page. /api/checkout/session + /api/webhooks/stripe route stubs (501). Schema additions: stripe_subscription_id, stripe_price_id, licensed_lines, subscription_status (pushed to Neon). Removed all "no hardware" copy (hardware will be a future paid upsell).
 - **2026-04-07** — Admin login system shipped (manager /sign-in with email/password, Google/Microsoft SSO buttons placeholder, ADMIN_PASSWORD env var, HMAC cookie 14-day TTL). Site nav got bigger/bolder text (16px white, 56px logo, pill CTAs). Copy cleanup: removed all em/en dashes from user-facing text, replaced ★ stars and ✓ checks with inline SVGs, removed maple leaf emoji from footer.

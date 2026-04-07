@@ -387,6 +387,83 @@ After the initial Phase 1 core flow, the following was added in the same day:
 - Footer: maple leaf emoji removed, "Made in Canada" line removed, body text bumped to 17px white, links 16px.
 - Generic emojis ★ ✓ 🍁 replaced with inline SVGs.
 
+## 2026-04-07 — Tier 1-4 product upgrades (live shift, dashboard, board mode, polish)
+
+Massive single-session batch turning the live shift screen into a real-time
+scoreboard, the manager dashboard into a decision-making surface, and adding
+a public TV-board view that's the kind of thing that makes Easy OEE *spread*
+inside a plant. All four tiers shipped with full EN/ES/FR i18n.
+
+**Tier 1 — live shift screen** (`src/app/(app)/shift/[id]/live-shift.tsx`):
+elapsed/projected/stop-time timers in big mono digits, live OEE estimate
+ticking with target delta + color buckets, pulsing red downtime card with
+the current-stop clock, long-stop note prompt that fires after 10+ minute
+stops, hand-off button that lets the next operator slide in mid-shift with
+their PIN (records `shift.endingOperatorId`, rotates the cookie).
+
+**Tier 2 — manager dashboard** (`src/app/(app)/dashboard/page.tsx`): three
+shift-type comparison cards (morning/afternoon/night, 7-day avg). Pareto
+already shipped earlier. Daily digest cron at `/api/cron/daily-digest`
+assembles per-line OEE + best/worst + top 3 stops + 7-day delta and
+optionally calls Claude Haiku 4.5 for a 2-3 sentence narrative summary.
+Weekly anomaly scan at `/api/cron/anomaly-scan` flags lines whose 7-day
+avg dropped > 5pp vs the prior 4-week baseline. Both registered in
+`vercel.json`. Auth via `x-vercel-cron` header or `Bearer CRON_SECRET`.
+
+**Tier 3 — TV Board mode + loss tree:**
+- `/board/[token]` is a public read-only fullscreen route designed for a
+  55" display bolted above a line. No login. Manager rotates the token
+  from `/dashboard/lines`. Big OEE numeral, RUNNING/STOPPED pill,
+  operator + product subtitle, side panel with parts/elapsed/top-stops,
+  idle state when no shift is active. Server revalidates every 10s,
+  client keeps timers smooth and triggers `router.refresh()` between pulls.
+- Loss-tree stacked-bar card on `/shift/[id]/summary`: partitions all
+  planned minutes into Good Output / Quality Loss / Speed Loss / Downtime
+  with a legend. Driven by new `computeLossTree()` in `src/lib/oee.ts`
+  (2 new tests, 13/13 passing).
+
+**Tier 4 — polish:**
+- PWA manifest at `src/app/manifest.ts` — operators "Add to Home Screen"
+  on a tablet, launches `/pin` standalone with the teal background and
+  branded icons.
+- Edit-shift workflow: `editShift()` server action + new
+  `/dashboard/shifts/[id]/edit` page with audit-reason field. If shift is
+  already complete, OEE numbers are recomputed automatically from the new
+  values + existing stops.
+- Calendar grid: "Last 14 Days · Calendar" card on `/dashboard/shifts`
+  showing morning/afternoon/night × 14 days, color-coded by oeeBucket.
+- Plant timezone column on company (`America/Toronto` default) — wired
+  into the schema, ready for `getCompanyDay()` helper to use it.
+
+**Schema additions** — all backwards compatible, push when convenient:
+
+| Table     | Column                | Type                                       |
+|-----------|-----------------------|---------------------------------------------|
+| `company` | `timezone`            | `text NOT NULL DEFAULT 'America/Toronto'`   |
+| `line`    | `target_oee`          | `numeric(5,4) NOT NULL DEFAULT 0.85`        |
+| `line`    | `board_token`         | `text UNIQUE`                               |
+| `shift`   | `ending_operator_id`  | `uuid REFERENCES user(id)`                  |
+
+```bash
+pnpm db:push   # apply to dev branch
+```
+
+**New env vars (all optional, all degrade gracefully):**
+- `ANTHROPIC_API_KEY` — turns on AI digest summaries via Claude Haiku 4.5
+- `CRON_SECRET` — `Authorization: Bearer ${CRON_SECRET}` for manual
+  triggering of `/api/cron/*` from outside Vercel Cron
+
+**i18n:** ~40 new keys × 3 languages (EN/ES/FR) covering all the new
+strings on live shift, dashboard, summary, board.
+
+**CSS additions** (`src/app/globals.css`): `.timer-row`,
+`.progress-track`, `.liveoee-*`, `.downtime-card` (reduced-motion-aware
+pulse), `.app-input`, `.loss-tree`, `.board-*`, `.shift-compare`,
+`.calendar-grid`, `.cal-cell`.
+
+**Verified clean:** `pnpm test` 13/13, `pnpm typecheck`, `pnpm lint`,
+`pnpm build` all green.
+
 ## Late additions (2026-04-07 evening)
 
 - **Cross-machine auto-sync** — see "Cross-machine sync" section above. Hook +
