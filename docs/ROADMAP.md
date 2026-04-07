@@ -142,5 +142,6 @@ See `docs/HARDWARE-INTEGRATION.md`.
 
 ## Recent activity
 
-- **2026-04-06** — Marketing site ported to new teal/cyan palette matching live easy-oee.com. First production deploy on Vercel. GitHub repo + auto-deploy wired. Handoff doc written for laptop continuation.
+- **2026-04-07** — Repo relocated to portable SSD at `/Volumes/CQ-PRO-4TB/Easy OEE/easy-oee` so it can be worked on from any machine. HANDOFF + PROJECT docs updated with new canonical path. iMac (`cqmarketing`) confirmed bare — toolchain install pending.
+- **2026-04-06** — Marketing site ported to new teal/cyan palette matching live easy-oee.com. First production deploy on Vercel (currently behind 401 deployment protection). GitHub repo + auto-deploy wired. Handoff doc written for laptop continuation.
 - **2026-04-06** — OEE math + 11 tests + Drizzle schema + initial scaffold.

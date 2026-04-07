@@ -142,10 +142,11 @@ These are all fixable in Bubble, but the roadmap (multi-tenant SaaS, Stripe, das
 
 ## 11. References
 
-- Live marketing site: https://easy-oee.com
-- Original spec: `/Users/cqstudio/Library/CloudStorage/Dropbox/Easy OEE/easy-oee-master.md`
-- Bubble app data export (in Dropbox folder): App Data state in master doc Appendix A
-- Existing HTML files (in Dropbox folder): `index.html`, `pricing.html`, `contact.html` — to port
+- Live marketing site: https://easy-oee.com (currently GitHub Pages — Louis's static HTML)
+- **Canonical working path:** `/Volumes/CQ-PRO-4TB/Easy OEE/easy-oee` (portable SSD — see `docs/HANDOFF.md`)
+- Original spec (reference only): `/Volumes/CQ-PRO-4TB/Easy OEE/easy-oee-master.md`
+- Bubble app data export: App Data state in master doc Appendix A
+- Original HTML files: already ported into `src/app/(marketing)/`
 
 ## 12. How to keep this doc useful
 

@@ -1,10 +1,28 @@
 # HANDOFF — Pick this up on a different machine
 
-> **You are switching machines mid-build.** Read this top-to-bottom before doing anything else. Everything you need to continue is in this repo. Last updated: 2026-04-06.
+> **You are switching machines mid-build.** Read this top-to-bottom before doing anything else. Everything you need to continue is in this repo. Last updated: 2026-04-07.
 
 ---
 
-## TL;DR — what to do on the new machine
+## ⚡ Canonical working path (portable SSD)
+
+The project now lives on the **CQ-PRO-4TB external SSD** so it's portable across machines:
+
+```
+/Volumes/CQ-PRO-4TB/Easy OEE/
+├── easy-oee/                    ← THE REPO (work here)
+├── easy-oee-master.md           ← original Bubble-era spec (reference only)
+├── easy-oee-project-brief.md    ← original brief (reference only)
+└── Project Blueprint.docx
+```
+
+**On any new machine:** plug in the SSD, `cd "/Volumes/CQ-PRO-4TB/Easy OEE/easy-oee"`, and you're working in the same checkout. No re-cloning needed. `git pull` to sync with GitHub before starting.
+
+> ⚠️ **Do NOT clone this repo into Dropbox.** node_modules + .next will thrash Dropbox sync and melt your CPU. The SSD is the canonical location now. If you ever need a non-SSD workspace, use `~/Code/easy-oee` instead.
+
+---
+
+## TL;DR — what to do on a new machine
 
 ```bash
 # 1. Make sure you have the toolchain (skip any you already have)
@@ -14,10 +32,9 @@ brew install node pnpm git gh vercel-cli postgresql@16
 gh auth login          # GitHub  → cqdesignsny account
 vercel login           # Vercel → cqdesignsny account
 
-# 3. Clone the repo (NOT inside Dropbox — node_modules will melt your CPU)
-mkdir -p ~/Code && cd ~/Code
-git clone https://github.com/cqdesignsny/easy-oee.git
-cd easy-oee
+# 3. Go to the repo on the SSD (it's already cloned there)
+cd "/Volumes/CQ-PRO-4TB/Easy OEE/easy-oee"
+git pull               # sync any changes from other machines
 
 # 4. Install deps
 pnpm install
@@ -269,15 +286,27 @@ vercel logs           # tail production logs
 
 ---
 
-## Resume here 👇 (the literal next thing to do)
+## Resume here 👇 (the literal next thing to do — as of 2026-04-07)
 
-1. Open this file on the new machine
-2. Run the **TL;DR** commands at the top
-3. Confirm `pnpm dev` shows the marketing site at http://localhost:3000 with the teal design
-4. Confirm `pnpm test` shows **11/11 OEE tests passing**
-5. Confirm `pnpm build` is clean
-6. Then go to **"Open work — pick up here"** section above and start with **Step 1: Provision Neon Postgres**.
-7. After Neon is up, build the operator flow (Step 3) — that's the demo Louis can show prospects.
+**Current machine state:** the iMac (`cqmarketing`) is a **bare machine** — no Homebrew, no node, no pnpm, no gh, no vercel CLI installed yet. Only `git` is present. The repo is cloned to `/Volumes/CQ-PRO-4TB/Easy OEE/easy-oee` but no deps have been installed.
+
+**Unblock sequence:**
+
+1. Plug in the CQ-PRO-4TB SSD
+2. `cd "/Volumes/CQ-PRO-4TB/Easy OEE/easy-oee"` and `git pull`
+3. Install Homebrew if missing: `/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"`
+4. `brew install node pnpm gh vercel-cli postgresql@16`
+5. `gh auth login` (cqdesignsny) and `vercel login` (cqdesignsny)
+6. `pnpm install`
+7. `pnpm test` → expect 11/11 OEE tests passing
+8. `pnpm build` → expect clean
+9. `vercel link --yes --project easy-oee` → `vercel env pull .env.local`
+10. **Then:** Provision Neon Postgres via Vercel Marketplace (see "Open work" Step 1 above), `pnpm db:push`, write `src/lib/db/seed.ts`, then start the operator flow.
+
+**Known issues to investigate after auth:**
+- Vercel preview URL `https://easy-fnqyp90da-cq-marketings-projects.vercel.app` returns **HTTP 401** — likely Vercel deployment protection / SSO. Disable in project Settings → Deployment Protection if you want public preview.
+- `easy-oee.com` is currently served from **GitHub Pages** (Louis's static HTML), NOT Vercel. DON'T cut over DNS until app v1 is ready.
+- Louis's contact-form leads from the live site: destination unknown. Fetch the live `contact.html` and inspect the form action to locate them (Formspree / Netlify Forms / email).
 
 If anything looks wrong, the source of truth is the GitHub repo — the local copy you make should match. Re-clone if in doubt.
 
