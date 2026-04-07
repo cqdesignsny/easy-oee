@@ -1,53 +1,10 @@
 import Link from "next/link";
-
-const ArrowRight = () => (
-  <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
-    <path d="M3 8h10M9 4l4 4-4 4" />
-  </svg>
-);
+import { HomeHero } from "@/components/marketing/HomeHero";
 
 export default function HomePage() {
   return (
     <>
-      {/* HERO */}
-      <section className="hero">
-        <div className="hero-glow" />
-        <div className="hero-grid" />
-        <div className="ticker">
-          AVAILABILITY 94.2%<br />
-          PERFORMANCE 87.1%<br />
-          QUALITY 99.3%<br />
-          OEE 81.6%<br />
-          LINE 3 RUNNING<br />
-          STOP: CHANGEOVER 12 MIN<br />
-          SHIFT: MORNING<br />
-          GOOD PARTS: 1,240<br />
-          REJECT RATE: 0.7%
-        </div>
-        <div className="hero-content fi">
-          <div className="hero-eyebrow">Built for smart manufacturers</div>
-          <h1>
-            YOU DON&apos;T KNOW
-            <br />
-            YOUR <em>REAL OEE.</em>
-            <br />
-            <span className="out">WE CAN FIX THAT.</span>
-          </h1>
-          <p className="hero-sub">
-            Easy OEE gives plant managers real-time visibility into machine performance,
-            downtime causes, and shift efficiency, from any device on the floor. No hardware.
-            No IT department. Up and running today.
-          </p>
-          <div className="hero-actions">
-            <Link href="/contact" className="btn-y">
-              Book a Free Demo <ArrowRight />
-            </Link>
-            <Link href="/how-it-works" className="btn-ghost">
-              See How It Works <ArrowRight />
-            </Link>
-          </div>
-        </div>
-      </section>
+      <HomeHero />
 
       {/* STATS BAR */}
       <div className="stats-bar">
@@ -55,7 +12,7 @@ export default function HomePage() {
           { n: "23%", l: "Average OEE improvement in year one" },
           { n: "<4 min", l: "Operator setup time per shift" },
           { n: "$0", l: "Setup fees, ever" },
-          { n: "100%", l: "Web-based. Zero hardware required" },
+          { n: "100%", l: "Web-based. Works on any device you already own" },
         ].map((s, i) => (
           <div key={s.n} className={`stat fi${i ? ` d${i}` : ""}`}>
             <div className="stat-n">{s.n}</div>
@@ -220,8 +177,8 @@ export default function HomePage() {
           <div className="tag">How it works</div>
           <h2>UP AND RUNNING IN ONE SHIFT.</h2>
           <p className="how-intro">
-            No IT department. No hardware. Operators are logging real data within minutes of
-            account setup.
+            No IT department. No setup project. Operators are logging real data within minutes
+            of account setup.
           </p>
         </div>
         <div className="steps fi d1">
@@ -309,9 +266,9 @@ export default function HomePage() {
               red: true,
             },
             {
-              title: "Zero Hardware Required",
+              title: "Works on Any Device",
               body:
-                "Fully web-based. Works on the phone in the operator's pocket, the tablet on the line, or the PC in your office. Nothing to install.",
+                "Fully web-based. Runs on the phone in the operator's pocket, the tablet on the line, or the PC in your office. Hardware add-on coming soon for plants that want PLC integration.",
               red: true,
             },
           ].map((f) => (

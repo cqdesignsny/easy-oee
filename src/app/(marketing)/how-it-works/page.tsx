@@ -210,7 +210,7 @@ export default function HowItWorksPage() {
           <div className="tag">Getting started</div>
           <h2>FOUR STEPS.</h2>
           <p className="how-intro" style={{ marginInline: "auto" }}>
-            No IT department. No hardware. No training sessions.
+            No IT department. No setup project. No training sessions.
           </p>
         </div>
 
