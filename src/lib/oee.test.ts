@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { computeOEE, formatPercent, oeeBucket } from "./oee";
+import { computeOEE, computeLossTree, formatPercent, oeeBucket } from "./oee";
 
 describe("computeOEE", () => {
   it("happy path — the canonical worked example", () => {
@@ -101,6 +101,35 @@ describe("formatPercent", () => {
   });
   it("respects decimals option", () => {
     expect(formatPercent(0.8125, { decimals: 2 })).toBe("81.25%");
+  });
+});
+
+describe("computeLossTree", () => {
+  it("partitions planned minutes into 4 buckets that sum to plannedMinutes", () => {
+    const t = computeLossTree({
+      plannedMinutes: 480,
+      stopMinutes: 60,
+      goodParts: 780,
+      badParts: 20,
+      idealRate: 2,
+    });
+    expect(t.plannedMinutes).toBe(480);
+    expect(t.downtimeMinutes).toBe(60);
+    const sum = t.goodMinutes + t.qualityLossMinutes + t.speedLossMinutes + t.downtimeMinutes;
+    expect(sum).toBeCloseTo(480, 4);
+    expect(t.goodMinutes).toBeGreaterThan(t.qualityLossMinutes);
+  });
+
+  it("zero ideal rate → all run time becomes speed loss", () => {
+    const t = computeLossTree({
+      plannedMinutes: 480,
+      stopMinutes: 60,
+      goodParts: 0,
+      badParts: 0,
+      idealRate: 0,
+    });
+    expect(t.speedLossMinutes).toBe(420);
+    expect(t.downtimeMinutes).toBe(60);
   });
 });
 

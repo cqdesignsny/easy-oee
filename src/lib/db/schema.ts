@@ -99,6 +99,10 @@ export const line = pgTable(
     name: text("name").notNull(),
     /** Theoretical max parts per minute */
     idealRate: numeric("ideal_rate", { precision: 10, scale: 2 }).notNull(),
+    /** Manager-set OEE target (0–1 decimal). Drives goal line on dashboard + live shift. */
+    targetOee: numeric("target_oee", { precision: 5, scale: 4 }).notNull().default("0.85"),
+    /** Optional public board token for the shop floor TV view (no login). */
+    boardToken: text("board_token").unique(),
     active: boolean("active").notNull().default(true),
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   },
@@ -124,6 +128,8 @@ export const shift = pgTable(
     operatorId: uuid("operator_id")
       .notNull()
       .references(() => user.id),
+    /** If a different operator finished the shift via hand-off, recorded here. */
+    endingOperatorId: uuid("ending_operator_id").references(() => user.id),
     shiftType: shiftTypeEnum("shift_type").notNull(),
     product: text("product").notNull(),
     plannedMinutes: integer("planned_minutes").notNull(),

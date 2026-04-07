@@ -29,6 +29,66 @@ export type OEEResult = {
   totalParts: number;
 };
 
+/**
+ * Loss-tree breakdown of a planned shift, in *minutes equivalent*.
+ *
+ *   plannedMinutes = goodMinutes + qualityLossMinutes + speedLossMinutes + downtimeMinutes
+ *
+ * Useful for the summary "loss tree" stacked bar so operators see *where*
+ * the time actually went, not just three abstract percentages.
+ */
+export type LossTree = {
+  plannedMinutes: number;
+  /** Minutes spent producing good parts at ideal speed. */
+  goodMinutes: number;
+  /** Minutes "lost" to bad parts (produced but rejected). */
+  qualityLossMinutes: number;
+  /** Minutes lost because the line ran slower than ideal rate. */
+  speedLossMinutes: number;
+  /** Minutes the machine was stopped. */
+  downtimeMinutes: number;
+};
+
+export function computeLossTree(input: OEEInput): LossTree {
+  const { plannedMinutes, stopMinutes, goodParts, badParts, idealRate } = input;
+  const downtimeMinutes = Math.min(plannedMinutes, Math.max(0, stopMinutes));
+  const runTime = Math.max(0, plannedMinutes - downtimeMinutes);
+
+  if (idealRate <= 0 || runTime <= 0) {
+    return {
+      plannedMinutes,
+      goodMinutes: 0,
+      qualityLossMinutes: 0,
+      speedLossMinutes: runTime,
+      downtimeMinutes,
+    };
+  }
+
+  // Theoretical max parts in available run time
+  const theoretical = idealRate * runTime;
+  const total = goodParts + badParts;
+  // Time-equivalent of parts actually produced (capped at run time)
+  const producedTime = Math.min(runTime, total / idealRate);
+  const speedLossMinutes = Math.max(0, runTime - producedTime);
+
+  // Within produced time, split good vs bad proportionally
+  const goodFraction = total > 0 ? goodParts / total : 0;
+  const goodMinutes = producedTime * goodFraction;
+  const qualityLossMinutes = producedTime - goodMinutes;
+
+  // Sanity: tiny floating-point drift can leave a few μs unaccounted; the
+  // summary UI should treat these as a single rounded total.
+  void theoretical;
+
+  return {
+    plannedMinutes,
+    goodMinutes,
+    qualityLossMinutes,
+    speedLossMinutes,
+    downtimeMinutes,
+  };
+}
+
 export function computeOEE(input: OEEInput): OEEResult {
   const runTimeMinutes = Math.max(0, input.plannedMinutes - input.stopMinutes);
   const totalParts = input.goodParts + input.badParts;

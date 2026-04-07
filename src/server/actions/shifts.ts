@@ -11,12 +11,13 @@
  */
 
 import { z } from "zod";
-import { and, asc, eq, isNull, sql } from "drizzle-orm";
+import { and, asc, desc, eq, isNull, sql } from "drizzle-orm";
+import bcrypt from "bcryptjs";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { db } from "@/lib/db/client";
 import * as s from "@/lib/db/schema";
-import { requireOperator } from "@/lib/auth/operator-session";
+import { requireOperator, setOperatorCookie } from "@/lib/auth/operator-session";
 import { computeOEE } from "@/lib/oee";
 import { STOP_REASON_VALUES, type StopReasonValue } from "@/lib/stop-reasons";
 
@@ -120,6 +121,91 @@ export async function closeStop(shiftId: string) {
   revalidatePath(`/shift/${shiftId}`);
 }
 
+const NoteSchema = z.object({
+  note: z.string().min(1).max(500),
+});
+
+/**
+ * Attach a note to the most recently *closed* stop on this shift.
+ * Used by the long-stop note prompt that fires after a stop > 10 minutes.
+ */
+export async function addLastStopNote(shiftId: string, note: string) {
+  const session = await requireOperator();
+  const parsed = NoteSchema.parse({ note });
+
+  // Find the most recently closed stop
+  const [last] = await db
+    .select()
+    .from(s.stop)
+    .where(and(eq(s.stop.companyId, session.companyId), eq(s.stop.shiftId, shiftId)))
+    .orderBy(desc(s.stop.startedAt))
+    .limit(1);
+  if (!last || !last.endedAt) return;
+
+  await db
+    .update(s.stop)
+    .set({ notes: parsed.note.trim() })
+    .where(eq(s.stop.id, last.id));
+
+  revalidatePath(`/shift/${shiftId}`);
+}
+
+const HandoffSchema = z.object({
+  shiftId: z.string().uuid(),
+  operatorId: z.string().uuid(),
+  pin: z.string().regex(/^\d{4}$/, "PIN must be 4 digits"),
+});
+
+/**
+ * Hand the active shift off to a different operator on the same tablet.
+ * Verifies the incoming operator's PIN, records them as the ending operator,
+ * and rotates the operator session cookie so subsequent taps log under them.
+ */
+export async function handoffShift(formData: FormData): Promise<{ ok: boolean; error?: string }> {
+  const session = await requireOperator();
+  const parsed = HandoffSchema.safeParse({
+    shiftId: formData.get("shiftId"),
+    operatorId: formData.get("operatorId"),
+    pin: formData.get("pin"),
+  });
+  if (!parsed.success) return { ok: false, error: "Invalid input" };
+
+  const [shiftRow] = await db
+    .select()
+    .from(s.shift)
+    .where(and(eq(s.shift.id, parsed.data.shiftId), eq(s.shift.companyId, session.companyId)))
+    .limit(1);
+  if (!shiftRow) return { ok: false, error: "Shift not found" };
+  if (shiftRow.status === "complete") return { ok: false, error: "Shift already complete" };
+
+  const [op] = await db
+    .select()
+    .from(s.user)
+    .where(
+      and(
+        eq(s.user.id, parsed.data.operatorId),
+        eq(s.user.companyId, session.companyId),
+        eq(s.user.role, "operator"),
+        eq(s.user.active, true),
+      ),
+    )
+    .limit(1);
+  if (!op || !op.pinHash) return { ok: false, error: "Operator not found" };
+
+  const ok = await bcrypt.compare(parsed.data.pin, op.pinHash);
+  if (!ok) return { ok: false, error: "Wrong PIN" };
+
+  // Record on shift, rotate session
+  await db
+    .update(s.shift)
+    .set({ endingOperatorId: op.id })
+    .where(eq(s.shift.id, parsed.data.shiftId));
+
+  await setOperatorCookie(op.id, session.companyId);
+  revalidatePath(`/shift/${parsed.data.shiftId}`);
+  return { ok: true };
+}
+
 const PartsSchema = z.object({
   type: z.enum(["good", "bad"]),
   delta: z.coerce.number().int(),
@@ -211,6 +297,22 @@ export async function getShiftForOperator(shiftId: string) {
     .where(and(eq(s.stop.companyId, session.companyId), eq(s.stop.shiftId, shiftId)))
     .orderBy(asc(s.stop.startedAt));
   return { shift: row, line: lineRow, stops };
+}
+
+/** Roster of active operators for the hand-off picker. */
+export async function listActiveOperators() {
+  const session = await requireOperator();
+  return db
+    .select({ id: s.user.id, fullName: s.user.fullName })
+    .from(s.user)
+    .where(
+      and(
+        eq(s.user.companyId, session.companyId),
+        eq(s.user.role, "operator"),
+        eq(s.user.active, true),
+      ),
+    )
+    .orderBy(asc(s.user.fullName));
 }
 
 // Suppress unused-import warning if `sql` not used elsewhere
