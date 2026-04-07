@@ -25,7 +25,7 @@ const dmMono = DM_Mono({
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://easy-oee.com"),
-  title: "Easy OEE | Real-Time OEE Tracking for Canadian Manufacturers",
+  title: "Easy OEE | Real-Time OEE Tracking for Smart Manufacturers",
   description:
     "Easy OEE helps plant managers track Overall Equipment Effectiveness in real time. Reduce downtime, increase throughput, and make data-driven decisions on the shop floor.",
   icons: {
@@ -36,7 +36,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Easy OEE",
     description:
-      "Real-time OEE tracking for Canadian plant managers. No hardware. No IT. Up and running in one shift.",
+      "Real-time OEE tracking for smart plant managers. No hardware. No IT. Up and running in one shift.",
     url: "https://easy-oee.com",
     siteName: "Easy OEE",
     locale: "en_CA",

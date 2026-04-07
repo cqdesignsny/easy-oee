@@ -25,7 +25,7 @@ export default function HomePage() {
           REJECT RATE: 0.7%
         </div>
         <div className="hero-content fi">
-          <div className="hero-eyebrow">Built for Canadian manufacturers</div>
+          <div className="hero-eyebrow">Built for smart manufacturers</div>
           <h1>
             YOU DON&apos;T KNOW
             <br />

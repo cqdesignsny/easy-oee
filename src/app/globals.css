@@ -473,37 +473,40 @@ h1 .out { -webkit-text-stroke: 1px #eff5f9; color: transparent; }
 .eo-footer {
   background: var(--mid);
   border-top: 1px solid var(--border);
-  padding: 60px 56px 34px;
+  padding: 72px 56px 40px;
 }
 .fg {
   display: grid; grid-template-columns: 2fr 1fr 1fr;
-  gap: 52px; margin-bottom: 40px;
+  gap: 64px; margin-bottom: 48px;
 }
 .fl {
   font-family: var(--font-bebas), "Bebas Neue", sans-serif;
   font-size: 26px; color: var(--accent);
   letter-spacing: 3px; margin-bottom: 13px;
 }
-.fd { font-size: 13px; color: var(--muted); line-height: 1.8; max-width: 250px; }
+.fd { font-size: 17px; color: var(--white); line-height: 1.7; max-width: 360px; font-weight: 400; }
 .fc h4 {
   font-family: var(--font-dm-mono), "DM Mono", monospace;
-  font-size: 10px; letter-spacing: 3px;
-  text-transform: uppercase; color: var(--muted);
-  margin-bottom: 16px;
+  font-size: 12px; letter-spacing: 2.5px;
+  text-transform: uppercase; color: var(--accent);
+  margin-bottom: 20px;
+  font-weight: 500;
 }
 .fc a {
-  display: block; font-size: 13px;
-  color: rgba(239, 245, 249, 0.5);
-  text-decoration: none; margin-bottom: 8px;
+  display: block; font-size: 16px;
+  color: var(--white);
+  text-decoration: none; margin-bottom: 12px;
+  font-weight: 400;
   transition: color 0.2s;
 }
-.fc a:hover { color: var(--white); }
+.fc a:hover { color: var(--accent); }
 .fb {
-  padding-top: 24px;
+  padding-top: 28px;
   border-top: 1px solid var(--border);
   display: flex; justify-content: space-between;
   font-family: var(--font-dm-mono), "DM Mono", monospace;
-  font-size: 11px; color: var(--muted);
+  font-size: 13px; color: var(--white);
+  letter-spacing: 0.5px;
 }
 
 /* FADE-IN ANIMATION (replaces .fi/.on from live site) */
@@ -938,4 +941,44 @@ details[open] .faq-q::after { content: "−"; }
   .stop-list-row .stop-desc { grid-column: 1 / -1; padding-left: 62px; }
   .problem, .how-sec, .feat-sec, .proof-sec, .sol, .pt { padding: 64px 24px !important; }
   .cta-band { padding: 56px 24px !important; }
+}
+
+/* Sign-in SSO buttons */
+.sso-btn {
+  display: flex; align-items: center; justify-content: center;
+  gap: 12px;
+  width: 100%;
+  min-height: 56px;
+  padding: 14px 20px;
+  background: var(--white);
+  color: #1a1a1a;
+  border: 1px solid var(--white);
+  border-radius: 10px;
+  font-family: var(--font-dm-sans), "DM Sans", sans-serif;
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: opacity .15s, transform .15s;
+}
+.sso-btn:hover { opacity: 0.92; }
+.sso-btn:disabled { opacity: 0.55; cursor: not-allowed; }
+
+.sso-divider {
+  position: relative;
+  text-align: center;
+  margin: 20px 0 4px;
+}
+.sso-divider::before {
+  content: ""; position: absolute; top: 50%; left: 0; right: 0;
+  height: 1px; background: var(--border2);
+}
+.sso-divider span {
+  position: relative;
+  background: var(--black);
+  padding: 0 16px;
+  color: var(--muted2);
+  font-family: var(--font-dm-mono), "DM Mono", monospace;
+  font-size: 11px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
 }

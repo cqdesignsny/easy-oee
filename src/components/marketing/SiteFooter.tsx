@@ -11,15 +11,11 @@ export function SiteFooter() {
             alt="Easy OEE"
             width={713}
             height={175}
-            style={{ height: 72, width: "auto", display: "block", marginBottom: 18 }}
+            style={{ height: 72, width: "auto", display: "block", marginBottom: 22 }}
           />
-          <span className="fl" style={{ display: "none" }}>Easy OEE</span>
           <p className="fd">
-            Real-time OEE tracking built for Canadian plant managers. No hardware. No
-            complexity. Just clarity on the shop floor.
-          </p>
-          <p style={{ fontSize: 13, color: "var(--muted)", marginTop: 14, letterSpacing: 1 }}>
-            MADE IN CANADA
+            Real-time OEE tracking built for plant managers who want clarity on the shop floor.
+            No hardware. No complexity.
           </p>
         </div>
         <div className="fc">
