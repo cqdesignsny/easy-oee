@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { desc, eq } from "drizzle-orm";
+import { desc, eq, gte } from "drizzle-orm";
 import { db } from "@/lib/db/client";
 import * as s from "@/lib/db/schema";
 import { formatPercent, oeeBucket } from "@/lib/oee";
@@ -11,6 +11,8 @@ export const dynamic = "force-dynamic";
 function bucketClass(v: number | null) {
   return `oee-${oeeBucket(v)}`;
 }
+
+const SHIFT_ORDER = ["morning", "afternoon", "night"] as const;
 
 export default async function ShiftsPage() {
   const companyId = await getManagerCompanyId();
@@ -39,11 +41,87 @@ export default async function ShiftsPage() {
     .orderBy(desc(s.shift.startedAt))
     .limit(100);
 
+  // Calendar grid: last 14 days × 3 shift types, color-coded by OEE bucket
+  const cutoff = new Date();
+  cutoff.setUTCHours(0, 0, 0, 0);
+  cutoff.setUTCDate(cutoff.getUTCDate() - 13);
+
+  const calendarRows = await db
+    .select({
+      shiftDate: s.shift.shiftDate,
+      shiftType: s.shift.shiftType,
+      oee: s.shift.oee,
+    })
+    .from(s.shift)
+    .where(
+      eq(s.shift.companyId, companyId),
+    );
+  const recent = calendarRows.filter((r) => new Date(r.shiftDate + "T00:00:00Z").getTime() >= cutoff.getTime());
+
+  // Build a Map<date, Map<shiftType, avgOee>>
+  type Cell = { sum: number; n: number };
+  const map = new Map<string, Record<string, Cell>>();
+  for (const r of recent) {
+    if (r.oee == null) continue;
+    const day = map.get(r.shiftDate) ?? {};
+    const cell = day[r.shiftType] ?? { sum: 0, n: 0 };
+    cell.sum += Number(r.oee);
+    cell.n += 1;
+    day[r.shiftType] = cell;
+    map.set(r.shiftDate, day);
+  }
+  const days: string[] = [];
+  for (let i = 13; i >= 0; i--) {
+    const d = new Date(cutoff);
+    d.setUTCDate(d.getUTCDate() + (13 - i));
+    days.push(d.toISOString().slice(0, 10));
+  }
+
+  // suppress the unused `gte` import warning if calendar pivots to a server filter later
+  void gte;
+
   return (
     <main className="app-wrap">
       <div className="app-tag">History</div>
       <h1 className="app-h1">ALL SHIFTS</h1>
       <p style={{ color: "var(--muted2)", marginTop: 8 }}>Most recent 100 shifts.</p>
+
+      {/* Calendar grid */}
+      <div className="card" style={{ marginTop: 24, overflowX: "auto" }}>
+        <div className="kpi-label" style={{ marginBottom: 16 }}>Last 14 Days · Calendar</div>
+        <table className="calendar-grid">
+          <thead>
+            <tr>
+              <th></th>
+              {days.map((d) => (
+                <th key={d}>{d.slice(5)}</th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {SHIFT_ORDER.map((stype) => (
+              <tr key={stype}>
+                <th style={{ textAlign: "right", paddingRight: 12, textTransform: "uppercase", fontFamily: "var(--font-dm-mono)", fontSize: 11, color: "var(--muted2)" }}>
+                  {stype}
+                </th>
+                {days.map((d) => {
+                  const cell = map.get(d)?.[stype];
+                  const avg = cell ? cell.sum / cell.n : null;
+                  return (
+                    <td
+                      key={d + stype}
+                      className={`cal-cell ${avg != null ? bucketClass(avg) : "cal-empty"}`}
+                      title={avg != null ? `${formatPercent(avg)} (${cell!.n})` : "no data"}
+                    >
+                      {avg != null ? Math.round(avg * 100) : ""}
+                    </td>
+                  );
+                })}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
 
       <div className="card" style={{ marginTop: 24, overflowX: "auto" }}>
         {rows.length === 0 ? (
@@ -64,6 +142,7 @@ export default async function ShiftsPage() {
                 <th>Q</th>
                 <th>OEE</th>
                 <th>Status</th>
+                <th></th>
               </tr>
             </thead>
             <tbody>
@@ -92,6 +171,11 @@ export default async function ShiftsPage() {
                       <span className={`pill ${r.status === "in_progress" ? "pill-live" : "pill-done"}`}>
                         {r.status === "in_progress" ? "LIVE" : "DONE"}
                       </span>
+                    </td>
+                    <td>
+                      <Link href={`/dashboard/shifts/${r.id}/edit`} className="btn-ghost" style={{ fontSize: 12 }}>
+                        Edit
+                      </Link>
                     </td>
                   </tr>
                 );

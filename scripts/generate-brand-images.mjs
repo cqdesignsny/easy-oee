@@ -7,7 +7,7 @@
 // opengraph-image.png in src/app/).
 
 import sharp from "sharp";
-import { readFileSync, writeFileSync, mkdirSync } from "node:fs";
+import { readFileSync, mkdirSync } from "node:fs";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 

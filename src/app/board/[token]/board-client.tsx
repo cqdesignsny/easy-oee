@@ -59,7 +59,7 @@ export function BoardClient({
   todayLabel: string;
 }) {
   const router = useRouter();
-  const [now, setNow] = useState(Date.now());
+  const [now, setNow] = useState<number>(0);
 
   useEffect(() => {
     const id = setInterval(() => setNow(Date.now()), 1000);

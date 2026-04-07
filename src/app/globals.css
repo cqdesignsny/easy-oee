@@ -1625,3 +1625,13 @@ textarea.app-input { resize: vertical; min-height: 56px; font-family: var(--font
   text-transform: uppercase;
   letter-spacing: 2px;
 }
+
+/* Calendar grid (dashboard/shifts) */
+.calendar-grid { border-collapse: separate; border-spacing: 4px; width: 100%; min-width: 720px; }
+.calendar-grid th { font-family: var(--font-dm-mono); font-size: 10px; letter-spacing: 1.5px; color: var(--muted2); padding: 6px 0; font-weight: 400; }
+.cal-cell { width: 44px; height: 38px; text-align: center; font-family: var(--font-dm-mono); font-size: 13px; border-radius: 6px; }
+.cal-cell.cal-empty { background: var(--mid); }
+.cal-cell.oee-world-class { background: rgba(3, 191, 181, 0.85); color: #001b1f; }
+.cal-cell.oee-typical    { background: rgba(255, 201, 74, 0.8); color: #2b1d00; }
+.cal-cell.oee-low        { background: rgba(255, 92, 92, 0.8); color: #2b0000; }
+.cal-cell.oee-na         { background: var(--mid); color: var(--muted2); }

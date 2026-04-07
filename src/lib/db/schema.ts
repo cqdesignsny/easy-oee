@@ -55,6 +55,8 @@ export const company = pgTable("company", {
   // Number of licensed production lines (drives Stripe quantity / overage).
   licensedLines: integer("licensed_lines").notNull().default(1),
   subscriptionStatus: text("subscription_status"), // trialing | active | past_due | canceled
+  /** IANA timezone string (e.g. "America/Toronto"). Drives "today" boundaries. */
+  timezone: text("timezone").notNull().default("America/Toronto"),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
 });

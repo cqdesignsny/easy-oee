@@ -2,7 +2,8 @@ import { NextResponse } from "next/server";
 import { db } from "@/lib/db/client";
 import * as s from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
-import { buildDailyDigest, renderDigestText } from "@/server/actions/digest";
+import { buildDailyDigest } from "@/server/actions/digest";
+import { renderDigestText } from "@/lib/digest-render";
 
 /**
  * Vercel Cron entrypoint — runs once a day at ~6 AM (configure in vercel.json).

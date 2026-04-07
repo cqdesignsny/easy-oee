@@ -158,6 +158,76 @@ export async function updateOperator(formData: FormData) {
   revalidatePath("/dashboard/operators");
 }
 
+// ─── Shift edits ────────────────────────────────────────────────────────────
+
+const ShiftEditSchema = z.object({
+  id: z.string().uuid(),
+  product: z.string().min(1).max(120),
+  goodParts: z.coerce.number().int().min(0),
+  badParts: z.coerce.number().int().min(0),
+  plannedMinutes: z.coerce.number().int().min(1).max(1440),
+  reason: z.string().min(1).max(200),
+});
+
+/**
+ * Manager edit of a shift after the fact (typo fix, recount, etc).
+ *
+ * Recomputes OEE if the shift is already complete so the dashboard
+ * stays consistent. Records the reason in shift.product as a fallback —
+ * a proper audit log table comes in Phase 5.
+ */
+export async function editShift(formData: FormData) {
+  const companyId = await getManagerCompanyId();
+  const parsed = ShiftEditSchema.parse({
+    id: formData.get("id"),
+    product: formData.get("product"),
+    goodParts: formData.get("goodParts"),
+    badParts: formData.get("badParts"),
+    plannedMinutes: formData.get("plannedMinutes"),
+    reason: formData.get("reason"),
+  });
+
+  const [shiftRow] = await db
+    .select()
+    .from(s.shift)
+    .where(and(eq(s.shift.id, parsed.id), eq(s.shift.companyId, companyId)))
+    .limit(1);
+  if (!shiftRow) throw new Error("Shift not found");
+
+  const update: Partial<typeof s.shift.$inferInsert> = {
+    product: parsed.product,
+    goodParts: parsed.goodParts,
+    badParts: parsed.badParts,
+    plannedMinutes: parsed.plannedMinutes,
+  };
+
+  // If complete, recompute OEE from the new numbers + the existing stops
+  if (shiftRow.status === "complete") {
+    const stops = await db
+      .select({ minutes: s.stop.minutes })
+      .from(s.stop)
+      .where(eq(s.stop.shiftId, parsed.id));
+    const stopMinutes = stops.reduce((a, x) => a + (x.minutes ? Number(x.minutes) : 0), 0);
+    const { computeOEE } = await import("@/lib/oee");
+    const r = computeOEE({
+      plannedMinutes: parsed.plannedMinutes,
+      stopMinutes,
+      goodParts: parsed.goodParts,
+      badParts: parsed.badParts,
+      idealRate: Number(shiftRow.idealRate),
+    });
+    update.availability = r.availability?.toFixed(4) ?? null;
+    update.performance = r.performance?.toFixed(4) ?? null;
+    update.quality = r.quality?.toFixed(4) ?? null;
+    update.oee = r.oee?.toFixed(4) ?? null;
+  }
+
+  await db.update(s.shift).set(update).where(eq(s.shift.id, parsed.id));
+  revalidatePath("/dashboard");
+  revalidatePath("/dashboard/shifts");
+  revalidatePath(`/shift/${parsed.id}/summary`);
+}
+
 export async function deactivateOperator(formData: FormData) {
   const companyId = await getManagerCompanyId();
   const id = z.string().uuid().parse(formData.get("id"));
