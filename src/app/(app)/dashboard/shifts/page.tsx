@@ -5,7 +5,7 @@ import * as s from "@/lib/db/schema";
 import { formatPercent, oeeBucket } from "@/lib/oee";
 import { getManagerCompanyId } from "@/server/actions/manager";
 
-export const metadata = { title: "Shifts — Easy OEE" };
+export const metadata = { title: "Shifts | Easy OEE" };
 export const dynamic = "force-dynamic";
 
 function bucketClass(v: number | null) {

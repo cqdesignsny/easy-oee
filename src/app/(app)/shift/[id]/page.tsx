@@ -3,7 +3,7 @@ import { getOperatorSession } from "@/lib/auth/operator-session";
 import { getShiftForOperator } from "@/server/actions/shifts";
 import { LiveShift } from "./live-shift";
 
-export const metadata = { title: "Live Shift — Easy OEE" };
+export const metadata = { title: "Live Shift | Easy OEE" };
 export const dynamic = "force-dynamic";
 
 export default async function ShiftPage({ params }: { params: Promise<{ id: string }> }) {

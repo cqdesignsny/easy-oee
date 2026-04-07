@@ -8,7 +8,7 @@ import {
   updateLine,
 } from "@/server/actions/manager";
 
-export const metadata = { title: "Lines — Easy OEE" };
+export const metadata = { title: "Lines | Easy OEE" };
 export const dynamic = "force-dynamic";
 
 export default async function LinesPage() {

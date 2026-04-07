@@ -8,7 +8,7 @@ import {
   updateOperator,
 } from "@/server/actions/manager";
 
-export const metadata = { title: "Operators — Easy OEE" };
+export const metadata = { title: "Operators | Easy OEE" };
 export const dynamic = "force-dynamic";
 
 export default async function OperatorsPage() {

@@ -1,7 +1,7 @@
 import Link from "next/link";
 
 export const metadata = {
-  title: "Privacy Policy — Easy OEE",
+  title: "Privacy Policy | Easy OEE",
   description: "How Easy OEE collects, uses, and protects your data.",
 };
 

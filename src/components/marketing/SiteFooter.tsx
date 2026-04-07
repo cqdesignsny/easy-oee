@@ -10,8 +10,8 @@ export function SiteFooter() {
             Real-time OEE tracking built for Canadian plant managers. No hardware. No
             complexity. Just clarity on the shop floor.
           </p>
-          <p style={{ fontSize: 12, color: "var(--muted)", marginTop: 13 }}>
-            Made in Canada 🍁
+          <p style={{ fontSize: 13, color: "var(--muted)", marginTop: 14, letterSpacing: 1 }}>
+            MADE IN CANADA
           </p>
         </div>
         <div className="fc">

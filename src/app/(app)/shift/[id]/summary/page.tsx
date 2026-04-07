@@ -5,7 +5,7 @@ import { getShiftForOperator } from "@/server/actions/shifts";
 import { formatPercent, oeeBucket } from "@/lib/oee";
 import { stopReasonLabel } from "@/lib/stop-reasons";
 
-export const metadata = { title: "Shift Summary — Easy OEE" };
+export const metadata = { title: "Shift Summary | Easy OEE" };
 export const dynamic = "force-dynamic";
 
 function bucketClass(v: number | null) {
@@ -100,7 +100,7 @@ export default async function SummaryPage({
                 <tr key={s.id}>
                   <td>{stopReasonLabel(s.reason)}</td>
                   <td>{new Date(s.startedAt).toLocaleTimeString()}</td>
-                  <td>{s.minutes ? Number(s.minutes).toFixed(1) : "—"}</td>
+                  <td>{s.minutes ? Number(s.minutes).toFixed(1) : "..."}</td>
                 </tr>
               ))}
             </tbody>

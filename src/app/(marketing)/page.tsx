@@ -14,12 +14,12 @@ export default function HomePage() {
         <div className="hero-glow" />
         <div className="hero-grid" />
         <div className="ticker">
-          AVAILABILITY — 94.2%<br />
-          PERFORMANCE — 87.1%<br />
-          QUALITY — 99.3%<br />
-          OEE — 81.6%<br />
-          LINE 3 — RUNNING<br />
-          STOP: CHANGEOVER — 12 MIN<br />
+          AVAILABILITY 94.2%<br />
+          PERFORMANCE 87.1%<br />
+          QUALITY 99.3%<br />
+          OEE 81.6%<br />
+          LINE 3 RUNNING<br />
+          STOP: CHANGEOVER 12 MIN<br />
           SHIFT: MORNING<br />
           GOOD PARTS: 1,240<br />
           REJECT RATE: 0.7%
@@ -35,8 +35,8 @@ export default function HomePage() {
           </h1>
           <p className="hero-sub">
             Easy OEE gives plant managers real-time visibility into machine performance,
-            downtime causes, and shift efficiency — from any device on the floor. No hardware.
-            No IT department. Live today.
+            downtime causes, and shift efficiency, from any device on the floor. No hardware.
+            No IT department. Up and running today.
           </p>
           <div className="hero-actions">
             <Link href="/contact" className="btn-y">
@@ -55,7 +55,7 @@ export default function HomePage() {
           { n: "23%", l: "Average OEE improvement in year one" },
           { n: "<4 min", l: "Operator setup time per shift" },
           { n: "$0", l: "Setup fees, ever" },
-          { n: "100%", l: "Web-based — zero hardware required" },
+          { n: "100%", l: "Web-based. Zero hardware required" },
         ].map((s, i) => (
           <div key={s.n} className={`stat fi${i ? ` d${i}` : ""}`}>
             <div className="stat-n">{s.n}</div>
@@ -92,13 +92,13 @@ export default function HomePage() {
                 n: "03",
                 strong: "Shift-to-shift comparison is impossible.",
                 rest:
-                  " Without consistent data, every comparison is an argument — not a conversation backed by evidence.",
+                  " Without consistent data, every comparison turns into an argument instead of a conversation backed by evidence.",
               },
               {
                 n: "04",
                 strong: "By the time you see the data, it's too late.",
                 rest:
-                  " End-of-day reports tell you what happened. Easy OEE tells you what's happening — while you can still act.",
+                  " End-of-day reports tell you what happened. Easy OEE tells you what's happening, while you can still do something about it.",
               },
             ].map((p) => (
               <div key={p.n} className="pain-item">
@@ -114,7 +114,7 @@ export default function HomePage() {
         <div className="fi d2">
           <div className="dash">
             <div className="dash-hdr">
-              <span className="dash-lbl">Live Shift — Line 2 / Morning</span>
+              <span className="dash-lbl">Live Shift / Line 2 / Morning</span>
               <span className="dash-live">Running</span>
             </div>
             <div className="oee-g">
@@ -170,7 +170,7 @@ export default function HomePage() {
             <p className="sol-body">
               Easy OEE connects the operator on the floor to the numbers on your screen. Every
               stop gets logged with a reason. Every part gets counted. Availability,
-              Performance, and Quality calculate automatically — no formulas, no spreadsheets,
+              Performance, and Quality calculate automatically. No formulas, no spreadsheets,
               no end-of-day data entry.
             </p>
             <p className="sol-body-strong">
@@ -185,7 +185,10 @@ export default function HomePage() {
                 "Any device",
               ].map((p) => (
                 <div key={p} className="pill">
-                  <span style={{ color: "var(--accent)" }}>✓</span> {p}
+                  <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2.5" style={{ color: "var(--accent)" }}>
+                    <path d="M3 8.5l3.5 3.5L13 5" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>{" "}
+                  {p}
                 </div>
               ))}
             </div>
@@ -202,7 +205,7 @@ export default function HomePage() {
               &ldquo;KNOW YOUR OEE
               <br />
               <span>
-                BEFORE THE SHIFT ENDS —
+                BEFORE THE SHIFT ENDS.
                 <br />
                 NOT THE NEXT MORNING.&rdquo;
               </span>
@@ -227,7 +230,7 @@ export default function HomePage() {
               n: "1",
               title: "Operator Logs In",
               body:
-                "Opens Easy OEE on any device — phone, tablet, or floor terminal. Selects line, shift type, product, and ideal rate. Under 60 seconds.",
+                "Opens Easy OEE on any device. Phone, tablet, or floor terminal. Picks the line, shift type, product, and ideal rate. Under 60 seconds.",
               icon: (
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
                   <path d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
@@ -273,7 +276,7 @@ export default function HomePage() {
           <div className="tag">Features</div>
           <h2>EVERYTHING A PLANT MANAGER ACTUALLY NEEDS.</h2>
           <p className="how-intro">
-            Designed for the realities of the shop floor — not a generic BI tool retrofitted for
+            Built for the realities of the shop floor. Not a generic BI tool retrofitted for
             manufacturing.
           </p>
         </div>
@@ -287,7 +290,7 @@ export default function HomePage() {
             {
               title: "10 Standardized Stop Reasons",
               body:
-                "Mechanical Failure, Changeover, No Material, Quality Check, Maintenance, and more — consistent across every operator and every line.",
+                "Mechanical Failure, Changeover, No Material, Quality Check, Maintenance, and more. The same set across every operator and every line.",
             },
             {
               title: "Automatic Shift Reports",
@@ -297,7 +300,7 @@ export default function HomePage() {
             {
               title: "Multi-Line, Multi-Shift",
               body:
-                "Track Morning, Afternoon, and Night shifts across multiple production lines simultaneously — from a single account.",
+                "Track Morning, Afternoon, and Night shifts across as many lines as you run. All from one account.",
             },
             {
               title: "Company Data Privacy",
@@ -334,24 +337,30 @@ export default function HomePage() {
             {
               i: "DM",
               n: "Derek M.",
-              r: "Plant Manager — Ontario",
+              r: "Plant Manager, Ontario",
               q: "We went from a shared spreadsheet to live OEE data on my phone. The first week we found out changeover was eating 22% of our available time. We'd never measured it before.",
             },
             {
               i: "SC",
               n: "Sarah C.",
-              r: "Operations Director — Quebec",
-              q: "Our operators were skeptical. Two weeks in, they're the ones reminding each other to log stops because they can see the numbers in real time. Simplicity is what made it stick.",
+              r: "Operations Director, Quebec",
+              q: "Our operators were skeptical. Two weeks in, they're the ones reminding each other to log stops because they can see the numbers in real time. Simple is what made it stick.",
             },
             {
               i: "RL",
               n: "Robert L.",
-              r: "Plant Manager — Alberta",
-              q: "Enterprise OEE platforms want $2,000/month and six months to implement. Easy OEE was running on our floor the same afternoon we signed up. The difference is night and day.",
+              r: "Plant Manager, Alberta",
+              q: "Enterprise OEE platforms want $2,000 a month and six months to set up. Easy OEE was running on our floor the same afternoon we signed up. The difference is night and day.",
             },
           ].map((p, idx) => (
             <div key={p.i} className={`pc fi d${idx + 1}`}>
-              <div className="stars">★★★★★</div>
+              <div className="stars" aria-label="5 out of 5 stars">
+                {[0,1,2,3,4].map((i) => (
+                  <svg key={i} width="14" height="14" viewBox="0 0 16 16" fill="currentColor" style={{ display: "inline-block", marginRight: 2 }}>
+                    <path d="M8 0l2.36 5.13L16 5.94l-4 3.94.94 5.6L8 12.8 3.06 15.48 4 9.88 0 5.94l5.64-.81L8 0z" />
+                  </svg>
+                ))}
+              </div>
               <p className="pq">&ldquo;{p.q}&rdquo;</p>
               <div className="pa">
                 <div className="av">{p.i}</div>
@@ -375,8 +384,8 @@ export default function HomePage() {
             NO SETUP FEES. EVER.
           </h2>
           <p className="pt-intro">
-            Priced per production line — you only pay for the lines you track. A single hour of
-            downtime costs more than a full month of Easy OEE. The ROI is obvious on day one.
+            Priced per production line. You only pay for the lines you track. A single hour of
+            downtime costs more than a full month of Easy OEE. The math is obvious on day one.
           </p>
           <div style={{ display: "flex", gap: 14, marginTop: 28, flexWrap: "wrap" }}>
             <Link href="/pricing" className="btn-y" style={{ padding: "13px 26px", fontSize: 14 }}>
@@ -404,7 +413,7 @@ export default function HomePage() {
             <div className="roi-title">THE MATH IS SIMPLE</div>
             <p>
               If your line runs 480 minutes per shift and your OEE is 65%, you&apos;re losing 168
-              minutes of potential production — every single shift.
+              minutes of potential production every single shift.
             </p>
             <p>
               At a conservative $85/minute throughput value, that&apos;s{" "}
@@ -424,7 +433,7 @@ export default function HomePage() {
           <h2>READY TO SEE YOUR REAL OEE?</h2>
           <p>
             Book a free 30-minute demo. We&apos;ll walk through the platform live using your own
-            line configuration — no slides, no pitch.
+            line setup. No slides, no pitch.
           </p>
           <p className="cta-sub">14-day free trial included. No credit card required.</p>
         </div>

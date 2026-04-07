@@ -7,7 +7,7 @@ import * as s from "@/lib/db/schema";
 import { startShift } from "@/server/actions/shifts";
 import { logoutOperator } from "@/server/actions/operator-auth";
 
-export const metadata = { title: "Start Shift — Easy OEE" };
+export const metadata = { title: "Start Shift | Easy OEE" };
 export const dynamic = "force-dynamic";
 
 export default async function OperatorPage() {
@@ -59,7 +59,7 @@ export default async function OperatorPage() {
           <select name="lineId" className="field" required>
             {lines.map((l) => (
               <option key={l.id} value={l.id}>
-                {l.name} — {Number(l.idealRate).toFixed(0)} parts/min
+                {l.name} ({Number(l.idealRate).toFixed(0)} parts/min)
               </option>
             ))}
           </select>

@@ -5,7 +5,7 @@ import * as s from "@/lib/db/schema";
 import { formatPercent, oeeBucket } from "@/lib/oee";
 import { stopReasonLabel } from "@/lib/stop-reasons";
 
-export const metadata = { title: "Dashboard — Easy OEE" };
+export const metadata = { title: "Dashboard | Easy OEE" };
 // Live-ish: refresh every 10s for in-progress shifts
 export const revalidate = 10;
 export const dynamic = "force-dynamic";

@@ -1,7 +1,7 @@
 import { listOperators } from "@/server/actions/operator-auth";
 import { PinForm } from "./pin-form";
 
-export const metadata = { title: "Sign In — Easy OEE" };
+export const metadata = { title: "Sign In | Easy OEE" };
 export const dynamic = "force-dynamic";
 
 export default async function PinPage() {

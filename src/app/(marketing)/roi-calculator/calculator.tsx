@@ -35,7 +35,7 @@ const SLIDERS: Slider[] = [
   { key: "days", label: "Working days per week", min: 1, max: 7, step: 1, unit: "" },
   { key: "mins", label: "Minutes per shift", min: 60, max: 720, step: 10, unit: "min" },
   { key: "rate", label: "Throughput value", min: 5, max: 1000, step: 5, unit: "$/min", hint: "Estimate: hourly revenue ÷ 60" },
-  { key: "oee", label: "Current OEE estimate", min: 30, max: 90, step: 1, unit: "%", hint: "World class = 85%+. Canadian SME average = 60–70%" },
+  { key: "oee", label: "Current OEE estimate", min: 30, max: 90, step: 1, unit: "%", hint: "World class is 85%+. Canadian SME average is 60 to 70%." },
 ];
 
 export function ROICalculator() {
@@ -251,7 +251,7 @@ export function ROICalculator() {
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
               <span className="kpi-big" style={{ fontSize: 56 }}>{out.paybackDisplay}</span>
               <span style={{ fontFamily: "var(--font-bebas)", fontSize: 32, color: "var(--accent)" }}>
-                {out.roi >= 1 ? `${Math.round(out.roi)}x ROI` : "—"}
+                {out.roi >= 1 ? `${Math.round(out.roi)}x ROI` : "n/a"}
               </span>
             </div>
             <div

@@ -1,6 +1,6 @@
 import Link from "next/link";
 
-export const metadata = { title: "Pricing — Easy OEE" };
+export const metadata = { title: "Pricing | Easy OEE" };
 
 const tiers = [
   {
@@ -19,7 +19,7 @@ const tiers = [
   {
     name: "Professional",
     price: "$129",
-    desc: "Most popular — for multi-line plants ready to optimize.",
+    desc: "Most popular. For multi-line plants ready to optimize.",
     featured: true,
     features: [
       "Up to 5 production lines",
@@ -35,11 +35,11 @@ const tiers = [
     price: "Custom",
     desc: "For 5+ lines, multi-plant operations, or custom needs.",
     features: [
-      "Unlimited lines & operators",
+      "Unlimited lines and operators",
       "Custom stop reason categories",
       "Multi-plant dashboard",
       "Dedicated onboarding",
-      "SLA + priority support",
+      "SLA and priority support",
       "Unlimited history",
     ],
   },
@@ -47,91 +47,101 @@ const tiers = [
 
 export default function PricingPage() {
   return (
-    <main className="eo-section" style={{ paddingTop: 160, minHeight: "100vh" }}>
-      <div style={{ textAlign: "center", marginBottom: 80 }}>
-        <div className="section-tag">Pricing</div>
-        <h1 className="eo-h2">SIMPLE. TRANSPARENT.</h1>
-        <p className="section-intro" style={{ margin: "0 auto" }}>
-          Plans in CAD. 14-day free trial. No credit card required.
-        </p>
-      </div>
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(3, 1fr)",
-          gap: 24,
-          maxWidth: 1200,
-          margin: "0 auto",
-        }}
-      >
-        {tiers.map((t) => (
-          <div
-            key={t.name}
-            style={{
-              border: t.featured
-                ? "1px solid var(--accent)"
-                : "1px solid var(--border)",
-              padding: 40,
-              borderRadius: 4,
-              background: t.featured ? "rgba(232,255,71,0.04)" : "transparent",
-            }}
-          >
-            <div className="section-tag" style={{ marginBottom: 12 }}>
-              {t.name}
-            </div>
-            <div
-              style={{
-                fontFamily: "var(--font-bebas)",
-                fontSize: 64,
-                lineHeight: 1,
-                color: "var(--accent)",
-                marginBottom: 8,
-              }}
-            >
-              {t.price}
-              {t.price !== "Custom" && (
-                <span style={{ fontSize: 16, color: "var(--muted)", marginLeft: 8 }}>
-                  CAD/mo
-                </span>
-              )}
-            </div>
-            <p
-              style={{
-                color: "var(--muted)",
-                fontSize: 14,
-                lineHeight: 1.6,
-                marginBottom: 32,
-                minHeight: 60,
-              }}
-            >
-              {t.desc}
-            </p>
-            <Link
-              href="/contact"
-              className="btn-primary"
-              style={{ display: "block", textAlign: "center", marginBottom: 28 }}
-            >
-              Start Free Trial
-            </Link>
-            <ul style={{ listStyle: "none", padding: 0, display: "grid", gap: 12 }}>
-              {t.features.map((f) => (
-                <li
-                  key={f}
-                  style={{
-                    color: "var(--muted)",
-                    fontSize: 14,
-                    display: "flex",
-                    gap: 12,
-                    alignItems: "flex-start",
-                  }}
-                >
-                  <span style={{ color: "var(--accent)" }}>→</span> {f}
-                </li>
-              ))}
-            </ul>
+    <>
+      <section className="sub-hero">
+        <div className="hero-glow" />
+        <div className="hero-grid" />
+        <div className="sub-hero-inner fi">
+          <div className="tag" style={{ justifyContent: "center", display: "inline-flex" }}>
+            Pricing
           </div>
-        ))}
-      </div>
-    </main>
+          <h1>SIMPLE. TRANSPARENT.</h1>
+          <p className="sub-lead">
+            Plans in CAD. 14-day free trial. No credit card required.
+          </p>
+        </div>
+      </section>
+
+      <section className="how-sec">
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(3, 1fr)",
+            gap: 24,
+            maxWidth: 1200,
+            margin: "0 auto",
+          }}
+          className="pricing-grid"
+        >
+          {tiers.map((t) => (
+            <div
+              key={t.name}
+              style={{
+                border: t.featured ? "1px solid var(--accent)" : "1px solid var(--border)",
+                padding: 40,
+                borderRadius: 6,
+                background: t.featured ? "rgba(3,191,181,0.04)" : "transparent",
+              }}
+            >
+              <div className="tag" style={{ marginBottom: 12 }}>
+                {t.name}
+              </div>
+              <div
+                style={{
+                  fontFamily: "var(--font-bebas)",
+                  fontSize: 72,
+                  lineHeight: 1,
+                  color: "var(--accent)",
+                  marginBottom: 10,
+                }}
+              >
+                {t.price}
+                {t.price !== "Custom" && (
+                  <span style={{ fontSize: 18, color: "var(--muted2)", marginLeft: 8 }}>
+                    CAD/mo
+                  </span>
+                )}
+              </div>
+              <p style={{ color: "var(--muted2)", fontSize: 17, lineHeight: 1.6, marginBottom: 32, minHeight: 76 }}>
+                {t.desc}
+              </p>
+              <Link
+                href="/contact"
+                className="btn-y"
+                style={{ display: "block", textAlign: "center", marginBottom: 28 }}
+              >
+                Start Free Trial
+              </Link>
+              <ul style={{ listStyle: "none", padding: 0, display: "grid", gap: 14 }}>
+                {t.features.map((f) => (
+                  <li
+                    key={f}
+                    style={{
+                      color: "var(--muted2)",
+                      fontSize: 16,
+                      display: "flex",
+                      gap: 12,
+                      alignItems: "flex-start",
+                      lineHeight: 1.5,
+                    }}
+                  >
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2.5" style={{ color: "var(--accent)", flexShrink: 0, marginTop: 4 }}>
+                      <path d="M3 8.5l3.5 3.5L13 5" strokeLinecap="round" strokeLinejoin="round" />
+                    </svg>
+                    {f}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <style>{`
+        @media (max-width: 880px) {
+          .pricing-grid { grid-template-columns: 1fr !important; }
+        }
+      `}</style>
+    </>
   );
 }

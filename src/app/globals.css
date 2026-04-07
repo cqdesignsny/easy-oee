@@ -71,25 +71,39 @@ h3 { font-size: clamp(18px, 2.5vw, 26px); letter-spacing: 1px; }
 }
 .nav-logo {
   font-family: var(--font-bebas), "Bebas Neue", sans-serif;
-  font-size: 26px; letter-spacing: 3px;
+  font-size: 32px; letter-spacing: 3px;
   color: var(--accent); text-decoration: none;
 }
-.nav-links { display: flex; gap: 32px; align-items: center; }
+.nav-links { display: flex; gap: 36px; align-items: center; }
 .nav-links a {
-  color: var(--muted); text-decoration: none;
-  font-size: 13.5px; letter-spacing: 0.4px;
+  color: var(--white); text-decoration: none;
+  font-size: 16px; letter-spacing: 0.3px;
+  font-weight: 500;
   transition: color 0.2s;
 }
-.nav-links a:hover { color: var(--white); }
+.nav-links a:hover { color: var(--accent); }
+.nav-signin {
+  border: 1px solid var(--border2);
+  padding: 10px 22px !important;
+  border-radius: 4px !important;
+  color: var(--white) !important;
+  font-weight: 500 !important;
+  transition: all 0.2s !important;
+}
+.nav-signin:hover {
+  border-color: var(--accent);
+  color: var(--accent) !important;
+}
 .nav-cta {
   background: var(--accent) !important;
   color: #003038 !important;
-  padding: 9px 22px !important;
-  border-radius: 2px !important;
-  font-weight: 500 !important;
+  padding: 11px 24px !important;
+  border-radius: 4px !important;
+  font-weight: 600 !important;
+  font-size: 16px !important;
   transition: opacity 0.2s !important;
 }
-.nav-cta:hover { opacity: 0.85 !important; }
+.nav-cta:hover { opacity: 0.88 !important; color: #003038 !important; }
 
 /* HERO */
 .hero {

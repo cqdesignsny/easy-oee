@@ -1,7 +1,7 @@
 import Link from "next/link";
 
 export const metadata = {
-  title: "How Easy OEE Works — Real-Time OEE in 3 Steps",
+  title: "How Easy OEE Works | Real-Time OEE in 3 Steps",
   description:
     "From operator login to live OEE dashboard in under 60 seconds. See exactly how Easy OEE works on the shop floor.",
 };
@@ -15,14 +15,14 @@ const STOPS: [string, string, string][] = [
   ["06", "No Operator", "Waiting for an available qualified operator"],
   ["07", "Maintenance", "Planned preventive maintenance activities"],
   ["08", "Training", "Operator training activities during production hours"],
-  ["09", "No Production Scheduled", "Planned idle time — line not scheduled to run"],
+  ["09", "No Production Scheduled", "Planned idle time. Line is not scheduled to run."],
   ["10", "Other", "Anything not captured by the above categories"],
 ];
 
 const FAQS = [
   {
     q: "Do operators need smartphones?",
-    a: "No. Easy OEE works on any device with a browser — smartphones, tablets, shared terminals, or a PC on the floor. Many plants use an inexpensive wall-mounted tablet as the shared operator interface.",
+    a: "No. Easy OEE runs in any browser. Smartphones, tablets, shared floor terminals, or a PC. Most plants put a cheap wall-mounted tablet at the operator station and call it a day.",
   },
   {
     q: "What if an operator forgets to log a stop?",
@@ -60,7 +60,7 @@ export default function HowItWorksPage() {
           </h1>
           <p className="sub-lead">
             Here&apos;s exactly what happens when an operator picks up their phone and starts a
-            shift in Easy OEE — and what you see as plant manager while it runs.
+            shift in Easy OEE, and what you see as plant manager while it runs.
           </p>
         </div>
       </section>
@@ -80,7 +80,7 @@ export default function HowItWorksPage() {
             <div className="step-bnum">01</div>
             <h3>SHIFT START</h3>
             <p>
-              The operator opens Easy OEE on any device — phone, tablet, or shared floor
+              The operator opens Easy OEE on any device. Phone, tablet, or a shared floor
               terminal. No app download. No training manual.
             </p>
             <p>
@@ -101,7 +101,7 @@ export default function HowItWorksPage() {
             </p>
             <p>
               The button turns red. The timer starts. When the machine restarts, the operator
-              taps again — the stop closes and the duration is calculated automatically.
+              taps again. The stop closes and the duration is calculated automatically.
             </p>
             <p>No paper. No radio calls to the office. No end-of-day reconstruction.</p>
           </div>
@@ -114,7 +114,7 @@ export default function HowItWorksPage() {
             </p>
             <p>
               Availability, Performance, and Quality are calculated instantly. The OEE score
-              appears. The full shift summary is generated — every stop, every reason, every
+              appears. The full shift summary is generated. Every stop, every reason, every
               minute of lost production.
             </p>
             <p style={{ color: "var(--accent)", fontWeight: 500 }}>
@@ -130,7 +130,7 @@ export default function HowItWorksPage() {
           <div className="tag">Standardized</div>
           <h2>10 STOP REASONS.</h2>
           <p className="how-intro" style={{ marginInline: "auto" }}>
-            Every reason is consistent across all lines and all operators — so when you compare
+            Every reason is the same across every line and every operator. When you compare
             shifts or lines, you&apos;re comparing apples to apples.
           </p>
         </div>
@@ -199,7 +199,7 @@ export default function HowItWorksPage() {
           </div>
           <h2>OEE = A × P × Q</h2>
           <p>
-            World class: 85%+ &nbsp;·&nbsp; Typical: 60–75% &nbsp;·&nbsp; Low: below 60%
+            World class: 85%+ &nbsp;·&nbsp; Typical: 60 to 75% &nbsp;·&nbsp; Low: below 60%
           </p>
         </div>
       </section>
@@ -217,8 +217,8 @@ export default function HowItWorksPage() {
         <div className="steps" style={{ gridTemplateColumns: "repeat(4, 1fr)" }}>
           {[
             ["1", "Create your account", "Sign up at app.easy-oee.com. Enter your company name. Takes 2 minutes. No credit card needed for the trial."],
-            ["2", "Add your lines", "Enter each production line and its ideal parts-per-minute rate. Machine 1, Line A, Press 3 — whatever you call them on the floor."],
-            ["3", "Invite operators", "Add operators by email. They get a login link. No training required — the interface is self-explanatory from the first use."],
+            ["2", "Add your lines", "Enter each production line and its ideal parts-per-minute rate. Machine 1, Line A, Press 3, whatever you call them on the floor."],
+            ["3", "Invite operators", "Add operators by email. They get a login link. No training required. The interface explains itself the first time they use it."],
             ["4", "Start your first shift", "Your first real OEE data will be on your screen before the shift ends. That's the whole onboarding process."],
           ].map(([n, t, d]) => (
             <div className="step" key={n}>
@@ -231,7 +231,7 @@ export default function HowItWorksPage() {
 
         <div style={{ textAlign: "center", marginTop: 56 }}>
           <Link href="/contact" className="btn-y">
-            Start Your Free Trial — No Credit Card Required →
+            Start Your Free Trial. No Credit Card Required.
           </Link>
         </div>
       </section>

@@ -11,6 +11,9 @@ export function SiteNav() {
         <Link href="/#features">Features</Link>
         <Link href="/pricing">Pricing</Link>
         <Link href="/roi-calculator">ROI Calculator</Link>
+        <Link href="/sign-in" className="nav-signin">
+          Sign In
+        </Link>
         <Link href="/contact" className="nav-cta">
           Book a Demo
         </Link>

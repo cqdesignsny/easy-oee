@@ -1,7 +1,7 @@
 import Link from "next/link";
 
 export const metadata = {
-  title: "Terms of Service — Easy OEE",
+  title: "Terms of Service | Easy OEE",
   description: "The terms governing use of the Easy OEE platform.",
 };
 
