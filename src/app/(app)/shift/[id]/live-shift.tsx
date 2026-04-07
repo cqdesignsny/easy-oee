@@ -100,7 +100,7 @@ export function LiveShift({
   const totalParts = optimistic.goodParts + optimistic.badParts;
 
   return (
-    <main className="op-shell">
+    <main className="op-shell" style={{ maxWidth: 880, margin: "0 auto", width: "100%" }}>
       <div style={{ marginBottom: 24 }}>
         <Link href="/"><Logo height={42} /></Link>
       </div>

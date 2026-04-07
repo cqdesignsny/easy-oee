@@ -45,7 +45,7 @@ export default async function OperatorPage() {
   if (openShift) redirect(`/shift/${openShift.id}`);
 
   return (
-    <main className="op-shell">
+    <main className="op-shell" style={{ maxWidth: 880, margin: "0 auto", width: "100%" }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 28 }}>
         <Link href="/"><Logo height={48} /></Link>
         <LanguageSwitcher />
@@ -63,7 +63,7 @@ export default async function OperatorPage() {
         </form>
       </div>
 
-      <form action={startShift} className="card card-lg" style={{ maxWidth: 640 }}>
+      <form action={startShift} className="card card-lg">
         <div style={{ marginBottom: 20 }}>
           <label className="field-label">{t("operator.line")}</label>
           <select name="lineId" className="field" required>
