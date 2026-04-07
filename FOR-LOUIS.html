@@ -1,0 +1,1198 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Easy OEE — Para Louis</title>
+<meta name="description" content="Easy OEE — Where we're at. A complete walkthrough of the product, pricing, and features. En español y English.">
+<meta name="theme-color" content="#003038">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --black: #003038;
+    --mid: #004146;
+    --mid-2: #002a32;
+    --white: #EFF5F9;
+    --accent: #03BFB5;
+    --accent-dim: #018076;
+    --warn: #ffc94a;
+    --bad: #ff5c5c;
+    --muted: rgba(239, 245, 249, 0.55);
+    --border: rgba(239, 245, 249, 0.12);
+    --font-bebas: "Bebas Neue", system-ui, sans-serif;
+    --font-sans: "DM Sans", system-ui, sans-serif;
+    --font-mono: "DM Mono", ui-monospace, monospace;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--black);
+    color: var(--white);
+    font-family: var(--font-sans);
+    font-size: 17px;
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+  @media (max-width: 700px) { body { font-size: 16px; } }
+
+  /* ───────── header ───────── */
+  header.site {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    background: rgba(0, 48, 56, 0.92);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border-bottom: 1px solid var(--border);
+  }
+  .header-inner {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 18px 28px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+  }
+  .logo {
+    height: 44px;
+    width: auto;
+    display: block;
+  }
+  @media (max-width: 700px) {
+    .logo { height: 36px; }
+    .header-inner { padding: 14px 18px; }
+  }
+  .lang-switch {
+    display: flex;
+    background: var(--mid);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    padding: 4px;
+    gap: 2px;
+  }
+  .lang-switch button {
+    background: transparent;
+    color: var(--muted);
+    border: 0;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    letter-spacing: 1.5px;
+    padding: 8px 18px;
+    border-radius: 999px;
+    cursor: pointer;
+    text-transform: uppercase;
+    font-weight: 500;
+    transition: all 0.18s;
+  }
+  .lang-switch button:hover { color: var(--white); }
+  .lang-switch button.active {
+    background: var(--accent);
+    color: var(--black);
+    font-weight: 700;
+  }
+
+  /* ───────── hero ───────── */
+  .hero {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 80px 28px 40px;
+    text-align: center;
+  }
+  @media (max-width: 700px) { .hero { padding: 48px 20px 32px; } }
+  .eyebrow {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 20px;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .eyebrow::before {
+    content: "";
+    width: 28px;
+    height: 1px;
+    background: var(--accent);
+  }
+  h1.hero-title {
+    font-family: var(--font-bebas);
+    font-size: clamp(56px, 9vw, 124px);
+    line-height: 0.9;
+    letter-spacing: 0.01em;
+    margin-bottom: 22px;
+  }
+  h1.hero-title span { color: var(--accent); }
+  .hero-sub {
+    font-size: clamp(17px, 2vw, 21px);
+    color: var(--muted);
+    max-width: 720px;
+    margin: 0 auto 36px;
+  }
+  .hero-meta {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--muted);
+    display: flex;
+    gap: 28px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  .hero-meta a {
+    color: var(--accent);
+    text-decoration: none;
+    border-bottom: 1px solid transparent;
+    transition: border-color 0.2s;
+  }
+  .hero-meta a:hover { border-color: var(--accent); }
+
+  /* ───────── article body ───────── */
+  article {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 40px 28px 120px;
+  }
+  @media (max-width: 700px) { article { padding: 32px 20px 80px; } }
+  article[hidden] { display: none; }
+
+  article h2 {
+    font-family: var(--font-bebas);
+    font-size: clamp(36px, 5vw, 56px);
+    line-height: 1;
+    letter-spacing: 0.01em;
+    margin: 64px 0 24px;
+    padding-top: 32px;
+    border-top: 1px solid var(--border);
+    color: var(--white);
+    scroll-margin-top: 100px;
+  }
+  article h2:first-of-type { margin-top: 24px; padding-top: 0; border-top: 0; }
+  article h3 {
+    font-family: var(--font-sans);
+    font-size: 22px;
+    font-weight: 700;
+    margin: 36px 0 14px;
+    color: var(--white);
+    letter-spacing: -0.01em;
+  }
+  article p {
+    margin: 0 0 18px;
+    color: var(--white);
+  }
+  article p strong { color: var(--white); font-weight: 700; }
+  article p em { color: var(--white); }
+  article ul, article ol {
+    margin: 0 0 22px 24px;
+    color: var(--white);
+  }
+  article li { margin-bottom: 8px; }
+  article li::marker { color: var(--accent); }
+  article a {
+    color: var(--accent);
+    text-decoration: none;
+    border-bottom: 1px solid rgba(3, 191, 181, 0.4);
+    transition: border-color 0.2s;
+  }
+  article a:hover { border-bottom-color: var(--accent); }
+  article code {
+    font-family: var(--font-mono);
+    font-size: 0.85em;
+    background: var(--mid);
+    color: var(--accent);
+    padding: 2px 7px;
+    border-radius: 5px;
+    border: 1px solid var(--border);
+  }
+  article hr {
+    border: 0;
+    height: 1px;
+    background: var(--border);
+    margin: 56px 0;
+  }
+  article blockquote {
+    border-left: 3px solid var(--accent);
+    padding: 4px 0 4px 22px;
+    margin: 22px 0;
+    color: var(--muted);
+    font-style: italic;
+  }
+
+  /* tables */
+  .table-wrap {
+    overflow-x: auto;
+    margin: 24px -8px 28px;
+    -webkit-overflow-scrolling: touch;
+  }
+  article table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 0 8px;
+    font-size: 14px;
+    min-width: 480px;
+  }
+  article th, article td {
+    text-align: left;
+    padding: 14px 16px;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+  }
+  article th {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--accent);
+    font-weight: 500;
+    background: var(--mid-2);
+  }
+  article td strong { color: var(--accent); }
+  article tr:hover td { background: rgba(3, 191, 181, 0.04); }
+
+  /* highlight callout cards */
+  .callout {
+    background: var(--mid);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 24px 26px;
+    margin: 28px 0;
+  }
+  .callout.accent {
+    border-color: var(--accent);
+    background: rgba(3, 191, 181, 0.06);
+  }
+  .callout-label {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 10px;
+  }
+
+  /* TOC */
+  nav.toc {
+    background: var(--mid);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 26px 28px;
+    margin-bottom: 48px;
+  }
+  nav.toc h3 {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin: 0 0 14px;
+    font-weight: 500;
+  }
+  nav.toc ol {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px 20px;
+    counter-reset: toc;
+  }
+  @media (max-width: 600px) { nav.toc ol { grid-template-columns: 1fr; } }
+  nav.toc li {
+    counter-increment: toc;
+    font-size: 14px;
+  }
+  nav.toc li::before {
+    content: counter(toc, decimal-leading-zero) " ";
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--muted);
+    margin-right: 6px;
+  }
+  nav.toc a {
+    border-bottom: 0;
+    color: var(--white);
+  }
+  nav.toc a:hover { color: var(--accent); }
+
+  /* footer */
+  footer.site {
+    border-top: 1px solid var(--border);
+    padding: 48px 28px;
+    text-align: center;
+    color: var(--muted);
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+  }
+  footer.site .sig {
+    font-family: var(--font-sans);
+    font-size: 14px;
+    color: var(--white);
+    text-transform: none;
+    letter-spacing: 0;
+    margin-bottom: 8px;
+  }
+
+  /* misc */
+  .pill {
+    display: inline-block;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 1.5px;
+    padding: 4px 12px;
+    border-radius: 999px;
+    background: var(--mid);
+    color: var(--accent);
+    border: 1px solid var(--accent);
+    text-transform: uppercase;
+  }
+</style>
+</head>
+<body>
+
+<header class="site">
+  <div class="header-inner">
+    <svg class="logo" viewBox="0 0 713.38 175.25" xmlns="http://www.w3.org/2000/svg" aria-label="Easy OEE">
+      <defs>
+        <linearGradient id="lg-yellow" x1="126.04" y1=".5" x2="126.04" y2="64.33" gradientUnits="userSpaceOnUse">
+          <stop offset="0" stop-color="#fbb812"/><stop offset=".36" stop-color="#f7bb10"/><stop offset=".69" stop-color="#eec60a"/><stop offset="1" stop-color="#dfd900"/>
+        </linearGradient>
+        <linearGradient id="lg-green" x1="36.7" y1="33.91" x2="36.7" y2="154" gradientUnits="userSpaceOnUse">
+          <stop offset="0" stop-color="#40a528"/><stop offset=".2" stop-color="#42a92c"/><stop offset=".41" stop-color="#4bb538"/><stop offset=".63" stop-color="#59c94d"/><stop offset=".84" stop-color="#6ce569"/><stop offset="1" stop-color="#7fff84"/>
+        </linearGradient>
+        <linearGradient id="lg-sky" x1="183.18" y1="89.18" x2="263.92" y2="89.18" gradientUnits="userSpaceOnUse">
+          <stop offset="0" stop-color="#cce0f4"/><stop offset=".06" stop-color="#c2dcf2"/><stop offset=".17" stop-color="#a9d2ee"/><stop offset=".31" stop-color="#7fc2e7"/><stop offset=".46" stop-color="#46abdd"/><stop offset=".57" stop-color="#1e9cd7"/><stop offset=".87" stop-color="#0075be"/><stop offset=".99" stop-color="#005b97"/>
+        </linearGradient>
+      </defs>
+      <g>
+        <path fill="url(#lg-yellow)" stroke="#000" stroke-miterlimit="10" d="M203.2,21.24c-6.23-3.99-12.86-7.48-19.72-10.38C167.23,3.99,149.98.5,132.21.5s-35.02,3.49-51.27,10.36c-11.62,4.91-22.44,11.45-32.16,19.42l-1.1.9,28.37,33.15,1.05-.84c15.58-12.52,35.15-19.41,55.11-19.41,16.43,0,32.47,4.58,46.39,13.23l1.13.7,24.68-36-1.21-.77Z"/>
+        <path fill="url(#lg-green)" stroke="#000" stroke-miterlimit="10" d="M44.54,33.91l-1.06.97c-1.5,1.37-2.98,2.79-4.4,4.2-12.09,12.09-21.58,26.17-28.22,41.86C3.99,97.19.5,114.44.5,132.21c0,12.01,9.77,21.79,21.79,21.79s21.79-9.77,21.79-21.79c0-24.2,10.16-47.61,27.86-64.24l.97-.91-28.37-33.16Z"/>
+        <path fill="url(#lg-sky)" stroke="#000" stroke-miterlimit="10" d="M253.56,80.93c-6.63-15.69-16.13-29.77-28.22-41.86-5.07-5.07-10.57-9.74-16.34-13.89l-1.15-.83-24.67,35.99,1.08.8c22.59,16.59,36.08,43.16,36.08,71.07,0,12.01,9.77,21.79,21.79,21.79s21.79-9.77,21.79-21.79c0-17.77-3.49-35.02-10.36-51.27Z"/>
+      </g>
+      <g fill="#fff" stroke="#000" stroke-miterlimit="10">
+        <path d="M318.74,102.55c9.34-.26,23.81-.9,31.62-1.66,0,1.41-4.74,4.35-6.78,5.12-4.48,1.15-16.13,2.18-27.26,2.94-3.46,8.96-5.76,16.13-7.04,22.02-.26,1.41.26,1.92,1.92,1.92,13.7,0,28.29-.64,37.38-2.94,0,1.15-2.43,4.48-4.99,5.5-5.89,2.43-23.94,4.86-44.03,4.86-3.07,0-4.1-.9-3.71-2.3,3.46-14.72,14.21-40.19,19.97-51.97,3.33-2.43,9.22-4.35,12.67-4.35-3.84,7.55-7.17,14.59-9.73,20.87ZM318.61,71.32c16.77-1.28,41.09-1.41,48.26-1.79,0,.9-4.1,4.61-7.94,5.63-4.86,1.41-16.9,1.54-29.06,2.18-5.12.26-14.46,1.28-20.61,2.3.51-2.43,5.38-6.78,9.34-8.32Z"/>
+        <path d="M399.5,92.57c2.43,0,5.63.38,7.68.77-4.99,12.29-9.6,24.96-9.6,36.23,0,.9.26,1.54.38,2.3-3.07,3.71-9.22,6.66-11.78,6.66,0-9.98,1.54-16.26,4.1-24.83-7.81,9.09-23.17,25.34-32.13,25.34-3.2,0-4.48-2.94-4.48-5.5,0-6.91,4.35-18.56,12.93-27.14,11.78-11.65,21.5-13.82,32.9-13.82ZM365.58,124.95c0,2.69.38,4.22,1.66,4.22,3.71,0,8.19-3.2,12.54-7.55,8.32-8.45,12.29-16.51,14.72-22.02-1.92-1.02-4.99-1.79-8.32-1.79-2.82,0-7.81,1.15-11.39,4.74-5.12,5.12-9.22,16.51-9.22,22.4Z"/>
+        <path d="M435.85,111c6.27,3.33,10.62,6.14,10.62,11.26,0,2.56-1.28,4.61-3.07,6.4-6.14,6.14-17.15,10.5-25.86,10.5s-12.8-3.97-12.8-8.45c.9-2.69,3.58-6.27,6.27-7.04,1.54,6.91,5.89,12.03,12.29,12.03,3.46,0,6.66-1.02,9.09-3.33,2.3-2.18,3.07-4.1,3.07-5.89,0-2.82-2.43-5.5-8.83-8.96-7.81-4.22-9.86-6.78-9.86-10.37,0-1.79,1.02-3.58,2.43-4.99,4.22-4.22,14.34-9.6,26.88-9.6,2.18,0,4.86.51,6.27,1.15,0,1.79-3.58,5.12-5.5,6.02-2.05-1.79-5.63-3.2-8.7-3.2-3.97,0-7.3,1.02-9.34,3.07-.77.77-1.54,1.92-1.54,3.07,0,2.69,1.41,4.61,8.58,8.32Z"/>
+        <path d="M466.7,165.28c6.4-5.76,10.62-11.01,22.02-49.92-8.83,9.22-25.22,23.17-31.75,23.17-1.66,0-2.82-1.66-2.82-5.5,0-9.09,8.06-28.67,11.14-34.56,2.3-1.79,8.45-4.35,11.26-4.35-8.83,18.18-11.14,27.78-11.14,30.72,0,2.43.38,3.97,1.66,3.97,2.56,0,8.45-3.84,13.57-8.96,9.22-9.22,11.14-14.21,14.08-22.66,3.07-1.79,8.19-4.22,11.52-4.35-2.69,5.63-5.63,14.59-7.94,22.66-7.42,25.47-12.29,36.61-20.35,44.67-10.5,10.37-21.76,14.59-31.49,14.59s-14.46-4.61-15.36-7.94c0-2.05,1.79-7.55,4.61-9.47,2.3,6.79,8.45,13.19,16.13,13.19,6.53,0,11.26-2.05,14.85-5.25Z"/>
+        <path d="M558.56,72.27c6.75,0,12.55,1.37,17.4,4.11,4.84,2.74,8.51,6.64,11,11.69s3.73,10.98,3.73,17.79c0,5.04-.68,9.61-2.04,13.73-1.36,4.12-3.41,7.69-6.13,10.71-2.73,3.02-6.07,5.33-10.04,6.93-3.97,1.6-8.52,2.4-13.64,2.4s-9.66-.82-13.69-2.47c-4.03-1.64-7.39-3.96-10.09-6.95-2.7-2.99-4.73-6.59-6.11-10.8-1.38-4.21-2.07-8.75-2.07-13.64s.72-9.6,2.16-13.77c1.44-4.18,3.52-7.73,6.24-10.66s6.04-5.18,9.95-6.73c3.91-1.55,8.35-2.33,13.33-2.33ZM577.31,105.77c0-4.77-.77-8.9-2.31-12.4-1.54-3.49-3.74-6.14-6.6-7.93-2.86-1.79-6.14-2.69-9.84-2.69-2.64,0-5.07.5-7.31,1.49-2.24.99-4.16,2.44-5.78,4.33-1.62,1.9-2.89,4.32-3.82,7.27-.93,2.95-1.4,6.26-1.4,9.93s.47,7.05,1.4,10.04c.93,2.99,2.25,5.47,3.95,7.44,1.7,1.97,3.66,3.44,5.87,4.42,2.21.98,4.63,1.47,7.26,1.47,3.38,0,6.48-.84,9.31-2.53,2.83-1.69,5.08-4.29,6.75-7.82,1.67-3.52,2.51-7.87,2.51-13.02Z"/>
+        <path d="M644.89,83.56h-29.73v16h27.37c2.01,0,3.52.45,4.51,1.36.99.9,1.49,2.1,1.49,3.58s-.49,2.69-1.47,3.62-2.49,1.4-4.53,1.4h-27.37v18.53h30.75c2.07,0,3.64.48,4.69,1.45,1.05.96,1.58,2.24,1.58,3.84s-.53,2.79-1.58,3.76c-1.05.96-2.62,1.44-4.69,1.44h-35.86c-2.87,0-4.94-.64-6.2-1.91-1.26-1.27-1.89-3.33-1.89-6.18v-48.97c0-1.89.28-3.44.84-4.64s1.44-2.07,2.64-2.62c1.2-.55,2.73-.82,4.6-.82h34.84c2.1,0,3.67.47,4.69,1.4,1.02.93,1.53,2.16,1.53,3.67s-.51,2.78-1.53,3.71c-1.02.93-2.58,1.4-4.69,1.4Z"/>
+        <path d="M705.59,83.56h-29.73v16h27.37c2.01,0,3.52.45,4.51,1.36.99.9,1.49,2.1,1.49,3.58s-.49,2.69-1.47,3.62-2.49,1.4-4.53,1.4h-27.37v18.53h30.75c2.07,0,3.64.48,4.69,1.45,1.05.96,1.58,2.24,1.58,3.84s-.53,2.79-1.58,3.76c-1.05.96-2.62,1.44-4.69,1.44h-35.86c-2.87,0-4.94-.64-6.2-1.91-1.26-1.27-1.89-3.33-1.89-6.18v-48.97c0-1.89.28-3.44.84-4.64s1.44-2.07,2.64-2.62c1.2-.55,2.73-.82,4.6-.82h34.84c2.1,0,3.67.47,4.69,1.4,1.02.93,1.53,2.16,1.53,3.67s-.51,2.78-1.53,3.71c-1.02.93-2.58,1.4-4.69,1.4Z"/>
+      </g>
+      <path fill="#fff" stroke="#000" stroke-width="3" stroke-miterlimit="10" d="M129.31,110.74l84.49-61.74c1.59-1.16,3.81-.81,4.97.77c1,1.37.9,3.27-.26,4.51l-86.68,93.82c-1.71,1.85-4.24,2.73-6.73,2.35c-1.99-.31-3.77-1.39-4.96-3.02l-26.9-36.81c-3.63-4.97-2.55-11.94,2.42-15.58c4.05-2.96,9.57-2.85,13.5.27c7.83,6.21,19.84,15.66,20.14,15.43Z"/>
+    </svg>
+    <div class="lang-switch" role="tablist" aria-label="Language">
+      <button data-set-lang="es" class="active" role="tab">Español</button>
+      <button data-set-lang="en" role="tab">English</button>
+    </div>
+  </div>
+</header>
+
+<!-- ======================================================================
+     HERO — language-aware
+     ====================================================================== -->
+<section class="hero" data-lang="es">
+  <div class="eyebrow">Documento para Louis · Abril 2026</div>
+  <h1 class="hero-title">EASY OEE<br><span>EN DÓNDE ESTAMOS</span></h1>
+  <p class="hero-sub">Un recorrido completo del producto: qué es, cómo se usa, los precios, los idiomas, todo lo que hemos construido y hacia dónde va.</p>
+  <div class="hero-meta">
+    <span><a href="https://easy-oee.vercel.app" target="_blank" rel="noopener">easy-oee.vercel.app</a></span>
+    <span>contraseña: <code>EasyOEE2026Admin</code></span>
+    <span>operador PIN: <code>1234</code></span>
+  </div>
+</section>
+
+<section class="hero" data-lang="en" hidden>
+  <div class="eyebrow">For Louis · April 2026</div>
+  <h1 class="hero-title">EASY OEE<br><span>WHERE WE'RE AT</span></h1>
+  <p class="hero-sub">A complete walkthrough of the product: what it is, who uses it, pricing, languages, everything we've built so far, and where it's going.</p>
+  <div class="hero-meta">
+    <span><a href="https://easy-oee.vercel.app" target="_blank" rel="noopener">easy-oee.vercel.app</a></span>
+    <span>password: <code>EasyOEE2026Admin</code></span>
+    <span>operator PIN: <code>1234</code></span>
+  </div>
+</section>
+
+<!-- ======================================================================
+     SPANISH ARTICLE
+     ====================================================================== -->
+<article data-lang="es">
+
+<nav class="toc">
+  <h3>Contenido</h3>
+  <ol>
+    <li><a href="#es-pitch">El pitch en 60 segundos</a></li>
+    <li><a href="#es-que-es">Qué es Easy OEE</a></li>
+    <li><a href="#es-quien">Quién la usa y cómo</a></li>
+    <li><a href="#es-precios">Precios</a></li>
+    <li><a href="#es-probar">Cómo probarla ahora</a></li>
+    <li><a href="#es-operador">Día del operador</a></li>
+    <li><a href="#es-gerente">Día del gerente</a></li>
+    <li><a href="#es-tv">El nuevo modo TV Board</a></li>
+    <li><a href="#es-idiomas">Idiomas</a></li>
+    <li><a href="#es-todo">Todo lo construido</a></li>
+    <li><a href="#es-siguiente">Qué sigue</a></li>
+    <li><a href="#es-faq">Preguntas frecuentes</a></li>
+  </ol>
+</nav>
+
+<h2 id="es-pitch">El pitch en 60 segundos</h2>
+<p>La mayoría de las fábricas están adivinando qué tan bien funcionan sus máquinas. Creen que están al 90% de eficiencia. En realidad están al 55%. Pierden dinero todos los días y no lo saben.</p>
+<p><strong>Easy OEE</strong> es una aplicación web que le da al operador de planta una tablet en el piso de producción donde toca botones grandes para registrar su turno, los paros y las piezas producidas. La app hace las matemáticas automáticamente y le da al gerente <strong>un solo número del 0 al 100</strong> que le dice exactamente cómo está funcionando su fábrica, en tiempo real.</p>
+<ul>
+  <li>No requiere hardware (todavía — eso lo construiremos en la Fase 4)</li>
+  <li>Sin hojas de cálculo, sin papel</li>
+  <li>Funcionando en un solo turno</li>
+  <li>Construido para fabricantes pequeños y medianos de Canadá y EE.UU.</li>
+  <li>$49 a $129 USD por mes</li>
+</ul>
+<p>Eso es todo el producto.</p>
+
+<h2 id="es-que-es">Qué es Easy OEE en realidad</h2>
+<p>OEE significa <strong>Overall Equipment Effectiveness</strong> (Efectividad General del Equipo). Es la métrica estándar de oro para medir productividad en manufactura, usada en todas partes desde Toyota hasta Tesla. Es un solo porcentaje del 0 al 100 que combina tres cosas:</p>
+<div class="table-wrap"><table>
+  <thead><tr><th>Componente</th><th>Lo que mide</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Disponibilidad</strong></td><td>¿La máquina estaba funcionando cuando debía?</td></tr>
+    <tr><td><strong>Desempeño</strong></td><td>¿Funcionaba a la velocidad correcta cuando estaba encendida?</td></tr>
+    <tr><td><strong>Calidad</strong></td><td>De las piezas producidas, ¿cuántas salieron buenas?</td></tr>
+  </tbody>
+</table></div>
+<div class="callout accent">
+  <div class="callout-label">Fórmula</div>
+  <p style="margin:0; font-family:var(--font-mono); font-size:18px; color:var(--white);">OEE = Disponibilidad × Desempeño × Calidad</p>
+</div>
+<p>Una puntuación del <strong>85% o más</strong> se considera de clase mundial. La mayoría de las plantas que nunca lo han medido se sorprenden al descubrir que están al 50-60%. En el momento en que empiezan a medirlo, empiezan a mejorarlo — y eso solo ya vale el precio del software.</p>
+<p>Easy OEE maneja todas las matemáticas automáticamente. El operador solo toca botones. El gerente solo lee los números.</p>
+
+<h2 id="es-quien">Quién la usa y cómo</h2>
+<p>Hay <strong>dos tipos de usuarios completamente distintos</strong> en Easy OEE:</p>
+<h3>1. El Gerente (el comprador)</h3>
+<ul>
+  <li>Paga la suscripción con tarjeta de crédito</li>
+  <li>Inicia sesión con <strong>correo electrónico + contraseña</strong> desde una laptop en su oficina</li>
+  <li>Ve un panel en vivo de cada máquina, cada turno, cada puntuación</li>
+  <li>Agrega líneas de producción, invita operadores, descarga reportes</li>
+  <li>Probablemente nunca pisa el piso de producción</li>
+  <li><strong>Este es nuestro cliente</strong></li>
+</ul>
+<h3>2. El Operador (el trabajador)</h3>
+<ul>
+  <li><strong>No tiene correo electrónico ni contraseña</strong></li>
+  <li>Camina hasta una tablet compartida atornillada a la máquina</li>
+  <li>Escribe un <strong>PIN de 4 dígitos</strong> como en un cajero automático</li>
+  <li>Aparece su nombre, elige la máquina, inicia su turno</li>
+  <li>Toca botones grandes durante todo el turno para registrar paros y piezas</li>
+  <li>Al final, toca "Terminar Turno" → ve su puntuación → se va</li>
+  <li>Este es <strong>el usuario del producto que el gerente compró</strong></li>
+</ul>
+<p><strong>¿Por qué dos sistemas?</strong> Porque un trabajador de fábrica con guantes de hule a las 6 AM no va a teclear un correo y una contraseña. Va a teclear cuatro dígitos. Cualquier cosa más complicada que eso y dejará de registrar datos — lo que hace que todo el producto sea inútil. El sistema de PIN no es un atajo. Es el único diseño que sobrevive al contacto con un piso de producción real.</p>
+
+<h2 id="es-precios">Precios</h2>
+<p>Todos los precios están en <strong>USD por mes</strong>, facturados mensual o anualmente (anual tiene descuento). Las conversiones aproximadas a dólares canadienses se muestran como referencia, pero a los clientes se les cobra en USD.</p>
+<div class="table-wrap"><table>
+  <thead><tr><th>Plan</th><th>Precio</th><th>Líneas</th><th>Operadores</th><th>Historial</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Starter</strong></td><td>$49 USD/mes</td><td>1 línea</td><td>Hasta 5</td><td>90 días</td></tr>
+    <tr><td><strong>Professional</strong></td><td>$129 USD/mes</td><td>Hasta 5</td><td>Hasta 25</td><td>1 año</td></tr>
+    <tr><td><strong>Enterprise</strong></td><td>Personalizado</td><td>Ilimitado</td><td>Ilimitado</td><td>Para siempre</td></tr>
+  </tbody>
+</table></div>
+<p><strong>Pagas por máquina, no por trabajador.</strong> Este es el modelo correcto porque el valor de medir el OEE escala con el número de máquinas que se miden, no con el número de personas. Una planta con 100 trabajadores y 2 máquinas paga lo mismo que una planta con 10 trabajadores y 2 máquinas — ambas obtienen la misma información.</p>
+<p><strong>Prueba gratis de 14 días, sin tarjeta de crédito.</strong></p>
+<p>Hay un <strong>deslizador de número de líneas</strong> en la página de precios para que los clientes vean exactamente cuánto pagarían según su configuración antes de comprometerse.</p>
+
+<h3>Qué incluye cada plan</h3>
+<p><strong>Starter ($49/mes) incluye:</strong></p>
+<ul>
+  <li>1 línea de producción</li>
+  <li>Hasta 5 cuentas de operador</li>
+  <li>Las 10 categorías de razones de paro</li>
+  <li>Panel de OEE en tiempo real</li>
+  <li>Seguimiento de turno en vivo con cronómetros</li>
+  <li>Árbol de pérdidas en el resumen del turno</li>
+  <li>Reportes de resumen de turno</li>
+  <li>Exportación a CSV</li>
+  <li>Exportación a PDF / impresión</li>
+  <li>Historial de 90 días</li>
+</ul>
+<p><strong>Professional ($129/mes) incluye todo lo de Starter, más:</strong></p>
+<ul>
+  <li>Hasta 5 líneas de producción</li>
+  <li>Hasta 25 cuentas de operador</li>
+  <li>Panel multi-línea con comparación de turnos</li>
+  <li>Gráfica de Pareto de razones de paro de los últimos 7 días</li>
+  <li>Vista de calendario de turnos recientes</li>
+  <li>Flujo de edición de turno con registro de auditoría</li>
+  <li>Modo TV Board público para pantallas en piso de producción</li>
+  <li>Resúmenes de turno por correo</li>
+  <li>Resumen diario por correo (cuando se conecte Resend)</li>
+  <li>Historial de 1 año</li>
+</ul>
+<p><strong>Enterprise (precio personalizado) incluye todo lo de Professional, más:</strong></p>
+<ul>
+  <li>Líneas y operadores ilimitados</li>
+  <li>Categorías personalizadas de razones de paro</li>
+  <li>Consolidación multi-planta</li>
+  <li>Onboarding dedicado</li>
+  <li>SLA + soporte prioritario</li>
+  <li>Historial ilimitado</li>
+  <li>Futuro: integración con hardware (lectura de PLC)</li>
+  <li>Futuro: acceso a API para integración con ERP</li>
+</ul>
+
+<h2 id="es-probar">Cómo probar la app ahora mismo</h2>
+<p>Puedes probar toda la app tú mismo en cinco minutos.</p>
+
+<h3>Como gerente</h3>
+<ol>
+  <li>Ve a <a href="https://easy-oee.vercel.app/sign-in" target="_blank" rel="noopener">easy-oee.vercel.app/sign-in</a></li>
+  <li><strong>Correo:</strong> lo que sea (literalmente cualquier dirección — el login temporal no valida)</li>
+  <li><strong>Contraseña:</strong> <code>EasyOEE2026Admin</code></li>
+  <li>Llegarás al <strong>Panel del Gerente</strong> con datos de demostración cargados</li>
+  <li>Haz clic por todos lados: Dashboard, Líneas, Operadores, Turnos en la barra lateral</li>
+</ol>
+
+<h3>Como operador</h3>
+<ol>
+  <li>Ve a <a href="https://easy-oee.vercel.app/pin" target="_blank" rel="noopener">easy-oee.vercel.app/pin</a></li>
+  <li>Elige <strong>Pierre Lavoie</strong> de la lista</li>
+  <li><strong>PIN:</strong> <code>1234</code></li>
+  <li>Ya iniciaste sesión como operador</li>
+  <li>Verás el formulario de <strong>Iniciar Turno</strong> — elige una línea, tipo de turno, producto</li>
+  <li>Toca <strong>Iniciar Turno</strong></li>
+  <li>Ahora estás en la <strong>pantalla de Turno en Vivo</strong></li>
+</ol>
+
+<h3>Qué probar en la pantalla de turno en vivo</h3>
+<ul>
+  <li><strong>Toca una razón de paro</strong> (ej., "Falla Mecánica") — el botón se pone amarillo, aparece una tarjeta roja grande con un cronómetro contando, la estimación de OEE empieza a bajar</li>
+  <li><strong>Espera unos segundos, toca el mismo botón otra vez</strong> para reanudar — la tarjeta desaparece, el cronómetro de tiempo transcurrido sigue corriendo</li>
+  <li><strong>Toca +1 o +10 en Piezas Buenas</strong> — el contador sube, la estimación de OEE en vivo se actualiza</li>
+  <li><strong>Mira la fila de cronómetros</strong> — tiempo transcurrido del turno, hora prevista de fin, minutos totales de paro</li>
+  <li><strong>Mira la tarjeta de OEE en Vivo</strong> — codificada por color contra el objetivo, con un delta que muestra qué tan arriba o abajo estás</li>
+  <li><strong>Detén una parada larga (10+ minutos)</strong> — al reanudar, recibirás un aviso pidiendo una nota rápida sobre lo que pasó (esto construye memoria institucional de qué se descompone realmente)</li>
+  <li><strong>Toca Cambio de Turno</strong> — elige otro operador, escribe su PIN, el turno continúa bajo su nombre sin reiniciar nada</li>
+  <li><strong>Toca Terminar Turno</strong> — el servidor ejecuta el cálculo de OEE y llegas a la página de <strong>Resumen del Turno</strong></li>
+</ul>
+
+<h3>Qué probar en el resumen del turno</h3>
+<ul>
+  <li><strong>Número grande de OEE</strong> arriba, codificado por color</li>
+  <li><strong>Tres tarjetas de componentes</strong> para Disponibilidad / Desempeño / Calidad</li>
+  <li><strong>El Árbol de Pérdidas</strong> — una barra horizontal apilada que muestra exactamente a dónde se fue cada minuto planeado (Producción Buena / Pérdida de Calidad / Pérdida de Velocidad / Tiempo de Paro). Esta es una de las gráficas más útiles en OEE y la mayoría de los competidores no la muestran.</li>
+  <li><strong>Tabla de detalle de producción</strong> con todos los números</li>
+  <li><strong>Tabla de eventos de paro</strong> con cada parada, hora, duración y notas</li>
+  <li><strong>Tres botones de exportación:</strong> descargar CSV, imprimir/guardar PDF, enviar por correo</li>
+  <li><strong>Iniciar Nuevo Turno</strong> y <strong>Dashboard</strong> botones arriba para navegación con un solo toque</li>
+</ul>
+
+<h2 id="es-operador">La experiencia del operador, paso a paso</h2>
+<p>Un día real de un operador llamado John, trabajando el turno matutino en la Línea de Embotellado 1:</p>
+<p><strong>6:55 AM</strong> — John camina hasta la tablet atornillada a la Línea 1. Toca la pantalla. La página de PIN muestra una lista de nombres. Toca <strong>John Smith</strong>. Escribe <strong>4729</strong>. La app dice "Hola John."</p>
+<p><strong>6:56 AM</strong> — Está en el formulario de configuración de turno. Elige la Línea 1 de los botones de radio, elige "Turno Matutino", escribe "botellas de agua de 16oz" en el campo de producto. Los minutos planeados por defecto son 480 (8 horas). La cadencia ideal por defecto se toma de la configuración de la línea (120 botellas/min). Toca <strong>Iniciar Turno</strong>.</p>
+<p><strong>7:00 AM</strong> — Ahora está en la pantalla de Turno en Vivo. Una píldora grande de "EN MARCHA" en la esquina superior derecha. El cronómetro de tiempo transcurrido empieza a contar. La estimación de OEE muestra N/A porque todavía no hay datos.</p>
+<p><strong>7:00 AM – 9:00 AM</strong> — La línea está corriendo. John toca <strong>+10 Piezas Buenas</strong> aproximadamente cada minuto. La tarjeta de OEE en Vivo sube lentamente al verde.</p>
+<p><strong>9:14 AM</strong> — Una botella se atora. John toca <strong>Falla Mecánica</strong>. El botón se pone amarillo. La tarjeta roja grande aparece con un cronómetro contando. La píldora de arriba cambia a "DETENIDO". La estimación de OEE empieza a bajar en tiempo real.</p>
+<p><strong>9:23 AM</strong> — Atasco resuelto. John toca el mismo botón otra vez. La tarjeta desaparece. <strong>Como la parada duró 9 minutos, todavía no se dispara el aviso de nota.</strong> El turno se reanuda.</p>
+<p><strong>12:00 PM</strong> — Hora del almuerzo. John toca <strong>Descanso Programado</strong>. La tarjeta aparece otra vez con un cronómetro fresco.</p>
+<p><strong>12:30 PM</strong> — De regreso del almuerzo. John toca <strong>Descanso Programado</strong> para reanudar. <strong>30 minutos está sobre el umbral de 10 minutos</strong>, así que aparece un aviso de nota: "Esa parada duró 30 minutos por Descanso Programado. Deja una nota para que el equipo sepa qué pasó." John escribe "almuerzo" y toca Guardar Nota. La nota ahora está adjunta a ese registro de parada para siempre.</p>
+<p><strong>3:00 PM</strong> — Fin del turno. John toca <strong>Terminar Turno</strong>. Una confirmación pregunta "¿Terminar este turno? El OEE final será calculado y guardado." Toca OK.</p>
+<p><strong>3:00:01 PM</strong> — El servidor ejecuta el cálculo de OEE:</p>
+<div class="callout">
+  <div class="callout-label">Cálculo del servidor</div>
+  <ul style="margin:0;">
+    <li>Minutos planeados: 480</li>
+    <li>Minutos de paro: 67</li>
+    <li>Tiempo de marcha: 413 minutos</li>
+    <li><strong>Disponibilidad = 413/480 = 86%</strong></li>
+    <li>Piezas buenas: 47,840 / Piezas malas: 380</li>
+    <li><strong>Desempeño = 48,220 / (120 × 413) = 97%</strong></li>
+    <li><strong>Calidad = 47,840 / 48,220 = 99%</strong></li>
+    <li><strong>OEE = 86 × 97 × 99 = 82.6%</strong></li>
+  </ul>
+</div>
+<p><strong>3:00:02 PM</strong> — John llega al Resumen del Turno. "82.6%" grande en el centro, codificado en color verdoso (un poco abajo de la marca de clase mundial del 85%). Puede ver el árbol de pérdidas mostrando exactamente a dónde se fue el tiempo, la lista de todas sus paradas con notas, y los botones de exportación. Toca <strong>Iniciar Nuevo Turno</strong> si otro trabajador toma su lugar, o simplemente se va.</p>
+<p>Ese es el ciclo del operador. <strong>Está diseñado para ser usable con una sola mano, con guantes, por alguien que nunca ha visto la app antes, sin entrenamiento.</strong></p>
+
+<h2 id="es-gerente">La experiencia del gerente, paso a paso</h2>
+<p>Sarah es la gerente de producción. Trabaja en una oficina un piso arriba del piso de producción. Tiene una laptop. Tiene correo. Tiene una tarjeta de crédito. Es nuestro cliente.</p>
+<p><strong>Lunes, 7:30 AM</strong> — Sarah se sirve su primer café, abre su laptop, va a easy-oee.com/sign-in, escribe su correo y contraseña. Llega al Panel del Gerente.</p>
+<p><strong>Arriba del panel</strong> — un número gigante de "OEE de Hoy" para toda la planta. Está actualmente en 73% porque Pierre en la Línea 2 tuvo un mal arranque de turno.</p>
+<p><strong>Debajo de eso</strong> — tres tarjetas lado a lado comparando los promedios de <strong>Mañana vs Tarde vs Noche</strong> durante los últimos 7 días. Su turno de noche está al 64% vs su turno de mañana al 81%. Sarah toma nota mental de hablar con el supervisor de noche.</p>
+<p><strong>Tabla de Turnos en Vivo</strong> — muestra cada turno actualmente corriendo en toda la planta. Puede ver que Pierre está en la Línea 2 con 1,200 piezas producidas hasta ahora, comenzó a las 7:00 AM.</p>
+<p><strong>Tabla de Turnos Recientes</strong> — los últimos 10 turnos completados con su desglose completo de A/D/C y OEE final, codificados por color.</p>
+<p><strong>Top de Razones de Paro (Pareto)</strong> — una gráfica de barras horizontales de los últimos 7 días de tiempo de paro, ordenada por minutos totales perdidos. "Falla Mecánica" es la más grande con 142 minutos, "Sin Material" sigue con 67 minutos. Sabe exactamente qué arreglar primero.</p>
+<p><strong>Hace clic en "Líneas"</strong> — ve todas sus líneas de producción, sus cadencias ideales, sus objetivos de OEE, y <strong>sus enlaces de TV Board</strong>. Hace clic en <strong>Generar</strong> en la Línea 1, obtiene una URL pública, y se la envía por mensaje al técnico de mantenimiento que tiene una TV en su oficina.</p>
+<p><strong>Hace clic en "Turnos"</strong> — ve una cuadrícula de calendario de los últimos 14 días, 3 filas (mañana/tarde/noche) × 14 columnas. Cada celda está coloreada por el bucket de OEE. Inmediatamente nota que la noche del miércoles fue un desastre — rojo brillante. Hace clic en el número de OEE de ese turno y llega a su resumen.</p>
+<p><strong>Nota que el operador escribió mal el nombre del producto</strong> — "botellas de 168oz" en lugar de "16oz". Hace clic en <strong>Editar</strong>, arregla el error, escribe "error de tecleo del operador" en el campo de razón de auditoría, presiona Guardar. Listo.</p>
+<p><strong>Se va a una junta</strong> — pero antes de irse, recibirá un <strong>resumen por correo</strong> mañana a las 6 AM resumiendo el desempeño del día anterior por línea, las 3 razones principales de paro, y un párrafo narrativo escrito por Claude AI explicando a qué prestar atención primero.</p>
+<p>Ese es el ciclo del gerente. <strong>Nunca tiene que pensar en cómo funciona el OEE ni hacer matemáticas. La app lo hace. Ella solo lee los números y toma decisiones.</strong></p>
+
+<h2 id="es-tv">El nuevo modo TV Board</h2>
+<p>Esta es una de las funciones más diferenciadas del producto y nadie más piensa en construirla.</p>
+<p>El gerente genera un <strong>token público de tablero</strong> para cada línea desde la página de administración de Líneas. Eso le da una URL pública. La abren en una TV de 55 pulgadas atornillada arriba de la línea de producción. <strong>Sin login. Sin chrome del navegador. Solo números.</strong></p>
+<p>Lo que aparece en la TV:</p>
+<ul>
+  <li><strong>El nombre de la línea</strong> en tipografía Bebas Neue gigante en la parte superior izquierda</li>
+  <li><strong>Una píldora de EN MARCHA / DETENIDO</strong> en la parte superior derecha (roja cuando está detenida)</li>
+  <li><strong>El número actual de OEE</strong> en el centro, ocupando la mayor parte de la pantalla, codificado en verde/amarillo/rojo</li>
+  <li>Etiqueta "OEE EN VIVO · OBJETIVO 85%" debajo</li>
+  <li>Cuando está detenida: una razón de paro y cronómetro rojos parpadeando</li>
+  <li><strong>Un panel lateral</strong> con piezas buenas (y malas en rojo), tiempo transcurrido del turno, las 3 razones principales de paro de los últimos 7 días</li>
+  <li>Un pie con el logo de Easy OEE y la hora actual</li>
+</ul>
+<p>La página <strong>se actualiza cada 10 segundos automáticamente</strong> para que los números estén al día. Los cronómetros corren suavemente entre actualizaciones.</p>
+<div class="callout accent">
+  <div class="callout-label">Por qué importa</div>
+  <p style="margin:0;">Convierte a Easy OEE de "software que compró el jefe" a "el marcador del equipo." Cuando los trabajadores ven su propia puntuación en vivo arriba de la línea, se desempeñan mejor. Es la misma psicología que un rastreador de fitness. Y cada vez que alguien pasa frente a la TV, ve tu producto. <strong>Se propaga dentro de la planta.</strong></p>
+</div>
+<p>El gerente puede rotar el token en cualquier momento si quiere revocar el acceso público.</p>
+
+<h2 id="es-idiomas">Idiomas</h2>
+<p>Toda la app — <strong>cada página, cada botón, cada etiqueta, cada mensaje de error</strong> — está completamente traducida a:</p>
+<ul>
+  <li>🇨🇦🇺🇸 <strong>Inglés</strong></li>
+  <li>🇲🇽🇪🇸 <strong>Español</strong></li>
+  <li>🇨🇦🇫🇷 <strong>Francés (canadiense)</strong></li>
+</ul>
+<p>Eso es aproximadamente <strong>200 claves de traducción × 3 idiomas = 600 strings</strong> completamente localizados. El selector de idioma siempre está visible en la barra de navegación superior, en la barra lateral del panel, en la página de inicio de sesión, y en las páginas del operador.</p>
+<p>La elección <strong>se guarda en una cookie</strong> para que la próxima vez que el usuario visite, llegue automáticamente en su idioma. Las páginas renderizadas en el servidor leen la cookie y renderizan en el idioma correcto en el primer pintado — sin parpadeo de inglés.</p>
+<p>Esto es enorme para el mercado canadiense porque <strong>Quebec tiene requisitos legales laborales de solo francés</strong> para software de trabajo, y es enorme para el mercado de EE.UU. porque el español es el idioma dominante del piso de producción en muchos estados.</p>
+
+<h2 id="es-todo">Todo lo que hemos construido hasta ahora</h2>
+<p>Esta es la lista completa de lo que realmente está en el producto ahora mismo, organizada por área.</p>
+
+<h3>Sitio de marketing (easy-oee.com)</h3>
+<ul>
+  <li><strong>Página de inicio</strong> con hero, barra de estadísticas, sección de problema, píldoras de solución, cómo funciona, cuadrícula de funciones, prueba social, teaser de precios, CTA</li>
+  <li><strong>Página de precios</strong> con deslizador de número de líneas, tres niveles, USD primario + CAD de referencia, tabla de comparación, FAQ acordeón</li>
+  <li><strong>Página de Cómo Funciona</strong> explicativa</li>
+  <li><strong>Calculadora de ROI</strong> — widget interactivo que muestra cuánto dinero está dejando el cliente sobre la mesa</li>
+  <li><strong>Página de Contacto</strong> con formulario de solicitud de demo</li>
+  <li><strong>Política de Privacidad</strong> + <strong>Términos del Servicio</strong></li>
+  <li><strong>Flujo de Registro</strong> para la prueba de Stripe</li>
+  <li><strong>Manómetro animado del hero</strong> — SVG puro, la aguja sube de 0 al máximo, rebota dos veces, se reinicia. Respeta "reducir movimiento"</li>
+  <li><strong>Menú hamburguesa móvil</strong> con superposición de pantalla completa</li>
+  <li><strong>Favicon e imagen de Open Graph con marca</strong> para vistas previas en Slack, iMessage, Twitter, LinkedIn</li>
+</ul>
+
+<h3>Superficie del operador</h3>
+<ul>
+  <li><strong>Login con PIN</strong> en <code>/pin</code> — bcrypt, sesión con cookie HTTP-only firmada, TTL de 12 horas</li>
+  <li><strong>Configuración de turno</strong> en <code>/operator</code></li>
+  <li><strong>Pantalla de turno en vivo</strong> en <code>/shift/[id]</code> con cronómetros grandes, barra de progreso, estimación de OEE en vivo, tarjeta roja pulsante de tiempo de paro, aviso de nota para paradas largas, botón de cambio de turno, contadores +1/+10, 10 botones de razones de paro, terminar turno con confirmación</li>
+  <li><strong>Resumen del Turno</strong> con OEE grande, tres tarjetas de componentes, árbol de pérdidas, tabla de detalle, tabla de eventos de paro, exportación CSV/PDF/correo</li>
+  <li><strong>Manifest de PWA</strong> para "Agregar a la Pantalla de Inicio" en una tablet</li>
+</ul>
+
+<h3>Panel del gerente</h3>
+<ul>
+  <li><strong>Inicio de sesión del gerente</strong> en <code>/sign-in</code> (contraseña temporal, será Clerk pronto)</li>
+  <li><strong>Dashboard</strong> con OEE de Hoy, tarjetas de comparación de turno, tabla de turnos en vivo, tabla de turnos recientes, gráfica de Pareto</li>
+  <li><strong>Administración de líneas</strong> con edición en línea, panel de TV Board por línea (Generar / Rotar Token + Abrir)</li>
+  <li><strong>Administración de operadores</strong> con agregar/editar/restablecer PIN/desactivar</li>
+  <li><strong>Historial de turnos</strong> con cuadrícula de calendario de 14 días × 3 tipos de turno, tabla completa, página de Editar Turno con razón de auditoría</li>
+</ul>
+
+<h3>Modo TV Board (el diferenciador)</h3>
+<ul>
+  <li><strong>Ruta pública</strong> en <code>/board/[token]</code> — sin login</li>
+  <li>Diseñado para pantallas de 55" con dimensionamiento responsivo basado en <code>clamp()</code></li>
+  <li>Se actualiza automáticamente cada 10 segundos</li>
+  <li>Los cronómetros en vivo corren suavemente entre actualizaciones</li>
+</ul>
+
+<h3>Insights y automatización</h3>
+<ul>
+  <li><strong>Matemáticas del árbol de pérdidas</strong> — particiona cada minuto en Bueno / Calidad / Velocidad / Tiempo de paro</li>
+  <li><strong>Cron de resumen diario</strong> a las 6 AM — consolidado del día anterior con resumen narrativo opcional con Claude AI</li>
+  <li><strong>Cron de escaneo semanal de anomalías</strong> los lunes — marca cualquier línea cuyo promedio de OEE de 7 días bajó más de 5 puntos porcentuales</li>
+</ul>
+
+<h3>Fundación que no ves pero que importa</h3>
+<ul>
+  <li><strong>Multi-tenancy</strong> aplicada a nivel del más bajo de la base de datos — los clientes nunca pueden ver datos de otros</li>
+  <li><strong>Capa de datos a prueba de bugs</strong> — los cuatro bugs del prototipo de Bubble ahora son estructuralmente imposibles</li>
+  <li><strong>Auto-migraciones</strong> — cada despliegue aplica automáticamente los cambios de schema antes de que corra el código nuevo</li>
+  <li><strong>Integración continua</strong> — typecheck, lint, pruebas, build antes de cada despliegue</li>
+  <li><strong>Auto-sincronización entre máquinas</strong> — la copia de trabajo se mantiene continuamente en sincronía sin <code>git pull</code> manual</li>
+</ul>
+
+<h2 id="es-siguiente">Qué sigue</h2>
+<p>El producto está <strong>listo para hacerle demo a clientes reales ahora mismo</strong>. El trabajo restante es principalmente conectar servicios externos y pulido.</p>
+
+<h3>Próximos pasos inmediatos (antes de cobrarle a alguien)</h3>
+<ol>
+  <li><strong>Facturación con Stripe</strong> — el andamiaje está todo en su lugar. Necesitamos crear productos en Stripe, pegar los IDs de precio, y reemplazar los stubs.</li>
+  <li><strong>Autenticación con Clerk</strong> — reemplazar la contraseña de admin temporal con un inicio de sesión real con correo/contraseña.</li>
+  <li><strong>Correo con Resend</strong> — reemplazar el stub de enviar-por-correo con envío real, y activar el resumen diario.</li>
+</ol>
+
+<h3>Mediano plazo (para el lanzamiento)</h3>
+<ol start="4">
+  <li>Estados de carga y error</li>
+  <li>Sentry para rastreo de errores</li>
+  <li>Cambio de dominio — apuntar easy-oee.com del HTML estático viejo a la nueva app</li>
+  <li>Analíticas de producto con PostHog</li>
+</ol>
+
+<h3>Fase 4 — Integración con hardware</h3>
+<p>Esta es la grande. Agregamos un dispositivo pequeño (Raspberry Pi o similar) que se conecta al PLC de la máquina por Wi-Fi y alimenta los datos automáticamente. El operador no tiene que tocar ningún botón. Esto se convierte en un upsell pagado encima de la suscripción SaaS. <strong>Margen de hardware + ingresos recurrentes.</strong></p>
+
+<h3>Fase 5 — Funciones empresariales</h3>
+<ul>
+  <li>Consolidación multi-planta</li>
+  <li>Acceso basado en roles (operador / supervisor / gerente / admin)</li>
+  <li>Categorías personalizadas de razones de paro</li>
+  <li>API REST para integración con ERP</li>
+  <li>Preparación para SOC2</li>
+  <li>Tabla de líderes de operadores (gamificación)</li>
+  <li>Alertas SMS / Slack cuando una línea está caída demasiado tiempo</li>
+</ul>
+
+<h2 id="es-faq">Preguntas frecuentes</h2>
+
+<h3>¿Cuánto tarda la configuración para un nuevo cliente?</h3>
+<p>Menos de una hora. El gerente se registra, agrega sus líneas, agrega sus operadores con PINs, imprime la hoja de PINs, la baja al piso. Los operadores pueden empezar a registrar turnos en el siguiente cambio de turno.</p>
+
+<h3>¿Qué pasa si el wifi se cae?</h3>
+<p>Ahora mismo: los últimos toques del operador podrían no guardarse hasta que la conexión regrese. Tenemos <strong>modo offline</strong> en cola para una versión futura.</p>
+
+<h3>¿Qué pasa si un operador olvida su PIN?</h3>
+<p>El gerente puede restablecerlo desde la página de Operadores en dos clics.</p>
+
+<h3>¿Pueden dos operadores estar en la misma máquina al mismo tiempo?</h3>
+<p>No — un turno por máquina a la vez. Pero pueden <strong>pasarse el control sin interrupciones</strong> con el botón de Cambio de Turno.</p>
+
+<h3>¿Qué pasa si el gerente quiere arreglar un error después?</h3>
+<p>Hay un flujo completo de edición de turno que requiere una razón de auditoría y recalcula el OEE automáticamente.</p>
+
+<h3>¿Cómo veo qué está pasando sin bajar al piso?</h3>
+<p>Tres formas: el Dashboard (se actualiza cada 10 segundos), el TV Board (URL pública para cualquier oficina), y el correo de resumen automático a las 6 AM.</p>
+
+<h3>¿Puede el operador hacer trampa con los números?</h3>
+<p>No. <strong>Todas las matemáticas corren en el servidor.</strong> El navegador es solo una pantalla tonta. No hay forma de que un operador (o una tablet maliciosa) falsifique un número.</p>
+
+<h3>¿Los datos están seguros?</h3>
+<p>Sí. La multi-tenancy se aplica a nivel del más bajo de las consultas. Todas las contraseñas y PINs están con hash bcrypt. Todas las sesiones están firmadas criptográficamente. Todas las conexiones usan HTTPS. Hosting en Vercel + Neon Postgres, ambos SOC2-compliant.</p>
+
+<h3>¿Cuánto nos cuesta operar?</h3>
+<p>Casi nada ahora mismo. Vercel y Neon son gratis hasta cierto límite. Una vez que tengamos clientes reales, pagaremos quizá $20-50/mes en infraestructura para soportar varios cientos de clientes. <strong>Los márgenes son excelentes.</strong></p>
+
+<h3>¿Cuándo podemos empezar a vender?</h3>
+<p>En cuanto Stripe + Clerk estén conectados. Aproximadamente dos días más de trabajo enfocado y podemos aceptar dinero real. Todo lo demás está en su lugar.</p>
+
+</article>
+
+<!-- ======================================================================
+     ENGLISH ARTICLE
+     ====================================================================== -->
+<article data-lang="en" hidden>
+
+<nav class="toc">
+  <h3>Contents</h3>
+  <ol>
+    <li><a href="#en-pitch">The 60-second pitch</a></li>
+    <li><a href="#en-what">What Easy OEE actually is</a></li>
+    <li><a href="#en-who">Who uses it and how</a></li>
+    <li><a href="#en-pricing">Pricing</a></li>
+    <li><a href="#en-test">How to test it now</a></li>
+    <li><a href="#en-operator">Operator's day</a></li>
+    <li><a href="#en-manager">Manager's day</a></li>
+    <li><a href="#en-tv">The new TV Board mode</a></li>
+    <li><a href="#en-languages">Languages</a></li>
+    <li><a href="#en-built">Everything we've built</a></li>
+    <li><a href="#en-next">What's next</a></li>
+    <li><a href="#en-faq">FAQ</a></li>
+  </ol>
+</nav>
+
+<h2 id="en-pitch">The 60-second pitch</h2>
+<p>Most factories are guessing how well their machines run. They think they're at 90% efficiency. They're actually at 55%. They lose money every day and don't know it.</p>
+<p><strong>Easy OEE</strong> is a web app that gives manufacturing operators a tablet on the shop floor where they tap big buttons to log their shift, downtime, and parts produced. The app does the math automatically and gives the plant manager <strong>one number from 0 to 100</strong> that tells them exactly how their factory is performing — in real time.</p>
+<ul>
+  <li>No hardware required (yet — we're building that for Phase 4)</li>
+  <li>No spreadsheets, no paper logs</li>
+  <li>Up and running in one shift</li>
+  <li>Built for Canadian and US small-to-mid-size manufacturers</li>
+  <li>$49 to $129 USD per month</li>
+</ul>
+<p>That's the whole product.</p>
+
+<h2 id="en-what">What Easy OEE actually is</h2>
+<p>OEE stands for <strong>Overall Equipment Effectiveness</strong>. It's the gold standard metric for measuring manufacturing productivity, used everywhere from Toyota to Tesla. It's a single percentage from 0 to 100 that combines three things:</p>
+<div class="table-wrap"><table>
+  <thead><tr><th>Component</th><th>What it measures</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Availability</strong></td><td>Was the machine running when it was supposed to?</td></tr>
+    <tr><td><strong>Performance</strong></td><td>Was it running at the right speed when it was on?</td></tr>
+    <tr><td><strong>Quality</strong></td><td>Of the parts produced, how many were good?</td></tr>
+  </tbody>
+</table></div>
+<div class="callout accent">
+  <div class="callout-label">Formula</div>
+  <p style="margin:0; font-family:var(--font-mono); font-size:18px; color:var(--white);">OEE = Availability × Performance × Quality</p>
+</div>
+<p>A score of <strong>85% or higher</strong> is considered world-class. Most plants that have never measured it are surprised to learn they're at 50-60%. The moment they start measuring, they start improving — that alone is worth the price of the software.</p>
+<p>Easy OEE handles all the math automatically. The operator just taps buttons. The manager just reads numbers.</p>
+
+<h2 id="en-who">Who uses it and how</h2>
+<p>There are <strong>two completely different kinds of users</strong> in Easy OEE:</p>
+<h3>1. The Manager (the buyer)</h3>
+<ul>
+  <li>Pays for the subscription with a credit card</li>
+  <li>Logs in with <strong>email + password</strong> from a laptop in their office</li>
+  <li>Sees a live dashboard of every machine, every shift, every score</li>
+  <li>Adds production lines, invites operators, downloads reports</li>
+  <li>Probably never sets foot on the shop floor</li>
+  <li><strong>This is our customer</strong></li>
+</ul>
+<h3>2. The Operator (the worker)</h3>
+<ul>
+  <li><strong>Doesn't have an email or password</strong></li>
+  <li>Walks up to a shared tablet bolted to the machine</li>
+  <li>Types a <strong>4-digit PIN</strong> like an ATM</li>
+  <li>Their name pops up, they pick the machine, they start their shift</li>
+  <li>Taps big buttons all shift to log stops and parts</li>
+  <li>At the end, taps "End Shift" → sees their score → walks away</li>
+  <li>This is <strong>the user of the product the manager bought</strong></li>
+</ul>
+<p><strong>Why two systems?</strong> Because a factory worker wearing rubber gloves at 6 AM is not going to type an email and password. They will type four digits. Anything more complicated than that and they will stop logging data — which makes the whole product useless. The PIN system isn't a shortcut. It's the only design that survives contact with a real shop floor.</p>
+
+<h2 id="en-pricing">Pricing</h2>
+<p>All prices are in <strong>USD per month</strong>, billed monthly or annually (annual gets a discount). Approximate Canadian dollar conversions are shown as a reference but customers are charged in USD.</p>
+<div class="table-wrap"><table>
+  <thead><tr><th>Plan</th><th>Price</th><th>Lines</th><th>Operators</th><th>History</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Starter</strong></td><td>$49 USD/mo</td><td>1 line</td><td>Up to 5</td><td>90 days</td></tr>
+    <tr><td><strong>Professional</strong></td><td>$129 USD/mo</td><td>Up to 5</td><td>Up to 25</td><td>1 year</td></tr>
+    <tr><td><strong>Enterprise</strong></td><td>Custom</td><td>Unlimited</td><td>Unlimited</td><td>Forever</td></tr>
+  </tbody>
+</table></div>
+<p><strong>You pay per machine, not per worker.</strong> This is the right model because the value of OEE measurement scales with the number of machines being measured, not with the number of people. A plant with 100 workers and 2 machines pays the same as a plant with 10 workers and 2 machines — both get the same insight.</p>
+<p><strong>14-day free trial, no credit card required.</strong></p>
+<p>There's a <strong>line-count slider</strong> on the pricing page so customers can see exactly what they'd pay for their setup before committing.</p>
+
+<h3>What's in each plan</h3>
+<p><strong>Starter ($49/mo) includes:</strong></p>
+<ul>
+  <li>1 production line</li>
+  <li>Up to 5 operator accounts</li>
+  <li>All 10 stop reason categories</li>
+  <li>Real-time OEE dashboard</li>
+  <li>Live shift tracking with timers</li>
+  <li>Loss tree on shift summary</li>
+  <li>Shift summary reports</li>
+  <li>CSV export</li>
+  <li>PDF / print export</li>
+  <li>90-day data history</li>
+</ul>
+<p><strong>Professional ($129/mo) includes everything in Starter, plus:</strong></p>
+<ul>
+  <li>Up to 5 production lines</li>
+  <li>Up to 25 operator accounts</li>
+  <li>Multi-line dashboard with shift comparison</li>
+  <li>7-day Pareto chart of stop reasons</li>
+  <li>Calendar grid view of recent shifts</li>
+  <li>Edit-shift workflow with audit trail</li>
+  <li>Public TV Board mode for shop floor displays</li>
+  <li>Email shift summaries</li>
+  <li>Daily digest email (when wired to Resend)</li>
+  <li>1-year data history</li>
+</ul>
+<p><strong>Enterprise (custom pricing) includes everything in Professional, plus:</strong></p>
+<ul>
+  <li>Unlimited lines and operators</li>
+  <li>Custom stop reason categories</li>
+  <li>Multi-plant rollup</li>
+  <li>Dedicated onboarding</li>
+  <li>SLA + priority support</li>
+  <li>Unlimited data history</li>
+  <li>Future: hardware integration (PLC ingest)</li>
+  <li>Future: API access for ERP integration</li>
+</ul>
+
+<h2 id="en-test">How to test the app right now</h2>
+<p>You can try the entire app yourself in five minutes.</p>
+
+<h3>As a manager</h3>
+<ol>
+  <li>Go to <a href="https://easy-oee.vercel.app/sign-in" target="_blank" rel="noopener">easy-oee.vercel.app/sign-in</a></li>
+  <li><strong>Email:</strong> anything (literally any address — the temporary login doesn't validate)</li>
+  <li><strong>Password:</strong> <code>EasyOEE2026Admin</code></li>
+  <li>You'll land on the <strong>Manager Dashboard</strong> with the seeded demo data</li>
+  <li>Click around: Dashboard, Lines, Operators, Shifts in the sidebar</li>
+</ol>
+
+<h3>As an operator</h3>
+<ol>
+  <li>Go to <a href="https://easy-oee.vercel.app/pin" target="_blank" rel="noopener">easy-oee.vercel.app/pin</a></li>
+  <li>Pick <strong>Pierre Lavoie</strong> from the list</li>
+  <li><strong>PIN:</strong> <code>1234</code></li>
+  <li>You're now logged in as an operator</li>
+  <li>You'll see the <strong>Start Shift</strong> form — pick a line, shift type, product</li>
+  <li>Tap <strong>Start Shift</strong></li>
+  <li>You're now on the <strong>Live Shift screen</strong></li>
+</ol>
+
+<h3>What to try on the live shift screen</h3>
+<ul>
+  <li><strong>Tap a stop reason</strong> (e.g., "Mechanical Failure") — the button turns yellow, a big red downtime card appears with a clock counting up, the OEE estimate starts dropping</li>
+  <li><strong>Wait a few seconds, tap the same button again</strong> to resume — the card disappears, the elapsed timer keeps going</li>
+  <li><strong>Tap +1 or +10 on Good Parts</strong> — the parts counter goes up, the live OEE estimate updates</li>
+  <li><strong>Look at the timers row</strong> — elapsed shift time, projected end time, total stop minutes</li>
+  <li><strong>Look at the Live OEE card</strong> — color-coded against the target, with a delta showing how far above or below you are</li>
+  <li><strong>Stop a long stop (10+ minutes)</strong> — when you resume, you'll get a prompt asking for a quick note about what happened (this builds institutional memory of what actually breaks)</li>
+  <li><strong>Tap Hand Off</strong> — pick another operator, type their PIN, the shift continues under their name without resetting anything</li>
+  <li><strong>Tap End Shift</strong> — the server runs the OEE calculation and you land on the <strong>Shift Summary</strong> page</li>
+</ul>
+
+<h3>What to try on the shift summary</h3>
+<ul>
+  <li><strong>Big OEE number</strong> at the top, color-coded</li>
+  <li><strong>Three component cards</strong> for Availability / Performance / Quality</li>
+  <li><strong>The Loss Tree</strong> — a horizontal stacked bar showing exactly where every planned minute went (Good Output / Quality Loss / Speed Loss / Downtime). This is one of the most useful charts in OEE and most competitors don't show it.</li>
+  <li><strong>Production detail table</strong> with all the numbers</li>
+  <li><strong>Downtime events table</strong> with every stop, time, duration, and notes</li>
+  <li><strong>Three export buttons:</strong> Download CSV, Print or save as PDF, Email it</li>
+  <li><strong>Start New Shift</strong> and <strong>Dashboard</strong> buttons up top for one-tap navigation</li>
+</ul>
+
+<h2 id="en-operator">The operator experience, step by step</h2>
+<p>A real day for an operator named John, working the morning shift on Bottling Line 1:</p>
+<p><strong>6:55 AM</strong> — John walks up to the tablet bolted to Line 1. Taps the screen. The PIN page shows a list of names. He taps <strong>John Smith</strong>. Types <strong>4729</strong>. App says "Hi John."</p>
+<p><strong>6:56 AM</strong> — He's on the shift setup form. He picks Line 1 from the radio buttons, picks "Morning Shift", types "16oz water bottles" in the product field. Default planned minutes is 480 (8 hours). Default ideal rate is pulled from the line settings (120 bottles/min). He taps <strong>Start Shift</strong>.</p>
+<p><strong>7:00 AM</strong> — He's now on the Live Shift screen. Big "RUNNING" pill in the top right. The elapsed timer starts ticking. The OEE estimate shows N/A because there's no data yet.</p>
+<p><strong>7:00 AM – 9:00 AM</strong> — Line is running. John taps <strong>+10 Good Parts</strong> roughly every minute. The Live OEE card slowly climbs into the green.</p>
+<p><strong>9:14 AM</strong> — A bottle jam. John taps <strong>Mechanical Failure</strong>. The button turns yellow. The big red downtime card pops up with a clock counting up. The pill at the top changes to "STOPPED". The OEE estimate starts dropping in real time.</p>
+<p><strong>9:23 AM</strong> — Jam cleared. John taps the same button again. The card disappears. <strong>Because the stop ran 9 minutes, no note prompt fires yet.</strong> The shift resumes.</p>
+<p><strong>12:00 PM</strong> — Lunch break. John taps <strong>Scheduled Break</strong>. The card appears again with a fresh clock.</p>
+<p><strong>12:30 PM</strong> — Back from lunch. John taps <strong>Scheduled Break</strong> to resume. <strong>30 minutes is over the 10-minute threshold</strong>, so a note prompt appears: "That stop ran 30 minutes for Scheduled Break. Leave a note so the team knows what happened." John types "lunch" and taps Save Note. The note is now attached to that stop record forever.</p>
+<p><strong>3:00 PM</strong> — End of shift. John taps <strong>End Shift</strong>. A confirmation asks "End this shift? Final OEE will be calculated and saved." He taps OK.</p>
+<p><strong>3:00:01 PM</strong> — The server runs the OEE calculation:</p>
+<div class="callout">
+  <div class="callout-label">Server-side calculation</div>
+  <ul style="margin:0;">
+    <li>Planned minutes: 480</li>
+    <li>Stop minutes: 67 (sum of all stops)</li>
+    <li>Run time: 413 minutes</li>
+    <li><strong>Availability = 413/480 = 86%</strong></li>
+    <li>Good parts: 47,840 / Bad parts: 380</li>
+    <li><strong>Performance = 48,220 / (120 × 413) = 97%</strong></li>
+    <li><strong>Quality = 47,840 / 48,220 = 99%</strong></li>
+    <li><strong>OEE = 86 × 97 × 99 = 82.6%</strong></li>
+  </ul>
+</div>
+<p><strong>3:00:02 PM</strong> — John lands on the Shift Summary. Big "82.6%" in the center, color-coded green-ish (a hair below the world-class 85% mark). He can see the loss tree showing exactly where the time went, the list of all his stops with notes, and the export buttons. He taps <strong>Start New Shift</strong> if another worker is taking over, or just walks away.</p>
+<p>That's the operator loop. <strong>It's designed to be usable with one hand, in gloves, by someone who's never seen the app before, with no training.</strong></p>
+
+<h2 id="en-manager">The manager experience, step by step</h2>
+<p>Sarah is the production manager. She works in an office one floor up from the shop floor. She has a laptop. She has email. She has a credit card. She is our customer.</p>
+<p><strong>Monday, 7:30 AM</strong> — Sarah pours her first coffee, opens her laptop, goes to easy-oee.com/sign-in, types her email and password. Lands on the Manager Dashboard.</p>
+<p><strong>Top of the dashboard</strong> — a giant "Today's OEE" number for the whole plant. It's currently 73% because Pierre on Line 2 had a rough start to his shift.</p>
+<p><strong>Below that</strong> — three side-by-side cards comparing <strong>Morning vs Afternoon vs Night</strong> shift averages over the last 7 days. Sarah's night shift is at 64% vs her morning at 81%. She makes a mental note to talk to the night supervisor.</p>
+<p><strong>Live Shifts table</strong> — shows every shift currently running across the plant. She can see Pierre is on Line 2 with 1,200 parts produced so far, started at 7:00 AM.</p>
+<p><strong>Recent Shifts table</strong> — last 10 completed shifts with their full A/P/Q breakdown and final OEE, color-coded.</p>
+<p><strong>Top Stop Reasons (Pareto)</strong> — a horizontal bar chart of the last 7 days of downtime, sorted by total minutes lost. "Mechanical Failure" is the biggest at 142 minutes, "No Material" is next at 67 minutes. She knows exactly what to fix first.</p>
+<p><strong>She clicks "Lines"</strong> — sees all her production lines, their ideal rates, their target OEE goals, and <strong>their TV Board links</strong>. She clicks <strong>Generate</strong> on Line 1, gets a public URL, and texts it to the maintenance guy who has a TV in his office.</p>
+<p><strong>She clicks "Shifts"</strong> — sees a calendar grid of the last 14 days, 3 rows × 14 columns, color-coded by OEE bucket. She immediately spots that Wednesday night was a disaster. She clicks the OEE number for that shift and lands on its summary.</p>
+<p><strong>She notices the operator typed the wrong product name</strong> — "168oz water bottles" instead of "16oz". She clicks <strong>Edit</strong>, fixes the typo, types "operator typo" in the audit reason field, hits Save. Done.</p>
+<p><strong>She heads to a meeting</strong> — but before she leaves, she'll get an <strong>email digest</strong> at 6 AM tomorrow morning summarizing yesterday's performance per line, the top 3 stop reasons, and a one-paragraph narrative summary written by Claude AI explaining what to pay attention to first.</p>
+<p>That's the manager loop. <strong>She never has to think about how OEE works or do any math. The app does it. She just reads the numbers and makes decisions.</strong></p>
+
+<h2 id="en-tv">The new TV Board mode</h2>
+<p>This is one of the most differentiated features in the product and nobody else thinks to build it.</p>
+<p>The Manager generates a <strong>public board token</strong> for each line from the Lines admin page. They open that URL on a 55-inch TV bolted above the production line. <strong>No login. No browser chrome. Just numbers.</strong></p>
+<p>What appears on the TV:</p>
+<ul>
+  <li><strong>The line name</strong> in giant Bebas Neue type at the top left</li>
+  <li><strong>A RUNNING / STOPPED pill</strong> at the top right (red when stopped)</li>
+  <li><strong>The current OEE number</strong> in the center, taking up most of the screen, color-coded green/yellow/red</li>
+  <li>"LIVE OEE · TARGET 85%" label underneath</li>
+  <li>When stopped: a flashing red current-stop reason and timer</li>
+  <li><strong>A side panel</strong> with good parts (and bad parts in red), elapsed shift time, top 3 stop reasons in the last 7 days</li>
+  <li>A footer with the Easy OEE logo and the current time</li>
+</ul>
+<p>The page <strong>refreshes every 10 seconds automatically</strong> so the numbers stay current. The timers tick smoothly between refreshes.</p>
+<div class="callout accent">
+  <div class="callout-label">Why this matters</div>
+  <p style="margin:0;">It turns Easy OEE from "software the boss bought" into "the team's scoreboard." When workers can see their own score live above the line, they perform better. It's the same psychology as a fitness tracker. And every time someone walks past the TV, they see your product. <strong>It spreads inside the plant.</strong></p>
+</div>
+<p>Manager can rotate the token at any time if they want to revoke public access.</p>
+
+<h2 id="en-languages">Languages</h2>
+<p>The entire app — <strong>every page, every button, every label, every error message</strong> — is fully translated into:</p>
+<ul>
+  <li>🇨🇦🇺🇸 <strong>English</strong></li>
+  <li>🇲🇽🇪🇸 <strong>Spanish</strong></li>
+  <li>🇨🇦🇫🇷 <strong>French (Canadian)</strong></li>
+</ul>
+<p>That's roughly <strong>200 translation keys × 3 languages = 600 strings</strong> fully localized. The language switcher is always visible in the top nav, in the dashboard sidebar, on the sign-in page, and on the operator pages.</p>
+<p>The choice is <strong>persisted in a cookie</strong> so the next time the user visits, they land in their language automatically. Server-rendered pages read the cookie and render in the right language on the first paint — no flash of English.</p>
+<p>This is huge for the Canadian market because <strong>Quebec has French-only labor law requirements</strong> for workplace software, and it's huge for the US market because Spanish is the dominant shop-floor language in many states.</p>
+
+<h2 id="en-built">Everything we've built so far</h2>
+<p>This is the comprehensive list of what's actually in the product right now, organized by area.</p>
+
+<h3>Marketing site (easy-oee.com)</h3>
+<ul>
+  <li><strong>Landing page</strong> with hero, stats bar, problem section, solution pills, how-it-works, features grid, social proof, pricing teaser, CTA</li>
+  <li><strong>Pricing page</strong> with line-count slider, three tiers, USD primary + CAD reference, comparison table, FAQ accordion</li>
+  <li><strong>How it Works</strong> explainer page</li>
+  <li><strong>ROI Calculator</strong> — interactive widget that shows how much money the customer is leaving on the table</li>
+  <li><strong>Contact page</strong> with demo request form</li>
+  <li><strong>Privacy Policy</strong> + <strong>Terms of Service</strong> pages</li>
+  <li><strong>Sign Up flow</strong> for the Stripe trial</li>
+  <li><strong>Animated hero gauge</strong> — pure SVG, needle revs from 0 to max, bounces twice, resets. Respects "reduce motion"</li>
+  <li><strong>Mobile hamburger menu</strong> with full-screen overlay</li>
+  <li><strong>Branded favicon and Open Graph image</strong> for link previews on Slack, iMessage, Twitter, LinkedIn</li>
+</ul>
+
+<h3>Operator surface</h3>
+<ul>
+  <li><strong>PIN login</strong> at <code>/pin</code> — bcrypt-verified, signed HTTP-only cookie session, 12-hour TTL</li>
+  <li><strong>Shift setup</strong> at <code>/operator</code></li>
+  <li><strong>Live shift screen</strong> at <code>/shift/[id]</code> with big timers, progress bar, live OEE estimate, pulsing red downtime card, long-stop note prompt, hand-off button, +1/+10 parts counters, 10 stop buttons, end-shift with confirmation</li>
+  <li><strong>Shift Summary</strong> with big OEE, three component cards, loss tree, production detail, downtime events, CSV/PDF/email export</li>
+  <li><strong>PWA manifest</strong> so operators can "Add to Home Screen" on a tablet</li>
+</ul>
+
+<h3>Manager dashboard</h3>
+<ul>
+  <li><strong>Manager sign-in</strong> at <code>/sign-in</code> (currently temporary admin password, will be Clerk soon)</li>
+  <li><strong>Dashboard</strong> with Today's OEE, shift comparison cards, live shifts table, recent shifts table, Pareto chart</li>
+  <li><strong>Lines admin</strong> with inline edit, per-line TV Board panel (Generate / Rotate Token + Open)</li>
+  <li><strong>Operators admin</strong> with add/edit/PIN reset/deactivate</li>
+  <li><strong>Shifts history</strong> with calendar grid (14 days × 3 shift types), full table, Edit Shift page with audit reason</li>
+</ul>
+
+<h3>TV Board mode (the differentiator)</h3>
+<ul>
+  <li><strong>Public route</strong> at <code>/board/[token]</code> — no login required</li>
+  <li>Designed for 55" displays with <code>clamp()</code>-based responsive sizing</li>
+  <li>Auto-refreshes every 10 seconds</li>
+  <li>Live timers tick smoothly between refreshes</li>
+</ul>
+
+<h3>Insights and automation</h3>
+<ul>
+  <li><strong>Loss tree math</strong> — partitions every planned minute into Good / Quality / Speed / Downtime</li>
+  <li><strong>Daily digest cron</strong> at 6 AM — per-company yesterday rollup with optional Claude AI narrative summary</li>
+  <li><strong>Weekly anomaly scan cron</strong> on Mondays — flags any line whose 7-day average OEE dropped more than 5 percentage points</li>
+</ul>
+
+<h3>Foundation that you don't see but matters</h3>
+<ul>
+  <li><strong>Multi-tenancy enforced everywhere</strong> — customers can never see each other's data, even by accident</li>
+  <li><strong>Bug-proof data layer</strong> — the four bugs from the Bubble prototype are now structurally impossible</li>
+  <li><strong>Auto-migrations</strong> — every deploy automatically applies schema changes before the new code runs</li>
+  <li><strong>Continuous integration</strong> — typecheck, lint, tests, and build before every deploy</li>
+  <li><strong>Auto-sync across machines</strong> — the working copy stays continuously in sync without manual <code>git pull</code></li>
+</ul>
+
+<h2 id="en-next">What's next</h2>
+<p>The product is <strong>ready to demo to real customers right now</strong>. The remaining work is mostly wiring up external services and polish.</p>
+
+<h3>Immediate next steps (before we charge anyone)</h3>
+<ol>
+  <li><strong>Stripe billing</strong> — the scaffolding is all in place. We need to create products in Stripe, paste the price IDs, and replace the 501 stub endpoints.</li>
+  <li><strong>Clerk authentication</strong> — replace the temporary admin password with real manager email/password sign-in.</li>
+  <li><strong>Resend email</strong> — replace the email-it stub with real email sending, and turn on the daily digest delivery.</li>
+</ol>
+
+<h3>Medium-term (for the launch)</h3>
+<ol start="4">
+  <li>Loading and error states</li>
+  <li>Sentry for error tracking</li>
+  <li>Domain cutover — point easy-oee.com from the old static HTML to the new app</li>
+  <li>PostHog product analytics</li>
+</ol>
+
+<h3>Phase 4 — Hardware integration</h3>
+<p>This is the big one. We add a small device (Raspberry Pi or similar) that connects to the machine's PLC over Wi-Fi and feeds data automatically. The operator doesn't have to tap any buttons. This becomes a paid upsell on top of the SaaS subscription. <strong>Hardware margin + recurring revenue.</strong></p>
+
+<h3>Phase 5 — Enterprise features</h3>
+<ul>
+  <li>Multi-plant rollup</li>
+  <li>Role-based access (operator / supervisor / manager / admin)</li>
+  <li>Custom stop reason categories</li>
+  <li>REST API for ERP integration</li>
+  <li>SOC2 prep</li>
+  <li>Operator leaderboard (gamification)</li>
+  <li>SMS / Slack alerts when a line goes down for too long</li>
+</ul>
+
+<h2 id="en-faq">Frequently asked questions</h2>
+
+<h3>How long does setup take for a new customer?</h3>
+<p>Less than an hour. The manager signs up, adds their lines, adds their operators with PINs, prints out the PIN cheat sheet, walks it down to the shop floor. Operators can start logging shifts on the next shift change.</p>
+
+<h3>What if the wifi goes down on the shop floor?</h3>
+<p>Right now: the operator's last few taps might not save until the connection comes back. We have <strong>offline mode</strong> queued for a future release.</p>
+
+<h3>What if an operator forgets their PIN?</h3>
+<p>The manager can reset it from the Operators admin page in two clicks.</p>
+
+<h3>Can two operators be on the same machine at the same time?</h3>
+<p>No — one shift per machine at a time. But they can <strong>hand off seamlessly</strong> with the new Hand-Off button. The shift continues without resetting any timers or counters; both operators are recorded.</p>
+
+<h3>What if the manager wants to fix a typo after the shift is over?</h3>
+<p>They can. There's a full edit-shift workflow in the manager dashboard that requires an audit reason and recomputes OEE automatically.</p>
+
+<h3>How do I see what's happening on the shop floor without going down there?</h3>
+<p>Three ways: the Dashboard (refreshes every 10 seconds), the TV Board (public URL on any TV in any office), and the automatic 6 AM digest email.</p>
+
+<h3>Can the operator cheat the numbers?</h3>
+<p>No. <strong>All the math runs on the server.</strong> The browser is just a dumb display. There is no way for an operator (or a malicious tablet) to fake a number.</p>
+
+<h3>Is the data secure?</h3>
+<p>Yes. Multi-tenancy is enforced at the lowest level of the database queries. All passwords and PINs are bcrypt-hashed. All sessions are cryptographically signed. All connections use HTTPS. Hosting is on Vercel + Neon Postgres, both SOC2-compliant providers.</p>
+
+<h3>How much does it cost us to run?</h3>
+<p>Almost nothing right now. Vercel and Neon are free up to a generous limit. Once we have real customers, we'll pay maybe $20-50/month total in infrastructure to support several hundred customers. <strong>The margins are excellent.</strong></p>
+
+<h3>When can we start selling?</h3>
+<p>As soon as Stripe + Clerk are wired up. Roughly two more days of focused work and we can take real money. Everything else is in place.</p>
+
+</article>
+
+<footer class="site">
+  <div class="sig">— CQ</div>
+  <div data-lang="es">Easy OEE · Hecho por CQ Marketing</div>
+  <div data-lang="en" hidden>Easy OEE · Built by CQ Marketing</div>
+</footer>
+
+<script>
+  (function () {
+    const STORAGE_KEY = 'eo-louis-lang';
+    const buttons = document.querySelectorAll('[data-set-lang]');
+    function setLang(lang) {
+      if (lang !== 'es' && lang !== 'en') lang = 'es';
+      document.documentElement.lang = lang;
+      document.querySelectorAll('[data-lang]').forEach(function (el) {
+        el.hidden = el.dataset.lang !== lang;
+      });
+      buttons.forEach(function (b) {
+        b.classList.toggle('active', b.dataset.setLang === lang);
+        b.setAttribute('aria-selected', b.dataset.setLang === lang ? 'true' : 'false');
+      });
+      try { localStorage.setItem(STORAGE_KEY, lang); } catch (e) {}
+    }
+    buttons.forEach(function (b) {
+      b.addEventListener('click', function () { setLang(b.dataset.setLang); });
+    });
+    var saved = null;
+    try { saved = localStorage.getItem(STORAGE_KEY); } catch (e) {}
+    if (saved && saved !== 'es') setLang(saved);
+  })();
+</script>
+
+</body>
+</html>
