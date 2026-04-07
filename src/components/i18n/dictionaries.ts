@@ -531,6 +531,12 @@ export const dictionaries: Record<Locale, Dictionary> = {
     "summary.col.reason": "Reason",
     "summary.col.started": "Started",
     "summary.col.minutes": "Minutes",
+    "summary.lossTree": "Where the Time Went",
+    "summary.lossTree.help": "All planned minutes split into productive output, quality losses (bad parts), speed losses (running below ideal rate), and downtime.",
+    "summary.loss.good": "Good Output",
+    "summary.loss.quality": "Quality Loss",
+    "summary.loss.speed": "Speed Loss",
+    "summary.loss.down": "Downtime",
 
     // EXPORT (shift summary)
     "export.title": "Export this shift",
@@ -1086,6 +1092,12 @@ export const dictionaries: Record<Locale, Dictionary> = {
     "summary.col.reason": "Razón",
     "summary.col.started": "Iniciado",
     "summary.col.minutes": "Minutos",
+    "summary.lossTree": "A Dónde Se Fue el Tiempo",
+    "summary.lossTree.help": "Todos los minutos planeados divididos en producción útil, pérdidas de calidad (piezas malas), pérdidas de velocidad (por debajo de la cadencia ideal) y paradas.",
+    "summary.loss.good": "Producción Buena",
+    "summary.loss.quality": "Pérdida de Calidad",
+    "summary.loss.speed": "Pérdida de Velocidad",
+    "summary.loss.down": "Paradas",
 
     "export.title": "Exportar este turno",
     "export.csv": "Descargar CSV",
@@ -1637,6 +1649,12 @@ export const dictionaries: Record<Locale, Dictionary> = {
     "summary.col.reason": "Raison",
     "summary.col.started": "Démarré",
     "summary.col.minutes": "Minutes",
+    "summary.lossTree": "Où Le Temps Est Allé",
+    "summary.lossTree.help": "Toutes les minutes planifiées réparties entre la production utile, les pertes de qualité (pièces mauvaises), les pertes de vitesse (sous la cadence idéale) et les arrêts.",
+    "summary.loss.good": "Production Bonne",
+    "summary.loss.quality": "Perte de Qualité",
+    "summary.loss.speed": "Perte de Vitesse",
+    "summary.loss.down": "Temps d'Arrêt",
 
     "export.title": "Exporter ce quart",
     "export.csv": "Télécharger CSV",

@@ -2,7 +2,7 @@ import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { getOperatorSession } from "@/lib/auth/operator-session";
 import { getShiftForOperator } from "@/server/actions/shifts";
-import { formatPercent, oeeBucket } from "@/lib/oee";
+import { computeLossTree, formatPercent, oeeBucket } from "@/lib/oee";
 import { Logo } from "@/components/Logo";
 import { LanguageSwitcher } from "@/components/i18n/LanguageSwitcher";
 import { getServerT } from "@/components/i18n/server";
@@ -50,6 +50,15 @@ export default async function SummaryPage({
     (acc, s) => acc + (s.minutes ? Number(s.minutes) : 0),
     0,
   );
+
+  const lossTree = computeLossTree({
+    plannedMinutes: sh.plannedMinutes,
+    stopMinutes: totalStopMin,
+    goodParts: sh.goodParts,
+    badParts: sh.badParts,
+    idealRate: Number(sh.idealRate),
+  });
+  const lossPct = (m: number) => (sh.plannedMinutes > 0 ? (m / sh.plannedMinutes) * 100 : 0);
 
   return (
     <main className="op-shell summary-print" style={{ maxWidth: 880, margin: "0 auto", width: "100%" }}>
@@ -109,6 +118,42 @@ export default async function SummaryPage({
             </div>
           </div>
         ))}
+      </div>
+
+      {/* Loss tree — where the planned minutes actually went */}
+      <div className="card" style={{ marginBottom: 24 }}>
+        <div className="kpi-label" style={{ marginBottom: 4 }}>{t("summary.lossTree")}</div>
+        <p style={{ color: "var(--muted2)", fontSize: 13, marginTop: 0, marginBottom: 8 }}>
+          {t("summary.lossTree.help")}
+        </p>
+        <div className="loss-tree">
+          {lossTree.goodMinutes > 0 && (
+            <div className="loss-good" style={{ width: `${lossPct(lossTree.goodMinutes)}%` }}>
+              {lossPct(lossTree.goodMinutes) > 8 ? `${lossTree.goodMinutes.toFixed(0)}m` : ""}
+            </div>
+          )}
+          {lossTree.qualityLossMinutes > 0 && (
+            <div className="loss-quality" style={{ width: `${lossPct(lossTree.qualityLossMinutes)}%` }}>
+              {lossPct(lossTree.qualityLossMinutes) > 8 ? `${lossTree.qualityLossMinutes.toFixed(0)}m` : ""}
+            </div>
+          )}
+          {lossTree.speedLossMinutes > 0 && (
+            <div className="loss-speed" style={{ width: `${lossPct(lossTree.speedLossMinutes)}%` }}>
+              {lossPct(lossTree.speedLossMinutes) > 8 ? `${lossTree.speedLossMinutes.toFixed(0)}m` : ""}
+            </div>
+          )}
+          {lossTree.downtimeMinutes > 0 && (
+            <div className="loss-down" style={{ width: `${lossPct(lossTree.downtimeMinutes)}%` }}>
+              {lossPct(lossTree.downtimeMinutes) > 8 ? `${lossTree.downtimeMinutes.toFixed(0)}m` : ""}
+            </div>
+          )}
+        </div>
+        <div className="loss-legend">
+          <span className="lg-good">{t("summary.loss.good")} {lossTree.goodMinutes.toFixed(0)}m</span>
+          <span className="lg-quality">{t("summary.loss.quality")} {lossTree.qualityLossMinutes.toFixed(0)}m</span>
+          <span className="lg-speed">{t("summary.loss.speed")} {lossTree.speedLossMinutes.toFixed(0)}m</span>
+          <span className="lg-down">{t("summary.loss.down")} {lossTree.downtimeMinutes.toFixed(0)}m</span>
+        </div>
       </div>
 
       {/* Numbers */}
