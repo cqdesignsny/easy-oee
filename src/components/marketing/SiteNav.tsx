@@ -11,7 +11,7 @@ export function SiteNav() {
           width={713}
           height={175}
           priority
-          style={{ height: 38, width: "auto", display: "block" }}
+          style={{ height: 56, width: "auto", display: "block" }}
         />
       </Link>
       <div className="nav-links">

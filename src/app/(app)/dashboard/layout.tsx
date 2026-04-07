@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { ManagerNav } from "./manager-nav";
 import { getAdminSession } from "@/lib/auth/admin-session";
 import { signOutAdmin } from "@/server/actions/admin-auth";
+import { Logo } from "@/components/Logo";
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
   const session = await getAdminSession();
@@ -11,7 +12,9 @@ export default async function DashboardLayout({ children }: { children: React.Re
   return (
     <div className="mgr-shell">
       <aside className="mgr-side">
-        <Link href="/dashboard" className="brand">Easy OEE</Link>
+        <Link href="/dashboard" className="brand" style={{ display: "block", marginBottom: 32 }}>
+          <Logo height={42} />
+        </Link>
         <ManagerNav />
         <form action={signOutAdmin} style={{ marginTop: 24 }}>
           <button

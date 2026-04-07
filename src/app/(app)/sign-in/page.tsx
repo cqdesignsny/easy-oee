@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { SignInForm } from "./sign-in-form";
+import { Logo } from "@/components/Logo";
 
 export const metadata = { title: "Sign In | Easy OEE" };
 export const dynamic = "force-dynamic";
@@ -11,6 +12,9 @@ export default function SignInPage() {
       style={{ justifyContent: "center", alignItems: "center", minHeight: "100vh" }}
     >
       <div style={{ width: "100%", maxWidth: 460 }}>
+        <Link href="/" style={{ display: "inline-block", marginBottom: 36 }}>
+          <Logo height={56} priority />
+        </Link>
         <div className="app-tag">Manager Sign In</div>
         <h1 className="app-h1">SIGN IN</h1>
         <p style={{ color: "var(--muted2)", marginTop: 12, marginBottom: 32, fontSize: 17 }}>

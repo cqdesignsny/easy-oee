@@ -28,6 +28,11 @@ export const metadata: Metadata = {
   title: "Easy OEE | Real-Time OEE Tracking for Canadian Manufacturers",
   description:
     "Easy OEE helps plant managers track Overall Equipment Effectiveness in real time. Reduce downtime, increase throughput, and make data-driven decisions on the shop floor.",
+  icons: {
+    icon: "/easy-oee-logo.svg",
+    shortcut: "/easy-oee-logo.svg",
+    apple: "/easy-oee-logo.svg",
+  },
   openGraph: {
     title: "Easy OEE",
     description:

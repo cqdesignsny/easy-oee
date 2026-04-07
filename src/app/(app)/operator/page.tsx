@@ -6,6 +6,7 @@ import { db } from "@/lib/db/client";
 import * as s from "@/lib/db/schema";
 import { startShift } from "@/server/actions/shifts";
 import { logoutOperator } from "@/server/actions/operator-auth";
+import { Logo } from "@/components/Logo";
 
 export const metadata = { title: "Start Shift | Easy OEE" };
 export const dynamic = "force-dynamic";
@@ -42,6 +43,9 @@ export default async function OperatorPage() {
 
   return (
     <main className="op-shell">
+      <div style={{ marginBottom: 28 }}>
+        <Link href="/"><Logo height={48} /></Link>
+      </div>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 32 }}>
         <div>
           <div className="app-tag">Operator</div>

@@ -4,6 +4,7 @@ import { getOperatorSession } from "@/lib/auth/operator-session";
 import { getShiftForOperator } from "@/server/actions/shifts";
 import { formatPercent, oeeBucket } from "@/lib/oee";
 import { stopReasonLabel } from "@/lib/stop-reasons";
+import { Logo } from "@/components/Logo";
 
 export const metadata = { title: "Shift Summary | Easy OEE" };
 export const dynamic = "force-dynamic";
@@ -36,6 +37,9 @@ export default async function SummaryPage({
 
   return (
     <main className="op-shell">
+      <div style={{ marginBottom: 24 }}>
+        <Link href="/"><Logo height={42} /></Link>
+      </div>
       <div style={{ marginBottom: 24 }}>
         <div className="app-tag">Shift Complete</div>
         <h1 className="app-h1">SHIFT SUMMARY</h1>

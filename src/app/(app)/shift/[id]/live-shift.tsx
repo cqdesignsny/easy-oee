@@ -1,9 +1,11 @@
 "use client";
 
 import { useOptimistic, useState, useTransition } from "react";
+import Link from "next/link";
 import { STOP_REASONS, type StopReasonValue } from "@/lib/stop-reasons";
 import { logStop, closeStop, updateParts, endShift } from "@/server/actions/shifts";
 import type { shift as shiftTable, stop as stopTable, line as lineTable } from "@/lib/db/schema";
+import { Logo } from "@/components/Logo";
 
 type ShiftRow = typeof shiftTable.$inferSelect;
 type StopRow = typeof stopTable.$inferSelect;
@@ -84,6 +86,9 @@ export function LiveShift({
 
   return (
     <main className="op-shell">
+      <div style={{ marginBottom: 24 }}>
+        <Link href="/"><Logo height={42} /></Link>
+      </div>
       {/* Header */}
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 24 }}>
         <div>

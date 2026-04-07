@@ -11,7 +11,7 @@ export function SiteFooter() {
             alt="Easy OEE"
             width={713}
             height={175}
-            style={{ height: 44, width: "auto", display: "block", marginBottom: 14 }}
+            style={{ height: 72, width: "auto", display: "block", marginBottom: 18 }}
           />
           <span className="fl" style={{ display: "none" }}>Easy OEE</span>
           <p className="fd">
