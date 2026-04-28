@@ -66,4 +66,22 @@ if [ "$LOCAL" != "$REMOTE" ]; then
   fi
 fi
 
+# 8. Mirror docs to Dropbox (backup-of-a-backup, docs only — no code, no build)
+DROPBOX_DOCS="$HOME/Library/CloudStorage/Dropbox/Easy OEE/easy-oee"
+if [ -d "$HOME/Library/CloudStorage/Dropbox/Easy OEE" ]; then
+  mkdir -p "$DROPBOX_DOCS/docs" 2>/dev/null
+  rsync -a --delete "$REPO/docs/" "$DROPBOX_DOCS/docs/" >> "$LOG" 2>&1 \
+    && rsync -a \
+      "$REPO/README.md" \
+      "$REPO/AGENTS.md" \
+      "$REPO/CLAUDE.md" \
+      "$REPO/PROJECT.md" \
+      "$REPO/FOR-LOUIS.md" \
+      "$REPO/FOR-LOUIS-ES.md" \
+      "$REPO/FOR-LOUIS.html" \
+      "$DROPBOX_DOCS/" >> "$LOG" 2>&1 \
+    && log "mirrored docs → Dropbox" \
+    || log "WARN: dropbox docs mirror failed (non-fatal)"
+fi
+
 exit 0
