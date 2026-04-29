@@ -180,12 +180,12 @@ export default async function DashboardPage() {
     <main className="app-shell">
       <div className="app-wrap">
         <TrialBanner trialEndsAt={company.trialEndsAt?.toISOString() ?? null} companyName={company.companyName} />
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", marginBottom: 24 }}>
+        <div className="dash-header">
           <div>
             <div className="app-tag">{t("dashboard.tag")}</div>
             <h1 className="app-h1">{t("dashboard.title")}</h1>
           </div>
-          <div style={{ display: "flex", gap: 10, flexWrap: "wrap", justifyContent: "flex-end" }}>
+          <div className="dash-header-actions">
             <DashboardScanButton />
             <Link href="/operator" className="btn">{t("dashboard.startShift")} →</Link>
           </div>

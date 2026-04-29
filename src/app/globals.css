@@ -787,11 +787,70 @@ table.app-table th {
 .mgr-side nav a.active { background: rgba(3,191,181,0.12); color: var(--accent); }
 .mgr-content { min-width: 0; }
 
+.mgr-side-foot {
+  margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.mgr-signout {
+  background: transparent;
+  border: 1px solid var(--border2);
+  color: var(--muted2);
+  padding: 10px 14px;
+  border-radius: 999px;
+  cursor: pointer;
+  width: 100%;
+  font-size: 14px;
+  font-family: inherit;
+}
+.mgr-signout:hover { color: var(--white); border-color: var(--accent); }
+
+/* Dashboard page header (title + action buttons) */
+.dash-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+.dash-header-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
 @media (max-width: 880px) {
   .mgr-shell { grid-template-columns: 1fr; }
   .mgr-side { position: static; height: auto; padding: 16px 20px; }
   .mgr-side nav { display: flex; flex-wrap: wrap; gap: 8px; }
   .mgr-side nav a { margin: 0; padding: 8px 12px; }
+  /* Lang + sign-out share a row at the bottom of the collapsed sidebar */
+  .mgr-side-foot {
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 12px;
+    margin-top: 16px;
+  }
+  .mgr-signout { width: auto; padding: 8px 14px; }
+}
+
+/* Dashboard header stacks on narrow phones */
+@media (max-width: 600px) {
+  .dash-header { flex-direction: column; align-items: flex-start; }
+  .dash-header-actions { width: 100%; justify-content: flex-start; }
+  .dash-header-actions .btn {
+    flex: 1;
+    text-align: center;
+    white-space: nowrap;
+    padding-left: 14px;
+    padding-right: 14px;
+  }
+  .dash-header-actions .btn span,
+  .dash-header-actions .btn { font-size: 14px; }
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════

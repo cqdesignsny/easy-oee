@@ -19,27 +19,14 @@ export default async function DashboardLayout({ children }: { children: React.Re
           <Logo height={42} />
         </Link>
         <ManagerNav />
-        <div style={{ marginTop: 20 }}>
+        <div className="mgr-side-foot">
           <LanguageSwitcher />
+          <form action={signOutAdmin}>
+            <button type="submit" className="mgr-signout">
+              {t("mgr.nav.signOut")}
+            </button>
+          </form>
         </div>
-        <form action={signOutAdmin} style={{ marginTop: 16 }}>
-          <button
-            type="submit"
-            style={{
-              background: "transparent",
-              border: "1px solid var(--border2)",
-              color: "var(--muted2)",
-              padding: "10px 14px",
-              borderRadius: 999,
-              cursor: "pointer",
-              width: "100%",
-              fontSize: 14,
-              fontFamily: "inherit",
-            }}
-          >
-            {t("mgr.nav.signOut")}
-          </button>
-        </form>
       </aside>
       <div className="mgr-content">{children}</div>
     </div>

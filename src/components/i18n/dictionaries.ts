@@ -205,7 +205,7 @@ export const dictionaries: Record<Locale, Dictionary> = {
     "home.cta.title": "READY TO SEE YOUR REAL OEE?",
     "home.cta.body":
       "Book a free 30-minute demo. We'll walk through the platform live using your own line setup. No slides, no pitch.",
-    "home.cta.sub": "14-day free trial included. No credit card required.",
+    "home.cta.sub": "7-day free trial included. No credit card required.",
     "home.cta.button": "Book Your Free Demo",
 
     // HOW IT WORKS PAGE
@@ -367,7 +367,7 @@ export const dictionaries: Record<Locale, Dictionary> = {
     // PRICING
     "pricing.eyebrow": "Pricing",
     "pricing.h1": "SIMPLE. TRANSPARENT.",
-    "pricing.sub": "14-day free trial. No credit card required.",
+    "pricing.sub": "7-day free trial. No credit card required.",
     "pricing.usdLabel": "USD",
     "pricing.cadLabel": "≈ {price} CAD",
     "pricing.perMo": "/mo",
@@ -879,7 +879,7 @@ export const dictionaries: Record<Locale, Dictionary> = {
     "home.cta.title": "¿LISTO PARA VER TU OEE REAL?",
     "home.cta.body":
       "Reserva una demo gratis de 30 minutos. Te mostraremos la plataforma en vivo usando la configuración de tu propia línea. Sin diapositivas, sin discurso de venta.",
-    "home.cta.sub": "Prueba gratis de 14 días incluida. No se requiere tarjeta de crédito.",
+    "home.cta.sub": "Prueba gratis de 7 días incluida. No se requiere tarjeta de crédito.",
     "home.cta.button": "Reserva Tu Demo Gratis",
 
     "how.eyebrow": "Cómo funciona",
@@ -1036,7 +1036,7 @@ export const dictionaries: Record<Locale, Dictionary> = {
 
     "pricing.eyebrow": "Precios",
     "pricing.h1": "SIMPLE. TRANSPARENTE.",
-    "pricing.sub": "Prueba gratis de 14 días. No se requiere tarjeta de crédito.",
+    "pricing.sub": "Prueba gratis de 7 días. No se requiere tarjeta de crédito.",
     "pricing.usdLabel": "USD",
     "pricing.cadLabel": "≈ {price} CAD",
     "pricing.perMo": "/mes",
@@ -1536,7 +1536,7 @@ export const dictionaries: Record<Locale, Dictionary> = {
     "home.cta.title": "PRÊT À VOIR VOTRE VRAI OEE ?",
     "home.cta.body":
       "Réservez une démo gratuite de 30 minutes. On parcourt la plateforme en direct avec votre propre configuration de ligne. Pas de diapositives, pas de discours de vente.",
-    "home.cta.sub": "Essai gratuit de 14 jours inclus. Aucune carte de crédit requise.",
+    "home.cta.sub": "Essai gratuit de 7 jours inclus. Aucune carte de crédit requise.",
     "home.cta.button": "Réserver Votre Démo Gratuite",
 
     "how.eyebrow": "Fonctionnement",
@@ -1693,7 +1693,7 @@ export const dictionaries: Record<Locale, Dictionary> = {
 
     "pricing.eyebrow": "Tarifs",
     "pricing.h1": "SIMPLE. TRANSPARENT.",
-    "pricing.sub": "Essai gratuit de 14 jours. Aucune carte de crédit requise.",
+    "pricing.sub": "Essai gratuit de 7 jours. Aucune carte de crédit requise.",
     "pricing.usdLabel": "USD",
     "pricing.cadLabel": "≈ {price} CAD",
     "pricing.perMo": "/mois",
