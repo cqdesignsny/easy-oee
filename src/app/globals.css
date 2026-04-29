@@ -27,6 +27,18 @@
   --muted: rgba(239, 245, 249, 0.42);
   --muted2: rgba(239, 245, 249, 0.68);
   --shadow: 0 2px 12px rgba(0, 0, 0, 0.18);
+  /* Manager sidebar uses its own slot so it can stay branded in dark mode
+     and switch to a card-style light surface in light mode. */
+  --mgr-side-bg: #002328;
+  --mgr-side-text: #eff5f9;
+  --mgr-side-muted: rgba(239, 245, 249, 0.62);
+  --mgr-side-border: rgba(239, 245, 249, 0.10);
+  --mgr-side-hover: rgba(239, 245, 249, 0.06);
+  --mgr-side-active-bg: rgba(3, 191, 181, 0.14);
+  --mgr-side-active-text: var(--accent);
+  /* Sticky offset (raised when the demo banner is present, see :has rule
+     below). */
+  --eo-sticky-top: 0px;
 }
 
 /* Light theme — flips surfaces + text while keeping the brand teal accent.
@@ -43,6 +55,13 @@
   --muted: rgba(0, 40, 46, 0.50);
   --muted2: rgba(0, 40, 46, 0.72);
   --shadow: 0 2px 12px rgba(0, 40, 46, 0.08);
+  --mgr-side-bg: #ffffff;
+  --mgr-side-text: #002830;
+  --mgr-side-muted: rgba(0, 40, 46, 0.62);
+  --mgr-side-border: rgba(0, 40, 46, 0.12);
+  --mgr-side-hover: rgba(0, 40, 46, 0.05);
+  --mgr-side-active-bg: rgba(1, 138, 130, 0.10);
+  --mgr-side-active-text: var(--accent);
 }
 
 /* Smooth color transitions on theme change */
@@ -789,10 +808,14 @@ table.app-table th {
 /* Manager sidebar shell */
 .mgr-shell { display: grid; grid-template-columns: 240px 1fr; min-height: 100vh; }
 .mgr-side {
-  background: #002328;
-  border-right: 1px solid var(--border);
+  background: var(--mgr-side-bg);
+  color: var(--mgr-side-text);
+  border-right: 1px solid var(--mgr-side-border);
   padding: 28px 20px;
-  position: sticky; top: 0; height: 100vh;
+  position: sticky;
+  top: var(--eo-sticky-top);
+  height: calc(100vh - var(--eo-sticky-top));
+  z-index: 10;
 }
 .mgr-side .brand {
   font-family: var(--font-bebas), "Bebas Neue", sans-serif;
@@ -804,15 +827,30 @@ table.app-table th {
 .mgr-side nav a {
   display: block;
   padding: 12px 14px;
-  color: var(--muted2);
+  color: var(--mgr-side-muted);
   text-decoration: none;
   font-size: 14px;
   border-radius: 8px;
   margin-bottom: 4px;
 }
-.mgr-side nav a:hover { background: rgba(239,245,249,0.04); color: var(--white); }
-.mgr-side nav a.active { background: rgba(3,191,181,0.12); color: var(--accent); }
+.mgr-side nav a:hover { background: var(--mgr-side-hover); color: var(--mgr-side-text); }
+.mgr-side nav a.active { background: var(--mgr-side-active-bg); color: var(--mgr-side-active-text); }
 .mgr-content { min-width: 0; }
+
+/* When the demo banner is sticky at the top of the app shell, push the
+   sticky sidebar down so it visually connects to the banner instead of
+   disappearing behind it. Uses :has() (Chrome 105+, Safari 15.4+, FF 121+). */
+.app-shell:has(> .demo-banner) { --eo-sticky-top: 48px; }
+@media (max-width: 600px) {
+  .app-shell:has(> .demo-banner) { --eo-sticky-top: 96px; }
+}
+
+/* On routes that have the manager sidebar, the per-route demo tip card
+   would otherwise span the full width above the sidebar and visually
+   disconnect it from the banner. Hide the wrapper there. The banner
+   copy already conveys the message. The tip card still shows on
+   operator / shift / summary / pin routes where there's no sidebar. */
+.app-shell:has(.mgr-shell) .demo-tip-wrap { display: none; }
 
 .mgr-side-foot {
   margin-top: 20px;
@@ -1887,6 +1925,16 @@ textarea.app-input { resize: vertical; min-height: 56px; font-family: var(--font
   color: var(--accent);
   margin-bottom: 4px;
 }
+
+/* Logo swap — shows the white-ink variant by default and the dark-ink
+   variant when html[data-theme="light"] is active. Both <img> tags ship,
+   but only one is in the layout flow at a time. The !important is
+   required because next/image stamps `display: block` into the element's
+   inline style attribute. */
+.logo-swap-dark { display: block !important; }
+.logo-swap-light { display: none !important; }
+html[data-theme="light"] .logo-swap-dark { display: none !important; }
+html[data-theme="light"] .logo-swap-light { display: block !important; }
 
 /* Theme toggle */
 .theme-toggle {

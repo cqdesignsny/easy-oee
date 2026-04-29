@@ -50,7 +50,7 @@ export function DemoBanner() {
         </div>
       </div>
       {tipKey && (
-        <div className="app-wrap" style={{ paddingTop: 16, paddingBottom: 0 }}>
+        <div className="app-wrap demo-tip-wrap" style={{ paddingTop: 16, paddingBottom: 0 }}>
           <div className="demo-tip">
             <div className="demo-tip-title">{t("demo.tip.label")}</div>
             <div>{t(tipKey)}</div>

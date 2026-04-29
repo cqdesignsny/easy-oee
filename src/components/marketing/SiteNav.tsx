@@ -1,9 +1,9 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
+import { Logo } from "@/components/Logo";
 import { LanguageSwitcher } from "@/components/i18n/LanguageSwitcher";
 import { ThemeToggle } from "@/components/theme/ThemeToggle";
 import { useT } from "@/components/i18n/LanguageProvider";
@@ -35,14 +35,7 @@ export function SiteNav() {
     <>
       <nav className="eo-nav">
         <Link href="/" className="nav-logo" aria-label="Easy OEE home">
-          <Image
-            src="/easy-oee-logo.svg"
-            alt="Easy OEE"
-            width={713}
-            height={175}
-            priority
-            style={{ height: 56, width: "auto", display: "block" }}
-          />
+          <Logo height={56} priority />
         </Link>
 
         {/* Desktop links */}

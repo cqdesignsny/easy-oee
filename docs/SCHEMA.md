@@ -210,10 +210,14 @@ pnpm db:generate && pnpm db:migrate
 All recent additions are backwards-compatible (nullable / defaults), so
 the deploy can ship before the migration runs without breaking reads.
 
-## Auth cookies (HMAC, signed with `OPERATOR_SESSION_SECRET`)
+## Cookies in use
 
-| Cookie | TTL | Set by | Payload |
-|---|---|---|---|
-| `eo_admin` | 14 days | `/sign-in`, `/sign-up`, `/demo` (manager side) | `{ role: "admin", userId, companyId, exp }` |
-| `eo_op` | 12 hours | `/pin`, `/demo` (operator side), shift handoff | `{ operatorId, companyId, exp }` |
-| `eo_demo` | 4 hours | `/demo` | marker only — toggles the DEMO MODE banner across `(app)` routes. Cleared on Exit demo. |
+The app sets five cookies. Three are HMAC-signed sessions (`OPERATOR_SESSION_SECRET`), two are plain UI-state markers.
+
+| Cookie | TTL | Set by | Payload | Notes |
+|---|---|---|---|---|
+| `eo_admin` | 14 days | `/sign-in`, `/sign-up`, `/demo` (manager side) | `{ role: "admin", userId, companyId, exp }` | HMAC-signed |
+| `eo_op` | 12 hours | `/pin`, `/demo` (operator side), shift handoff | `{ operatorId, companyId, exp }` | HMAC-signed |
+| `eo_demo` | 4 hours | `/demo` | `1` (marker only) | Toggles the DEMO MODE banner across `(app)` routes. Cleared on Exit demo. |
+| `eo-locale` | 1 year | language switcher | `en` / `es` / `fr` | Drives i18n. Read SSR via `getServerLocale()`. |
+| `eo-theme` | 1 year | theme toggle | `light` / `dark` | Drives `data-theme` on `<html>`. Read SSR via `getServerTheme()` so first paint matches preference (no flash). |

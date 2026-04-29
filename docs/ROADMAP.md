@@ -129,10 +129,12 @@ Legend: 🟢 done · 🟡 in progress · ⚪ queued · 🔵 blocked
 - 🟢 Daily digest cron (`/api/cron/daily-digest`) — assembles per-line OEE, top stops, 7-day delta. Optional Anthropic-powered summary if `ANTHROPIC_API_KEY` is set. Logs today; flip to `resend.emails.send()` once Resend is wired.
 - 🟢 Weekly anomaly scan cron (`/api/cron/anomaly-scan`) — flags lines whose 7-day avg dropped > 5pp vs 4-week baseline.
 - 🟢 Public TV Board view (`/board/[token]`) — read-only fullscreen for shop floor displays, no login, manager rotates token from `/dashboard/lines`.
-- ⚪ Weekly + monthly OEE trend lines
-- ⚪ Per-line drill-down
+- 🟢 **Analytics module at `/dashboard/analytics`** — overview (OEE/A/P/Q over 30 days, 14-day SVG sparkline, drill-in cards) + three deep-dives: by shift, by machine (vs-target bars), by operator (leaderboard cards + table). Multi-tenant, scoped via `getAdminSession` with seed fallback.
+- 🟢 **14-day OEE trend sparkline** (analytics overview)
+- 🟢 **Operator leaderboard** (`/dashboard/analytics/operators`) — ranked by avg OEE with full A/P/Q breakdown
+- ⚪ Weekly + monthly OEE trend lines (longer windows than the 14-day sparkline)
+- ⚪ Per-line drill-down page (`/dashboard/analytics/machines/[id]` — currently the machines page is a flat list)
 - ⚪ Custom stop reason categories per company
-- ⚪ Operator leaderboard (manager-toggled setting)
 
 ### Barcode / QR scanner (NEW — shipped 2026-04-28)
 - 🟢 Reusable `<ScanModal>` using native `BarcodeDetector` API + `@zxing/browser` fallback
@@ -174,6 +176,13 @@ See `docs/HARDWARE-INTEGRATION.md`.
 
 ## Recent activity
 
+- **2026-04-29** — Analytics module + light/dark theme + style sweep (commit `5e1f298`, all green):
+  - **Analytics module at `/dashboard/analytics`** — overview page (OEE / A / P / Q for last 30 days, production volumes, 14-day SVG sparkline with 85% target line, drill-in cards) plus three deep-dives: shifts (per-type cards + table + Pareto), machines (summary table, OEE-vs-target bars, Pareto per line), operators (leaderboard cards with rank + table + Pareto per operator).
+  - **Backed by** `src/lib/db/queries/analytics.ts` — Drizzle queries (`avg`, `count`, `sum`, `groupBy`) all multi-tenant scoped. Sub-nav at the top of every analytics route. Manager sidebar gets an Analytics tab. Demo banner has per-route tip cards for all 4 analytics pages.
+  - **Adapted from a draft Louis sent over** — kept the structure + queries, replaced hardcoded Spanish with i18n keys × EN/ES/FR (~95 keys), stripped decoration emojis (sun/moon, ✅/❌), swapped fallback CSS vars for the real theme tokens, fixed `oee-poor` → `oee-low` bucket class, reused existing `stop.NN.label` keys instead of duplicating per page.
+  - **Light / dark theme toggle** — tokens for `:root[data-theme="dark"]` and `:root[data-theme="light"]` in globals.css with smooth transitions. `eo-theme` cookie read SSR-side via `getServerTheme()` so first paint matches preference. `<ThemeToggle>` client component (sun/moon SVG, no emojis) wired into manager sidebar, operator setup, sign-in, pin, demo landing, marketing nav (desktop + mobile cluster). Persists to cookie + localStorage. i18n: `theme.light` / `theme.dark` / `theme.toLight` / `theme.toDark`.
+  - **AI-slop / em-dash sweep** — em-dash pause-breaks replaced with periods in user-facing strings (`shift.longStop.title`, `demo.banner.tip`, `demo.manager.body` × 3 langs). JSDoc headers cleaned across 9 files. `"—"` placeholder for null data in tables stays (correct typography). No decoration emojis in user strings; `✓` in `seed.ts` console output kept (CLI dev tool).
+  - **Verified clean:** `pnpm test` 13/13, typecheck, lint, build all green. All 4 analytics routes built.
 - **2026-04-28** — Sales-ready batch (6 commits, all green):
   - **`/demo` route + DEMO MODE banner** with per-route tip cards. Two entry buttons (Manager / Operator) drop prospects into the seeded Maple Manufacturing tenant with no login. Marketing nav adds "See it Live" link, sign-in page adds Demo CTA.
   - **Self-serve `/sign-up` is real:** creates a `company` + manager `user` (bcrypt password) with a 7-day `trial_ends_at`, sets the admin cookie, lands on `/dashboard` with a trial countdown banner. Schema migration `0001_user_password_hash.sql`. Marketing CTA switched to "Start Free Trial" → `/sign-up`.

@@ -1,15 +1,18 @@
 # HANDOFF — Pick this up on a different machine
 
-> **You are switching machines mid-build.** Read this top-to-bottom before doing anything else. Everything you need to continue is in this repo. Last updated: 2026-04-28 (sales-ready batch: live demo, self-serve signup, live machines grid, barcode/job number, mobile audit).
+> **You are switching machines mid-build.** Read this top-to-bottom before doing anything else. Everything you need to continue is in this repo. Last updated: 2026-04-29 (analytics module + light/dark theme toggle + style sweep).
 
 ## State of the world right now
 
 - ✅ App is **deployed and working** at https://easy-oee.vercel.app
-- ✅ **Sales demo path live** at `/demo` — prospects pick "Enter as Manager" or "Enter as Operator" with no login. Sticky `DEMO MODE` banner across every app screen with `Sign Up Free` CTA + per-route tip cards.
+- ✅ **Analytics module live** at `/dashboard/analytics` — overview (OEE / A / P / Q for last 30 days, 14-day sparkline, drill-in cards), plus three deep-dives: by shift type, by machine (with vs-target bars), by operator (leaderboard cards + table). Multi-tenant, scoped via `getAdminSession` with seed fallback. Adapted from Louis's spec into i18n + real theme tokens.
+- ✅ **Light / dark theme toggle** on every surface — manager sidebar, operator setup, sign-in, pin, demo landing, marketing nav (desktop + mobile). `eo-theme` cookie read SSR-side so first paint matches preference. Both themes share the brand teal accent; light theme flips background + text.
+- ✅ **Sales demo path live** at `/demo` — prospects pick "Enter as Manager" or "Enter as Operator" with no login. Sticky `DEMO MODE` banner across every app screen with `Sign Up Free` CTA + per-route tip cards (now including all four analytics routes).
 - ✅ **Self-serve signup live** at `/sign-up` — real flow creates company + manager user (bcrypt password) with a 7-day trial, lands on `/dashboard` with countdown banner. No credit card. Stripe billing wires in later.
 - ✅ **Live machines grid** at top of `/dashboard` — per-line cards with running/stopped pill, big OEE, current operator, parts, elapsed timer, top stop today. Auto-refreshes every 10s.
 - ✅ **Barcode/QR scanner** wired for **job numbers** — scan or type a work-order/job number on operator shift setup AND on manager edit-shift; visible on live shift, summary, dashboards, CSV export. Native `BarcodeDetector` API with `@zxing/browser` fallback. Plus a header "Scan code → clipboard" utility on the manager dashboard.
 - ✅ **Mobile audit complete** — fixed broken hamburger menu (backdrop-filter containing-block trap), dashboard header overlap on phones, manager sidebar bottom-row layout. Verified at 375×812 across all marketing + app routes.
+- ✅ **Style sweep done** — em-dash pause-breaks gone from user-facing strings (EN/ES/FR), JSDoc headers cleaned. No decoration emojis in user strings. `"—"` still used as null-data placeholder in tables (that's correct typography).
 - ✅ All Tier 1-4 product upgrades from the Apr 7 batch still live: live shift timers, downtime card, long-stop notes, hand-off, shift comparison, loss tree, calendar grid, edit-shift, TV Board, daily digest cron, weekly anomaly cron, PWA manifest.
 - ✅ Schema is **in sync with Neon** (auto-applied via `prebuild` migration runner; runner bug that silently skipped comment-headed migrations was fixed in `scripts/migrate.mjs`).
 - ✅ `pnpm test` 13/13 · `pnpm typecheck` clean · `pnpm lint` clean · `pnpm build` clean
@@ -774,3 +777,188 @@ If anything looks wrong, the source of truth is GitHub. Re-clone if in
 doubt. SSD canonical path is `/Volumes/CQ-PRO-4TB/Easy OEE/easy-oee`.
 Auto-sync runs every 3 minutes + on every commit; Dropbox docs mirror is
 wired into the same script and updates the same cycle.
+
+---
+
+## 2026-04-29 — Analytics module + light/dark theme + style sweep
+
+Two features and a style pass landed in one commit (`5e1f298`).
+
+### What shipped
+
+**1. Analytics module at `/dashboard/analytics`**
+
+Adapted from a spec Louis sent over. Four routes:
+
+- `/dashboard/analytics` — KPI cards (OEE / Availability / Performance /
+  Quality over the last 30 days), production volume cards (good parts,
+  defective units, total + defect rate), 14-day SVG sparkline with the
+  85% target line, and three drill-in cards.
+- `/dashboard/analytics/shifts` — per-shift-type cards, full shift
+  detail table, and Pareto stops broken out per shift type.
+- `/dashboard/analytics/machines` — line summary table with vs-target
+  column, OEE-vs-target horizontal bars (green when above, red below,
+  vertical white tick at the target), and Pareto stops per line.
+- `/dashboard/analytics/operators` — ranked leaderboard cards (#1 gets
+  a teal rank pill), full detail table sorted by OEE, and Pareto stops
+  per operator.
+
+Backed by `src/lib/db/queries/analytics.ts` — multi-tenant queries
+using Drizzle (`avg`, `count`, `sum`, `groupBy`). All queries scoped by
+`companyId` and resolved through `getAdminSession()` with a seed
+fallback for the legacy demo path.
+
+Sub-nav at the top of every analytics route via
+`src/app/(app)/dashboard/analytics/subnav.tsx`. Manager sidebar gets a
+new **Analytics** tab between Dashboard and Shifts. Demo banner has
+per-route tip cards for all four analytics pages.
+
+Adaptations from Louis's draft (his structure was sound; the polish
+needed cleanup):
+- All decoration emojis stripped (icons, sun/moon, ✅/❌ in the cards).
+- ~95 hardcoded Spanish strings lifted into i18n keys × EN/ES/FR.
+- CSS fallback variables replaced with the real theme tokens
+  (`--mid`, `--border`, `--border2`, `--accent`, `--white`,
+  `--muted2`, `--font-dm-mono`, `--font-bebas`).
+- Bucket class typo fixed (`oee-low`, not `oee-poor`).
+- Stop reason labels reuse the canonical `stop.NN.label` keys instead
+  of being duplicated three times.
+- A small helpers file `src/app/(app)/dashboard/analytics/helpers.ts`
+  with `getAnalyticsCompanyId()` and `STOP_LABEL_KEYS`.
+
+**2. Light / dark theme toggle**
+
+Wired through every surface. The dark theme is the existing brand teal
+look; light theme flips background and text while keeping the same
+teal accent.
+
+- Tokens defined in `src/app/globals.css` for both
+  `:root[data-theme="dark"]` and `:root[data-theme="light"]`. Smooth
+  `transition` on background-color + color + border-color across body,
+  cards, nav, sidebar, fields, buttons, scanner, banners.
+- `src/lib/theme.ts` — `getServerTheme()` reads the `eo-theme` cookie
+  via `next/headers`, defaulting to dark. Used by the root layout to
+  set `data-theme` on `<html>` at SSR. No flash of wrong theme on
+  first paint.
+- `src/components/theme/ThemeToggle.tsx` — client component with two
+  variants (`icon` round button, `labeled` with text). Sun/moon SVGs
+  (no emoji glyphs). Clicking updates `data-theme`, sets the cookie
+  (1-year max-age), and writes localStorage. Hydration-safe via the
+  mounted-flag pattern (eslint-disable-next-line on the standard
+  set-state-in-effect for the mount toggle).
+- Wired into:
+  - Manager sidebar bottom row (`mgr-side-foot`)
+  - Operator setup (`/operator`)
+  - `/sign-in`, `/pin`, `/demo` landing
+  - Marketing nav (desktop links + mobile cluster)
+- i18n: `theme.light`, `theme.dark`, `theme.toLight`, `theme.toDark`
+  in all 3 locales.
+
+**3. Style sweep — em-dashes, AI slop, decoration emojis**
+
+- Em-dash pause-breaks replaced with periods in user-facing strings:
+  `shift.longStop.title`, `demo.banner.tip`, `demo.manager.body` in
+  EN/ES/FR.
+- Em-dashes in JSDoc file headers cleaned (manifest, layout, csv
+  route, cron routes, ThemeToggle, ScanModal, dictionaries header) —
+  replaced with periods or colons.
+- Decoration emojis: none found in user-facing strings. The only
+  glyph left is `✓` in `seed.ts` console output — that's a CLI dev
+  tool with structural meaning, kept.
+- AI-slop phrases: none found.
+- `"—"` is still used as a null-data placeholder in tables (e.g.,
+  unset job number, no shift data). That's correct typography (the
+  character represents absence of value, not a pause-break).
+
+### Schema changes
+
+None this round. Analytics is read-only.
+
+### New i18n keys
+
+About 100 keys × EN/ES/FR. Topical groups: `analytics.*` (overview,
+KPI labels, sub-nav, column headers, drill-in card copy, per-page
+empty states), `theme.*`, plus extra `demo.tip.analytics.*` for the
+per-route demo banner tips, plus `mgr.nav.analytics`.
+
+### Cookies (full inventory after today)
+
+| Cookie | TTL | Set by | Payload | Notes |
+|---|---|---|---|---|
+| `eo_admin` | 14d | `/sign-in`, `/sign-up`, `/demo` (manager side) | `{ role: "admin", userId, companyId, exp }` | HMAC-signed |
+| `eo_op` | 12h | `/pin`, `/demo` (operator side), shift handoff | `{ operatorId, companyId, exp }` | HMAC-signed |
+| `eo_demo` | 4h | `/demo` | marker `1` | Toggles the DEMO MODE banner |
+| `eo-locale` | 1y | language switcher | `en` / `es` / `fr` | Drives i18n SSR |
+| `eo-theme` | 1y | theme toggle | `light` / `dark` | Drives `data-theme` on `<html>` |
+
+### Files added today
+
+```
+src/app/(app)/dashboard/analytics/layout.tsx
+src/app/(app)/dashboard/analytics/subnav.tsx
+src/app/(app)/dashboard/analytics/helpers.ts
+src/app/(app)/dashboard/analytics/page.tsx
+src/app/(app)/dashboard/analytics/shifts/page.tsx
+src/app/(app)/dashboard/analytics/machines/page.tsx
+src/app/(app)/dashboard/analytics/operators/page.tsx
+src/lib/db/queries/analytics.ts
+src/lib/theme.ts
+src/components/theme/ThemeToggle.tsx
+```
+
+### Resume here on the next session
+
+The "next steps" punch list from the 2026-04-28 entry still applies
+(Stripe wiring, Resend wiring, Clerk migration, loading/error/404,
+demo reset cron, DNS cutover). Two new items added by today's work:
+
+1. **Add a "Per-line drill-down" deep-dive page** under
+   `/dashboard/analytics/machines/[id]` — currently the machine
+   summary is a flat list. A per-line page with daily trend +
+   shift-by-shift table would round out Phase 3 "Insights".
+2. **Theme-aware OG / favicon images** — current PNGs are dark only;
+   light-theme users on iMessage previews will still see the dark
+   teal background. Low priority but on the list.
+
+Auto-sync runs every 3 min + on every commit. Dropbox docs mirror
+follows the same cycle.
+
+### Bug-fix addendum (same day)
+
+After the initial analytics + theme push, four light/demo bugs surfaced
+and were fixed:
+
+- **Logo rendered twice in light mode.** `next/image` stamps
+  `display: block` into the element's inline style, which beat the
+  `display: none` from the `.logo-swap-light/-dark` classes. Fixed
+  with `!important` on the swap rules. Without that, both variants
+  rendered side-by-side.
+- **Sidebar disappeared into the dark teal background in light mode.**
+  `.mgr-side` had a hardcoded `background: #002328`. Replaced with a
+  set of dedicated tokens (`--mgr-side-bg`, `--mgr-side-text`,
+  `--mgr-side-muted`, `--mgr-side-border`, `--mgr-side-hover`,
+  `--mgr-side-active-bg`, `--mgr-side-active-text`) so the sidebar can
+  stay branded teal in dark mode and be a clean white card in light
+  mode.
+- **Sidebar wasn't connecting to the demo banner.** Banner is sticky
+  at top:0 with z-index 50; sidebar was also sticky at top:0 with
+  default z-index, so it disappeared behind the banner whenever the
+  user scrolled past the page header. Added `--eo-sticky-top` CSS
+  variable on `:root` (default 0px), bumped to 48px via
+  `.app-shell:has(> .demo-banner)` rule. The sidebar now uses
+  `top: var(--eo-sticky-top)` and `height: calc(100vh - var(--eo-sticky-top))`,
+  visually connecting to the banner edge.
+- **Per-route demo tip card spanned the full width above the sidebar**,
+  pushing `.mgr-shell` (and the sidebar inside it) further down the
+  document. The result was a visible gap between the banner and the
+  sidebar's top edge. Hid the tip wrapper on routes that contain a
+  `.mgr-shell` via `.app-shell:has(.mgr-shell) .demo-tip-wrap { display: none }`.
+  The banner copy still conveys the message; tips remain on
+  operator/shift/summary/pin where they fit better.
+- Marketing nav and operator setup got the theme toggle alongside the
+  language switcher. Logo component now renders both `easy-oee-logo.svg`
+  (white ink) and `easy-oee-logo-dark.svg` (dark ink) and CSS swaps
+  visibility based on `data-theme`. The marketing nav was migrated from
+  raw `<Image>` to the shared `<Logo />` component for consistency.
+
+Lightning CSS gotcha: dropped a `.app-shell:has(.mgr-shell) > .app-wrap:has(> .demo-tip)` rule silently during minification (nested `:has()` with child combinators). Worked around it by adding a `demo-tip-wrap` class directly to the wrapper and targeting that.

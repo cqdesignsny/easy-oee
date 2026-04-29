@@ -5,7 +5,7 @@
 **Live:** [easy-oee.vercel.app](https://easy-oee.vercel.app) · **Demo (no login):** [easy-oee.vercel.app/demo](https://easy-oee.vercel.app/demo) · **Sign up (7-day free trial):** [easy-oee.vercel.app/sign-up](https://easy-oee.vercel.app/sign-up)
 **Domain:** [easy-oee.com](https://easy-oee.com) (currently serving Louis's static marketing HTML — DNS cutover pending)
 **GitHub:** https://github.com/cqdesignsny/easy-oee
-**Status:** Phase 1 + Phase 2-foundation shipped. Marketing site, operator flow, manager dashboard, admin pages, EN/ES/FR i18n, animated hero gauge, **live machines grid**, **/demo with banner + per-route tips**, **self-serve 7-day trial signup**, **barcode/QR scanner for job numbers**, Tier 1-4 product upgrades. Stripe + Resend + Clerk on stubs.
+**Status:** Phase 1 + Phase 2-foundation + Phase 3 (Insights) shipped. Marketing site, operator flow, manager dashboard, admin pages, EN/ES/FR i18n, animated hero gauge, **live machines grid**, **/demo with banner + per-route tips**, **self-serve 7-day trial signup**, **barcode/QR scanner for job numbers**, **analytics module (overview + by shift / machine / operator)**, **light/dark theme toggle on every surface**, Tier 1-4 product upgrades. Stripe + Resend + Clerk on stubs.
 
 > **Picking this up on a new machine?** Start with [`docs/HANDOFF.md`](./docs/HANDOFF.md).
 
@@ -72,6 +72,10 @@ See [`docs/ARCHITECTURE.md`](./docs/ARCHITECTURE.md) for the full rationale.
 - `/shift/[id]` — live tracking with `useOptimistic`, 10 stop buttons, parts counters, end-shift confirm
 - `/shift/[id]/summary` — color-coded OEE breakdown, shows job number when set
 - `/dashboard` — manager home: **live machines grid** (per-line cards with running/stopped pill, big OEE, operator, parts, elapsed timer, top stop today, auto-refresh 10s), trial countdown banner, today's OEE, shift comparison, live shifts, recent shifts (with Job # column), 7-day Pareto stops, **Scan code → clipboard** utility button in header
+- `/dashboard/analytics` — **analytics overview**: 30-day KPI cards (OEE / A / P / Q), production volumes, 14-day SVG sparkline with target line, drill-in cards
+- `/dashboard/analytics/shifts` — per-shift-type comparison + Pareto stops broken out by shift
+- `/dashboard/analytics/machines` — per-line summary table, OEE-vs-target horizontal bars, Pareto stops per machine
+- `/dashboard/analytics/operators` — leaderboard cards (#1 highlighted), detail table sorted by OEE, Pareto stops per operator
 - `/dashboard/lines` `/dashboard/operators` `/dashboard/shifts` — admin CRUD pages. Shifts admin includes Job # column + edit-shift with scanner-enabled job number field.
 - `/board/[token]` — public TV board for shop-floor displays
 - **Shift export** — Download CSV / Print or save PDF / Email it (scaffold) buttons on `/shift/[id]/summary`. CSV via `/api/shifts/[id]/csv` route handler includes Job Number row.
@@ -101,6 +105,12 @@ See [`docs/ARCHITECTURE.md`](./docs/ARCHITECTURE.md) for the full rationale.
 - **Demo mode**: `/demo` sets admin + operator cookies pointed at the seed user IDs and an `eo_demo` marker cookie that toggles the banner. Exit via the link in the banner.
 - **Operator PIN**: `/pin` with name picker + 4-digit PIN, bcrypt-hashed in Postgres. HMAC-signed cookie, 12-hour TTL.
 - Google/Microsoft SSO buttons present on `/sign-in` as placeholders (disabled with "Coming soon" tooltip)
+
+### Theme system (light + dark)
+- Both themes share the brand teal accent. Dark theme is the existing look; light theme flips background and text while keeping accent colors.
+- `eo-theme` cookie read SSR-side by the root layout, so `<html data-theme>` is set before first paint (no flash).
+- `<ThemeToggle />` client component (sun/moon SVG, no emoji glyphs) wired into manager sidebar, operator setup, sign-in, pin, demo landing, and the marketing nav (desktop + mobile cluster). Persists to cookie + localStorage.
+- Smooth color transitions across body, cards, nav, sidebar, fields, buttons, banners.
 
 ### Barcode / QR scanner
 - Native `BarcodeDetector` API with `@zxing/browser` fallback for Safari pre-TP.
