@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
 import { LanguageSwitcher } from "@/components/i18n/LanguageSwitcher";
+import { ThemeToggle } from "@/components/theme/ThemeToggle";
 import { useT } from "@/components/i18n/LanguageProvider";
 
 export function SiteNav() {
@@ -51,6 +52,7 @@ export function SiteNav() {
           <Link href="/pricing">{t("nav.pricing")}</Link>
           <Link href="/roi-calculator">{t("nav.roi")}</Link>
           <LanguageSwitcher />
+          <ThemeToggle />
           <Link href="/demo" className="nav-signin">
             {t("nav.tryDemo")}
           </Link>
@@ -65,6 +67,7 @@ export function SiteNav() {
         {/* Mobile right cluster: language switcher + hamburger (always visible) */}
         <div className="nav-mobile-cluster">
           <LanguageSwitcher />
+          <ThemeToggle />
           <button
             type="button"
             className="nav-burger"

@@ -1,7 +1,7 @@
 import type { MetadataRoute } from "next";
 
 /**
- * PWA manifest — lets operators "Add to Home Screen" the operator surface
+ * PWA manifest. Lets operators "Add to Home Screen" the operator surface
  * on a shop floor tablet so it launches fullscreen with no browser chrome.
  */
 export default function manifest(): MetadataRoute.Manifest {

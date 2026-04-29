@@ -4,6 +4,7 @@ import Link from "next/link";
 import { SignInForm } from "./sign-in-form";
 import { Logo } from "@/components/Logo";
 import { LanguageSwitcher } from "@/components/i18n/LanguageSwitcher";
+import { ThemeToggle } from "@/components/theme/ThemeToggle";
 import { useT } from "@/components/i18n/LanguageProvider";
 
 export const dynamic = "force-dynamic";
@@ -20,7 +21,10 @@ export default function SignInPage() {
           <Link href="/" style={{ display: "inline-block" }}>
             <Logo height={56} priority />
           </Link>
-          <LanguageSwitcher />
+          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+            <LanguageSwitcher />
+            <ThemeToggle />
+          </div>
         </div>
         <div className="app-tag">{t("signin.tag")}</div>
         <h1 className="app-h1">{t("signin.title")}</h1>

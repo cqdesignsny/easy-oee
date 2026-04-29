@@ -8,6 +8,7 @@ import { startShift } from "@/server/actions/shifts";
 import { logoutOperator } from "@/server/actions/operator-auth";
 import { Logo } from "@/components/Logo";
 import { LanguageSwitcher } from "@/components/i18n/LanguageSwitcher";
+import { ThemeToggle } from "@/components/theme/ThemeToggle";
 import { getServerT } from "@/components/i18n/server";
 import { ScanButton } from "@/components/scanner/ScanButton";
 
@@ -49,7 +50,10 @@ export default async function OperatorPage() {
     <main className="op-shell" style={{ maxWidth: 880, margin: "0 auto", width: "100%" }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 28 }}>
         <Link href="/"><Logo height={48} /></Link>
-        <LanguageSwitcher />
+        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+          <LanguageSwitcher />
+          <ThemeToggle />
+        </div>
       </div>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 32 }}>
         <div>

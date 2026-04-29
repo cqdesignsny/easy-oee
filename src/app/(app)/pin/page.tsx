@@ -3,6 +3,7 @@ import { listOperators } from "@/server/actions/operator-auth";
 import { PinForm } from "./pin-form";
 import { Logo } from "@/components/Logo";
 import { LanguageSwitcher } from "@/components/i18n/LanguageSwitcher";
+import { ThemeToggle } from "@/components/theme/ThemeToggle";
 import { getServerT } from "@/components/i18n/server";
 
 export const metadata = { title: "Sign In | Easy OEE" };
@@ -19,7 +20,10 @@ export default async function PinPage() {
           <Link href="/" style={{ display: "inline-block" }}>
             <Logo height={56} priority />
           </Link>
-          <LanguageSwitcher />
+          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+            <LanguageSwitcher />
+            <ThemeToggle />
+          </div>
         </div>
         <div className="app-tag">{t("pin.tag")}</div>
         <h1 className="app-h1">{t("pin.title")}</h1>

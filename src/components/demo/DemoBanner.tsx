@@ -63,6 +63,10 @@ export function DemoBanner() {
 
 function pickTipKey(pathname: string): string | null {
   if (pathname === "/dashboard") return "demo.tip.dashboard";
+  if (pathname.startsWith("/dashboard/analytics/shifts")) return "demo.tip.analytics.shifts";
+  if (pathname.startsWith("/dashboard/analytics/machines")) return "demo.tip.analytics.machines";
+  if (pathname.startsWith("/dashboard/analytics/operators")) return "demo.tip.analytics.operators";
+  if (pathname.startsWith("/dashboard/analytics")) return "demo.tip.analytics";
   if (pathname.startsWith("/dashboard/lines")) return "demo.tip.lines";
   if (pathname.startsWith("/dashboard/operators")) return "demo.tip.operators";
   if (pathname.startsWith("/dashboard/shifts")) return "demo.tip.shifts";

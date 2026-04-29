@@ -2,7 +2,7 @@
  * GET /api/shifts/[id]/csv
  *
  * Streams the shift summary as a CSV download. Scoped by either the operator
- * session or the admin session — anonymous requests get 401.
+ * session or the admin session. Anonymous requests get 401.
  */
 
 import { NextResponse } from "next/server";

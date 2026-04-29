@@ -15,7 +15,8 @@
    Easy OEE — ported 1:1 from the live easy-oee.com (teal/cyan design system)
 ═══════════════════════════════════════════════════════════════════════════ */
 
-:root {
+:root,
+:root[data-theme="dark"] {
   --black: #003038;
   --white: #eff5f9;
   --accent: #03bfb5;
@@ -25,6 +26,32 @@
   --border2: rgba(239, 245, 249, 0.18);
   --muted: rgba(239, 245, 249, 0.42);
   --muted2: rgba(239, 245, 249, 0.68);
+  --shadow: 0 2px 12px rgba(0, 0, 0, 0.18);
+}
+
+/* Light theme — flips surfaces + text while keeping the brand teal accent.
+   Background is a soft near-white tinted toward the brand teal so the
+   accent doesn't feel disconnected. */
+:root[data-theme="light"] {
+  --black: #f4f7f8;
+  --white: #00282e;
+  --accent: #018a82;
+  --red: #b3493e;
+  --mid: #ffffff;
+  --border: rgba(0, 40, 46, 0.10);
+  --border2: rgba(0, 40, 46, 0.18);
+  --muted: rgba(0, 40, 46, 0.50);
+  --muted2: rgba(0, 40, 46, 0.72);
+  --shadow: 0 2px 12px rgba(0, 40, 46, 0.08);
+}
+
+/* Smooth color transitions on theme change */
+html { color-scheme: dark; }
+html[data-theme="light"] { color-scheme: light; }
+body, .card, .eo-nav, .mgr-side, .app-input, .field, .btn, .stop-btn,
+.live-card, .trial-banner, .demo-tip, .nav-mobile-menu, .lang-trigger,
+.lang-menu {
+  transition: background-color 180ms ease, color 180ms ease, border-color 180ms ease;
 }
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -1859,6 +1886,242 @@ textarea.app-input { resize: vertical; min-height: 56px; font-family: var(--font
   text-transform: uppercase;
   color: var(--accent);
   margin-bottom: 4px;
+}
+
+/* Theme toggle */
+.theme-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: transparent;
+  border: 1px solid var(--border2);
+  color: var(--white);
+  width: 38px;
+  height: 38px;
+  border-radius: 999px;
+  cursor: pointer;
+  padding: 0;
+  font: inherit;
+  transition: color 120ms ease, border-color 120ms ease, background 120ms ease;
+}
+.theme-toggle:hover { color: var(--accent); border-color: var(--accent); }
+.theme-toggle-labeled {
+  width: auto;
+  padding: 8px 14px;
+  font-size: 13px;
+  border-radius: 999px;
+  color: var(--muted2);
+}
+.theme-toggle-labeled:hover { color: var(--white); }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   Analytics module (/dashboard/analytics/*)
+═══════════════════════════════════════════════════════════════════════════ */
+
+.analytics-subnav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 16px;
+  margin-bottom: 0;
+}
+.analytics-subnav-link {
+  padding: 7px 16px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--muted2);
+  text-decoration: none;
+  border: 1px solid transparent;
+  transition: color 120ms ease, border-color 120ms ease, background 120ms ease;
+}
+.analytics-subnav-link:hover {
+  color: var(--white);
+  border-color: var(--border2);
+}
+.analytics-subnav-link.is-active {
+  color: var(--accent);
+  background: rgba(3, 191, 181, 0.10);
+  border-color: rgba(3, 191, 181, 0.30);
+}
+
+.analytics-kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+}
+.analytics-kpi-grid--3 { grid-template-columns: repeat(3, 1fr); }
+
+@media (max-width: 900px) {
+  .analytics-kpi-grid { grid-template-columns: repeat(2, 1fr); }
+  .analytics-kpi-grid--3 { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 540px) {
+  .analytics-kpi-grid,
+  .analytics-kpi-grid--3 { grid-template-columns: 1fr; }
+}
+
+.analytics-kpi-card {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.analytics-kpi-card .kpi-big { font-size: clamp(40px, 6vw, 64px); }
+
+.kpi-sub {
+  font-size: 11px;
+  color: var(--muted2);
+  line-height: 1.4;
+  margin-top: 2px;
+}
+
+.analytics-apq-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  font-size: 12px;
+  color: var(--muted2);
+}
+.analytics-apq-row strong { color: var(--white); }
+
+.analytics-nav-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  margin-bottom: 24px;
+}
+@media (max-width: 760px) {
+  .analytics-nav-grid { grid-template-columns: 1fr; }
+}
+.analytics-nav-card {
+  text-decoration: none;
+  color: inherit;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  cursor: pointer;
+  transition: border-color 120ms ease, transform 120ms ease;
+}
+.analytics-nav-card:hover {
+  border-color: var(--accent);
+  transform: translateY(-1px);
+}
+.analytics-nav-tag {
+  font-family: var(--font-dm-mono);
+  font-size: 10px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+.analytics-nav-title {
+  font-family: var(--font-bebas), "Bebas Neue", sans-serif;
+  font-size: 24px;
+  letter-spacing: 1px;
+}
+.analytics-nav-desc {
+  font-size: 13px;
+  color: var(--muted2);
+  line-height: 1.55;
+}
+.analytics-nav-cta {
+  font-size: 13px;
+  color: var(--accent);
+  font-weight: 500;
+  margin-top: auto;
+}
+
+/* OEE-vs-target horizontal bar (machines page + operator card) */
+.analytics-bar-track {
+  position: relative;
+  height: 12px;
+  background: var(--mid);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  overflow: hidden;
+}
+.analytics-bar-fill {
+  height: 100%;
+  border-radius: 999px;
+  transition: width 220ms ease;
+}
+.analytics-bar-fill.is-above { background: var(--accent); }
+.analytics-bar-fill.is-below { background: #ff7a7a; }
+.analytics-bar-target {
+  position: absolute;
+  top: -3px;
+  bottom: -3px;
+  width: 2px;
+  background: var(--white);
+  border-radius: 2px;
+  z-index: 1;
+}
+.analytics-bar-legend {
+  margin-top: 12px;
+  font-size: 11px;
+  color: var(--muted2);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+}
+.analytics-bar-legend-fill {
+  display: inline-block;
+  width: 14px;
+  height: 8px;
+  background: var(--accent);
+  border-radius: 2px;
+  vertical-align: middle;
+}
+.analytics-bar-legend-target {
+  display: inline-block;
+  width: 2px;
+  height: 12px;
+  background: var(--white);
+  vertical-align: middle;
+  margin-right: 4px;
+}
+
+/* Operator leaderboard cards */
+.analytics-operator-card {
+  position: relative;
+  padding-top: 28px;
+}
+.analytics-operator-rank {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  width: 30px;
+  height: 30px;
+  border-radius: 999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-dm-mono);
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--muted2);
+  background: var(--mid);
+  border: 1px solid var(--border2);
+}
+.analytics-operator-rank.is-top {
+  color: #001b1f;
+  background: var(--accent);
+  border-color: var(--accent);
+}
+.analytics-operator-avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 999px;
+  background: var(--accent);
+  color: #001b1f;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 16px;
+  margin-bottom: 10px;
 }
 
 /* Barcode scan affordance — sits next to an input */

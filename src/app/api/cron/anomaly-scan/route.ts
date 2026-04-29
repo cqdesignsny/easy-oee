@@ -4,7 +4,7 @@ import * as s from "@/lib/db/schema";
 import { and, eq, gte, lt, sql } from "drizzle-orm";
 
 /**
- * Weekly anomaly scan — Monday morning. For each company, compares this
+ * Weekly anomaly scan. Runs Monday morning. For each company, compares this
  * week's average OEE per line to the prior 4-week baseline. Flags drops
  * of more than 5 percentage points and (when ANTHROPIC_API_KEY is set)
  * asks Claude Haiku for a one-paragraph "what changed" narrative.

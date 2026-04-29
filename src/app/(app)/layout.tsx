@@ -1,5 +1,5 @@
 /**
- * App-area layout — full-screen, no marketing chrome.
+ * App-area layout. Full-screen, no marketing chrome.
  * Used by /pin, /operator, /shift/[id], /shift/[id]/summary, /dashboard.
  *
  * Renders the DemoBanner above all content when the demo cookie is set.

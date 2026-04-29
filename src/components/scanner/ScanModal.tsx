@@ -8,9 +8,9 @@
  * cleanly on close.
  *
  * Props:
- *   open      — controls visibility
- *   onClose   — called when the user dismisses
- *   onDetect  — called once with the scanned text; the parent decides what
+ *   open:     controls visibility
+ *   onClose:  called when the user dismisses
+ *   onDetect: called once with the scanned text; the parent decides what
  *               to do with it (fill an input, copy to clipboard, etc.)
  */
 

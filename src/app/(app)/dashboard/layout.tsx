@@ -5,6 +5,7 @@ import { getAdminSession } from "@/lib/auth/admin-session";
 import { signOutAdmin } from "@/server/actions/admin-auth";
 import { Logo } from "@/components/Logo";
 import { LanguageSwitcher } from "@/components/i18n/LanguageSwitcher";
+import { ThemeToggle } from "@/components/theme/ThemeToggle";
 import { getServerT } from "@/components/i18n/server";
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
@@ -21,6 +22,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
         <ManagerNav />
         <div className="mgr-side-foot">
           <LanguageSwitcher />
+          <ThemeToggle />
           <form action={signOutAdmin}>
             <button type="submit" className="mgr-signout">
               {t("mgr.nav.signOut")}

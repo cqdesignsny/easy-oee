@@ -9,6 +9,7 @@ export function ManagerNav() {
   const pathname = usePathname();
   const links = [
     { href: "/dashboard", label: t("mgr.nav.dashboard"), exact: true },
+    { href: "/dashboard/analytics", label: t("mgr.nav.analytics") },
     { href: "/dashboard/shifts", label: t("mgr.nav.shifts") },
     { href: "/dashboard/lines", label: t("mgr.nav.lines") },
     { href: "/dashboard/operators", label: t("mgr.nav.operators") },

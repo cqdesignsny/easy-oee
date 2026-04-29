@@ -6,7 +6,7 @@ import { buildDailyDigest } from "@/server/actions/digest";
 import { renderDigestText } from "@/lib/digest-render";
 
 /**
- * Vercel Cron entrypoint — runs once a day at ~6 AM (configure in vercel.json).
+ * Vercel Cron entrypoint. Runs once a day at ~6 AM (configure in vercel.json).
  *
  *   { "crons": [{ "path": "/api/cron/daily-digest", "schedule": "0 11 * * *" }] }
  *
