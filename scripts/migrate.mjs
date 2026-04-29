@@ -65,12 +65,22 @@ function listMigrations() {
  * Drizzle migrations use `--> statement-breakpoint` between statements,
  * because Postgres doesn't allow some DDL inside a single transaction.
  * Split on it and run each chunk as its own query.
+ *
+ * A chunk is dropped only if it has no executable SQL after stripping
+ * single-line `--` comments. This avoids a class of silent "applied but
+ * empty" migrations where a leading comment header caused the previous
+ * `^--` regex to throw out the whole file.
  */
 function splitStatements(text) {
   return text
     .split(/-->\s*statement-breakpoint/gi)
     .map((s) => s.trim())
-    .filter((s) => s.length > 0 && !s.match(/^--/));
+    .filter((s) => s.length > 0)
+    .filter((s) => {
+      // Strip `-- comment` lines and whitespace; keep if any SQL remains.
+      const stripped = s.replace(/--[^\n]*/g, "").replace(/\s+/g, "");
+      return stripped.length > 0;
+    });
 }
 
 async function applyMigration(name) {
