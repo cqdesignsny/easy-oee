@@ -119,6 +119,7 @@ export default async function DashboardPage() {
       operatorName: s.user.fullName,
       shiftType: s.shift.shiftType,
       shiftDate: s.shift.shiftDate,
+      jobNumber: s.shift.jobNumber,
       oee: s.shift.oee,
       availability: s.shift.availability,
       performance: s.shift.performance,
@@ -266,6 +267,7 @@ export default async function DashboardPage() {
                   <th>{t("dashboard.col.line")}</th>
                   <th>{t("dashboard.col.operator")}</th>
                   <th>{t("dashboard.col.shift")}</th>
+                  <th>{t("dashboard.col.job")}</th>
                   <th>A</th>
                   <th>P</th>
                   <th>Q</th>
@@ -281,6 +283,9 @@ export default async function DashboardPage() {
                       <td>{r.lineName}</td>
                       <td>{r.operatorName}</td>
                       <td>{t(`operator.shift.${r.shiftType}`)}</td>
+                      <td style={{ fontFamily: "var(--font-dm-mono)", color: r.jobNumber ? "var(--white)" : "var(--muted2)" }}>
+                        {r.jobNumber ?? "—"}
+                      </td>
                       <td>{formatPercent(r.availability != null ? Number(r.availability) : null)}</td>
                       <td>{formatPercent(r.performance != null ? Number(r.performance) : null)}</td>
                       <td>{formatPercent(r.quality != null ? Number(r.quality) : null)}</td>

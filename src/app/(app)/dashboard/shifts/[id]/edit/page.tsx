@@ -4,6 +4,7 @@ import Link from "next/link";
 import { db } from "@/lib/db/client";
 import * as s from "@/lib/db/schema";
 import { editShift, getManagerCompanyId } from "@/server/actions/manager";
+import { ScanButton } from "@/components/scanner/ScanButton";
 
 export const metadata = { title: "Edit Shift | Easy OEE" };
 export const dynamic = "force-dynamic";
@@ -38,6 +39,22 @@ export default async function EditShiftPage({
         <label style={{ display: "grid", gap: 6 }}>
           <span className="kpi-label">Product</span>
           <input className="app-input" name="product" defaultValue={row.product} required />
+        </label>
+
+        <label style={{ display: "grid", gap: 6 }}>
+          <span className="kpi-label">Job Number</span>
+          <div style={{ display: "flex", gap: 10, alignItems: "stretch" }}>
+            <input
+              id="edit-shift-job-number"
+              className="app-input"
+              name="jobNumber"
+              defaultValue={row.jobNumber ?? ""}
+              placeholder="WO-12345 or scan a code"
+              autoComplete="off"
+              style={{ flex: 1 }}
+            />
+            <ScanButton targetInputId="edit-shift-job-number" />
+          </div>
         </label>
 
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 16 }}>

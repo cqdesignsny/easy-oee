@@ -23,6 +23,7 @@ export type LineLiveState = {
     operatorName: string;
     shiftType: "morning" | "afternoon" | "night";
     product: string;
+    jobNumber: string | null;
     startedAtIso: string;
     plannedMinutes: number;
     goodParts: number;
@@ -122,6 +123,7 @@ export async function getCompanyLiveLines(companyId: string): Promise<LineLiveSt
         operatorName: op?.fullName ?? "",
         shiftType: active.shiftType as "morning" | "afternoon" | "night",
         product: active.product,
+        jobNumber: active.jobNumber ?? null,
         startedAtIso: active.startedAt.toISOString(),
         plannedMinutes: active.plannedMinutes,
         goodParts: active.goodParts,

@@ -92,6 +92,7 @@ export default async function SummaryPage({
         </div>
         <p style={{ color: "var(--muted2)", marginTop: 8, fontSize: 17 }}>
           {data.line?.name} · {t(`operator.shift.${sh.shiftType}`)} · {sh.product}
+          {sh.jobNumber ? ` · ${t("shift.job")} ${sh.jobNumber}` : ""}
         </p>
       </div>
 

@@ -25,6 +25,7 @@ const StartShiftSchema = z.object({
   lineId: z.string().uuid(),
   shiftType: z.enum(["morning", "afternoon", "night"]),
   product: z.string().min(1).max(120),
+  jobNumber: z.string().trim().max(80).optional().or(z.literal("")),
   plannedMinutes: z.coerce.number().int().min(1).max(1440),
 });
 
@@ -34,6 +35,7 @@ export async function startShift(formData: FormData) {
     lineId: formData.get("lineId"),
     shiftType: formData.get("shiftType"),
     product: formData.get("product"),
+    jobNumber: formData.get("jobNumber"),
     plannedMinutes: formData.get("plannedMinutes"),
   });
 
@@ -46,6 +48,7 @@ export async function startShift(formData: FormData) {
   if (!line) throw new Error("Line not found");
 
   const now = new Date();
+  const jobNumber = parsed.jobNumber && parsed.jobNumber.length > 0 ? parsed.jobNumber : null;
   const [created] = await db
     .insert(s.shift)
     .values({
@@ -54,6 +57,7 @@ export async function startShift(formData: FormData) {
       operatorId: session.operatorId,
       shiftType: parsed.shiftType,
       product: parsed.product,
+      jobNumber,
       plannedMinutes: parsed.plannedMinutes,
       idealRate: line.idealRate,
       goodParts: 0,

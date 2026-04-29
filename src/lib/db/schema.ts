@@ -136,6 +136,9 @@ export const shift = pgTable(
     endingOperatorId: uuid("ending_operator_id").references(() => user.id),
     shiftType: shiftTypeEnum("shift_type").notNull(),
     product: text("product").notNull(),
+    /** Optional job/work-order number. Operators scan from the work ticket
+     *  on the shop floor; managers can enter or edit it from the dashboard. */
+    jobNumber: text("job_number"),
     plannedMinutes: integer("planned_minutes").notNull(),
     /** Snapshotted from line.idealRate at shift start so it can't change mid-shift */
     idealRate: numeric("ideal_rate", { precision: 10, scale: 2 }).notNull(),

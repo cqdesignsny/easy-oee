@@ -269,6 +269,7 @@ export function LiveShift({
         <div>
           <div className="app-tag">
             {line?.name ?? "Line"} · {t(`operator.shift.${initialShift.shiftType}`)} · {initialShift.product}
+            {initialShift.jobNumber ? ` · ${t("shift.job")} ${initialShift.jobNumber}` : ""}
           </div>
           <h1 className="app-h2">{t("shift.live")}</h1>
         </div>

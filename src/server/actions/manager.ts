@@ -167,6 +167,7 @@ export async function updateOperator(formData: FormData) {
 const ShiftEditSchema = z.object({
   id: z.string().uuid(),
   product: z.string().min(1).max(120),
+  jobNumber: z.string().trim().max(80).optional().or(z.literal("")),
   goodParts: z.coerce.number().int().min(0),
   badParts: z.coerce.number().int().min(0),
   plannedMinutes: z.coerce.number().int().min(1).max(1440),
@@ -185,6 +186,7 @@ export async function editShift(formData: FormData) {
   const parsed = ShiftEditSchema.parse({
     id: formData.get("id"),
     product: formData.get("product"),
+    jobNumber: formData.get("jobNumber"),
     goodParts: formData.get("goodParts"),
     badParts: formData.get("badParts"),
     plannedMinutes: formData.get("plannedMinutes"),
@@ -200,6 +202,7 @@ export async function editShift(formData: FormData) {
 
   const update: Partial<typeof s.shift.$inferInsert> = {
     product: parsed.product,
+    jobNumber: parsed.jobNumber && parsed.jobNumber.length > 0 ? parsed.jobNumber : null,
     goodParts: parsed.goodParts,
     badParts: parsed.badParts,
     plannedMinutes: parsed.plannedMinutes,

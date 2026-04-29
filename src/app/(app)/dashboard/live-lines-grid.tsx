@@ -108,6 +108,14 @@ export function LiveLinesGrid({ lines }: { lines: LineLiveState[] }) {
                     <span className="live-meta-k">{t("dashboard.lines.product")}</span>
                     <span className="live-meta-v">{line.activeShift.product}</span>
                   </div>
+                  {line.activeShift.jobNumber && (
+                    <div className="live-meta-row">
+                      <span className="live-meta-k">{t("dashboard.lines.job")}</span>
+                      <span className="live-meta-v" style={{ fontFamily: "var(--font-dm-mono)" }}>
+                        {line.activeShift.jobNumber}
+                      </span>
+                    </div>
+                  )}
                   <div className="live-meta-row">
                     <span className="live-meta-k">{t("dashboard.lines.parts")}</span>
                     <span className="live-meta-v">{parts.toLocaleString()}</span>

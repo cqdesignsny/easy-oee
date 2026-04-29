@@ -87,17 +87,30 @@ export default async function OperatorPage() {
 
         <div style={{ marginBottom: 20 }}>
           <label className="field-label">{t("operator.product")}</label>
+          <input
+            name="product"
+            className="field"
+            placeholder={t("operator.productPlaceholder")}
+            required
+          />
+        </div>
+
+        <div style={{ marginBottom: 20 }}>
+          <label className="field-label">{t("operator.jobNumber")}</label>
           <div style={{ display: "flex", gap: 10, alignItems: "stretch" }}>
             <input
-              id="op-product-input"
-              name="product"
+              id="op-job-number-input"
+              name="jobNumber"
               className="field"
-              placeholder={t("operator.productPlaceholder")}
-              required
+              placeholder={t("operator.jobNumberPlaceholder")}
+              autoComplete="off"
               style={{ flex: 1 }}
             />
-            <ScanButton targetInputId="op-product-input" />
+            <ScanButton targetInputId="op-job-number-input" />
           </div>
+          <p style={{ marginTop: 6, fontSize: 12, color: "var(--muted2)" }}>
+            {t("operator.jobNumberHint")}
+          </p>
         </div>
 
         <div style={{ marginBottom: 28 }}>

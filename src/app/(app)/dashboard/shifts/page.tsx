@@ -23,6 +23,7 @@ export default async function ShiftsPage() {
       operatorName: s.user.fullName,
       shiftType: s.shift.shiftType,
       product: s.shift.product,
+      jobNumber: s.shift.jobNumber,
       shiftDate: s.shift.shiftDate,
       startedAt: s.shift.startedAt,
       endedAt: s.shift.endedAt,
@@ -135,6 +136,7 @@ export default async function ShiftsPage() {
                 <th>Operator</th>
                 <th>Shift</th>
                 <th>Product</th>
+                <th>Job #</th>
                 <th>Good</th>
                 <th>Bad</th>
                 <th>A</th>
@@ -157,6 +159,9 @@ export default async function ShiftsPage() {
                     <td>{r.operatorName}</td>
                     <td>{r.shiftType}</td>
                     <td>{r.product}</td>
+                    <td style={{ fontFamily: "var(--font-dm-mono)", color: r.jobNumber ? "var(--white)" : "var(--muted2)" }}>
+                      {r.jobNumber ?? "—"}
+                    </td>
                     <td>{r.goodParts.toLocaleString()}</td>
                     <td>{r.badParts.toLocaleString()}</td>
                     <td>{formatPercent(r.availability != null ? Number(r.availability) : null)}</td>

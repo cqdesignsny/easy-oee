@@ -83,6 +83,7 @@ export async function GET(
   lines.push(row("Operator", operator?.fullName ?? ""));
   lines.push(row("Shift Type", shiftRow.shiftType));
   lines.push(row("Product", shiftRow.product));
+  lines.push(row("Job Number", shiftRow.jobNumber ?? ""));
   lines.push(
     row(
       "Started At",
