@@ -1769,14 +1769,16 @@ textarea.app-input { resize: vertical; min-height: 56px; font-family: var(--font
   text-decoration: underline;
   font-weight: 600;
 }
-.demo-banner-cta {
+.demo-banner a.demo-banner-cta {
   background: #001b1f;
-  color: var(--accent);
-  text-decoration: none !important;
+  color: #ffffff;
+  text-decoration: none;
   padding: 6px 14px;
   border-radius: 999px;
   font-weight: 600;
+  border: 0;
 }
+.demo-banner a.demo-banner-cta:hover { background: #000; }
 @media (max-width: 600px) {
   .demo-banner { flex-direction: column; align-items: stretch; text-align: center; }
 }
