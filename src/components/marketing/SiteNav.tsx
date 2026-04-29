@@ -50,11 +50,14 @@ export function SiteNav() {
         <Link href="/pricing">{t("nav.pricing")}</Link>
         <Link href="/roi-calculator">{t("nav.roi")}</Link>
         <LanguageSwitcher />
+        <Link href="/demo" className="nav-signin">
+          {t("nav.tryDemo")}
+        </Link>
         <Link href="/sign-in" className="nav-signin">
           {t("nav.signIn")}
         </Link>
-        <Link href="/contact" className="nav-cta">
-          {t("nav.bookDemo")}
+        <Link href="/sign-up" className="nav-cta">
+          {t("nav.startTrial")}
         </Link>
       </div>
 
@@ -82,11 +85,12 @@ export function SiteNav() {
           <Link href="/pricing">{t("nav.pricing")}</Link>
           <Link href="/roi-calculator">{t("nav.roi")}</Link>
           <div style={{ height: 1, background: "var(--border2)", margin: "12px 0" }} />
+          <Link href="/demo">{t("nav.tryDemo")}</Link>
           <Link href="/sign-in" className="nav-signin">
             {t("nav.signIn")}
           </Link>
-          <Link href="/contact" className="nav-cta">
-            {t("nav.bookDemo")}
+          <Link href="/sign-up" className="nav-cta">
+            {t("nav.startTrial")}
           </Link>
         </div>
       )}

@@ -4,6 +4,11 @@ import { db } from "@/lib/db/client";
 import * as s from "@/lib/db/schema";
 import { formatPercent, oeeBucket } from "@/lib/oee";
 import { getServerT } from "@/components/i18n/server";
+import { getCompanyLiveLines } from "@/lib/db/queries/line-state";
+import { LiveLinesGrid } from "./live-lines-grid";
+import { TrialBanner } from "./trial-banner";
+import { getAdminSession } from "@/lib/auth/admin-session";
+import { DashboardScanButton } from "@/components/scanner/DashboardScanButton";
 
 type ShiftType = "morning" | "afternoon" | "night";
 
@@ -26,16 +31,26 @@ export const revalidate = 10;
 export const dynamic = "force-dynamic";
 
 /**
- * Phase 1 dashboard — defaults to the seeded Maple Manufacturing tenant.
- * Once Clerk is wired, the company will come from the manager session.
+ * Resolve the company for the dashboard. Reads the admin session (set by
+ * /sign-up or /sign-in); falls back to the seeded demo tenant for the
+ * legacy ADMIN_PASSWORD demo gate while we migrate everyone onto real signup.
  */
-async function getDemoCompanyId(): Promise<string | null> {
+async function getDashboardCompanyId(): Promise<{ id: string | null; trialEndsAt: Date | null; companyName: string | null }> {
+  const session = await getAdminSession();
+  if (session) {
+    const [row] = await db
+      .select({ id: s.company.id, name: s.company.name, trialEndsAt: s.company.trialEndsAt })
+      .from(s.company)
+      .where(eq(s.company.id, session.companyId))
+      .limit(1);
+    if (row) return { id: row.id, trialEndsAt: row.trialEndsAt, companyName: row.name };
+  }
   const [c] = await db
-    .select({ id: s.company.id })
+    .select({ id: s.company.id, name: s.company.name, trialEndsAt: s.company.trialEndsAt })
     .from(s.company)
     .where(eq(s.company.slug, "maple-manufacturing"))
     .limit(1);
-  return c?.id ?? null;
+  return { id: c?.id ?? null, trialEndsAt: c?.trialEndsAt ?? null, companyName: c?.name ?? null };
 }
 
 function bucketClass(v: number | null) {
@@ -43,7 +58,8 @@ function bucketClass(v: number | null) {
 }
 
 export default async function DashboardPage() {
-  const companyId = await getDemoCompanyId();
+  const company = await getDashboardCompanyId();
+  const companyId = company.id;
   const t = await getServerT();
 
   if (!companyId) {
@@ -61,6 +77,9 @@ export default async function DashboardPage() {
   }
 
   const todayStr = new Date().toISOString().slice(0, 10);
+
+  // Live per-line snapshot for the new grid
+  const liveLines = await getCompanyLiveLines(companyId);
 
   // Today's shifts → today's OEE (avg of completed shifts today)
   const todayShifts = await db
@@ -159,13 +178,20 @@ export default async function DashboardPage() {
   return (
     <main className="app-shell">
       <div className="app-wrap">
+        <TrialBanner trialEndsAt={company.trialEndsAt?.toISOString() ?? null} companyName={company.companyName} />
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", marginBottom: 24 }}>
           <div>
             <div className="app-tag">{t("dashboard.tag")}</div>
             <h1 className="app-h1">{t("dashboard.title")}</h1>
           </div>
-          <Link href="/operator" className="btn">{t("dashboard.startShift")} →</Link>
+          <div style={{ display: "flex", gap: 10, flexWrap: "wrap", justifyContent: "flex-end" }}>
+            <DashboardScanButton />
+            <Link href="/operator" className="btn">{t("dashboard.startShift")} →</Link>
+          </div>
         </div>
+
+        {/* Live machines grid (all lines, polls every 10s) */}
+        <LiveLinesGrid lines={liveLines} />
 
         {/* Big today OEE */}
         <div className="card card-lg" style={{ textAlign: "center", marginBottom: 24 }}>

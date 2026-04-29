@@ -78,6 +78,8 @@ export const user = pgTable(
     role: userRoleEnum("role").notNull(),
     /** bcrypt hash of the operator's 4-digit PIN. Null for managers. */
     pinHash: text("pin_hash"),
+    /** bcrypt hash of the manager's password. Null for operators. */
+    passwordHash: text("password_hash"),
     active: boolean("active").notNull().default(true),
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   },

@@ -1635,3 +1635,183 @@ textarea.app-input { resize: vertical; min-height: 56px; font-family: var(--font
 .cal-cell.oee-typical    { background: rgba(255, 201, 74, 0.8); color: #2b1d00; }
 .cal-cell.oee-low        { background: rgba(255, 92, 92, 0.8); color: #2b0000; }
 .cal-cell.oee-na         { background: var(--mid); color: var(--muted2); }
+
+/* Live machines grid (dashboard) */
+.live-lines {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 14px;
+}
+.live-card {
+  display: block;
+  text-decoration: none;
+  background: var(--mid);
+  border: 1px solid var(--border2);
+  border-radius: 18px;
+  padding: 18px 20px;
+  color: inherit;
+  transition: border-color 120ms ease, transform 120ms ease;
+}
+.live-card:hover { border-color: var(--accent); transform: translateY(-1px); }
+.live-card-running { border-left: 4px solid var(--accent); }
+.live-card-stopped { border-left: 4px solid #ff5c5c; }
+.live-card-idle    { border-left: 4px solid var(--border2); }
+.live-card-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+.live-card-name {
+  font-family: var(--font-bebas);
+  font-size: 22px;
+  letter-spacing: 1px;
+  color: var(--white);
+}
+.live-pill {
+  font-family: var(--font-dm-mono);
+  font-size: 10px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  padding: 4px 10px;
+}
+.live-pill-running { background: rgba(3, 191, 181, 0.18); color: var(--accent); }
+.live-pill-stopped { background: rgba(255, 92, 92, 0.18); color: #ff7a7a; }
+.live-pill-idle    { background: var(--mid); color: var(--muted2); border: 1px solid var(--border2); }
+.live-oee {
+  font-family: var(--font-bebas);
+  font-size: clamp(44px, 5vw, 56px);
+  line-height: 1;
+  margin: 4px 0 2px;
+}
+.live-oee-label {
+  font-family: var(--font-dm-mono);
+  font-size: 10px;
+  letter-spacing: 1.5px;
+  color: var(--muted2);
+  text-transform: uppercase;
+  margin-bottom: 12px;
+}
+.live-meta {
+  border-top: 1px solid var(--border2);
+  padding-top: 10px;
+  display: grid;
+  gap: 4px;
+}
+.live-meta-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 13px;
+}
+.live-meta-k {
+  font-family: var(--font-dm-mono);
+  font-size: 10px;
+  letter-spacing: 1.5px;
+  color: var(--muted2);
+  text-transform: uppercase;
+}
+.live-meta-v { color: var(--white); }
+.live-stop {
+  margin-top: 8px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 10px;
+  background: rgba(255, 92, 92, 0.08);
+  border-radius: 10px;
+}
+.live-stop-label { font-size: 13px; color: #ff7a7a; }
+.live-stop-time  { color: #ff7a7a; font-size: 14px; }
+
+/* Trial banner (dashboard top) */
+.trial-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  background: rgba(3, 191, 181, 0.08);
+  border: 1px solid var(--accent);
+  border-radius: 14px;
+  padding: 14px 18px;
+  margin-bottom: 18px;
+  font-size: 14px;
+}
+.trial-banner strong { color: var(--white); }
+.trial-banner-expired {
+  background: rgba(255, 92, 92, 0.08);
+  border-color: #ff5c5c;
+}
+.trial-banner-expired strong { color: #ff7a7a; }
+@media (max-width: 540px) {
+  .trial-banner { flex-direction: column; align-items: stretch; }
+  .trial-banner .btn { width: 100%; text-align: center; }
+}
+
+/* Demo banner (sticky on app routes when in demo mode) */
+.demo-banner {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background: linear-gradient(90deg, var(--accent), #00b1a8);
+  color: #001b1f;
+  padding: 10px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  font-size: 14px;
+  font-weight: 500;
+}
+.demo-banner-tip { color: #001b1f; opacity: 0.85; font-weight: 400; }
+.demo-banner a {
+  color: #001b1f;
+  text-decoration: underline;
+  font-weight: 600;
+}
+.demo-banner-cta {
+  background: #001b1f;
+  color: var(--accent);
+  text-decoration: none !important;
+  padding: 6px 14px;
+  border-radius: 999px;
+  font-weight: 600;
+}
+@media (max-width: 600px) {
+  .demo-banner { flex-direction: column; align-items: stretch; text-align: center; }
+}
+
+/* Demo coachmark / tip card on app screens */
+.demo-tip {
+  background: rgba(3, 191, 181, 0.08);
+  border: 1px dashed var(--accent);
+  border-radius: 14px;
+  padding: 14px 18px;
+  margin-bottom: 16px;
+  font-size: 14px;
+  color: var(--white);
+}
+.demo-tip-title {
+  font-family: var(--font-dm-mono);
+  font-size: 11px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 4px;
+}
+
+/* Barcode scan affordance — sits next to an input */
+.scan-icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  min-width: 56px;
+  border: 1px solid var(--border2);
+  border-radius: 14px;
+  background: var(--mid);
+  color: var(--white);
+  cursor: pointer;
+  transition: border-color 120ms ease, color 120ms ease;
+}
+.scan-icon-btn:hover { border-color: var(--accent); color: var(--accent); }

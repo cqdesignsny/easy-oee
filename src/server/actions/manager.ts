@@ -14,8 +14,12 @@ import { and, eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { db } from "@/lib/db/client";
 import * as s from "@/lib/db/schema";
+import { getAdminSession } from "@/lib/auth/admin-session";
 
 export async function getManagerCompanyId(): Promise<string> {
+  const session = await getAdminSession();
+  if (session) return session.companyId;
+  // Fallback: seeded demo tenant for the legacy ADMIN_PASSWORD path during demos.
   const [c] = await db
     .select({ id: s.company.id })
     .from(s.company)

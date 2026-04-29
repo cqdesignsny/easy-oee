@@ -9,6 +9,7 @@ import { logoutOperator } from "@/server/actions/operator-auth";
 import { Logo } from "@/components/Logo";
 import { LanguageSwitcher } from "@/components/i18n/LanguageSwitcher";
 import { getServerT } from "@/components/i18n/server";
+import { ScanButton } from "@/components/scanner/ScanButton";
 
 export const metadata = { title: "Start Shift | Easy OEE" };
 export const dynamic = "force-dynamic";
@@ -86,7 +87,17 @@ export default async function OperatorPage() {
 
         <div style={{ marginBottom: 20 }}>
           <label className="field-label">{t("operator.product")}</label>
-          <input name="product" className="field" placeholder={t("operator.productPlaceholder")} required />
+          <div style={{ display: "flex", gap: 10, alignItems: "stretch" }}>
+            <input
+              id="op-product-input"
+              name="product"
+              className="field"
+              placeholder={t("operator.productPlaceholder")}
+              required
+              style={{ flex: 1 }}
+            />
+            <ScanButton targetInputId="op-product-input" />
+          </div>
         </div>
 
         <div style={{ marginBottom: 28 }}>

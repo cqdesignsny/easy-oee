@@ -30,11 +30,30 @@ export default function SignInPage() {
 
         <SignInForm />
 
-        <div style={{ marginTop: 36, paddingTop: 24, borderTop: "1px solid var(--border2)", textAlign: "center" }}>
+        <div style={{ marginTop: 28, paddingTop: 20, borderTop: "1px solid var(--border2)", textAlign: "center" }}>
           <p style={{ color: "var(--muted2)", fontSize: 15, marginBottom: 12 }}>
+            {t("signin.demoPrompt")}
+          </p>
+          <Link
+            href="/demo"
+            className="btn btn-ghost"
+            style={{ width: "100%", textAlign: "center", display: "inline-block" }}
+          >
+            {t("signin.demoCta")} →
+          </Link>
+          <p style={{ marginTop: 18, color: "var(--muted2)", fontSize: 14 }}>
+            {t("signin.signupPrompt")}{" "}
+            <Link href="/sign-up" style={{ color: "var(--accent)", fontWeight: 500 }}>
+              {t("signin.signupLink")} →
+            </Link>
+          </p>
+        </div>
+
+        <div style={{ marginTop: 24, paddingTop: 18, borderTop: "1px solid var(--border2)", textAlign: "center" }}>
+          <p style={{ color: "var(--muted2)", fontSize: 14, marginBottom: 8 }}>
             {t("signin.operatorPrompt")}
           </p>
-          <Link href="/pin" style={{ color: "var(--accent)", fontSize: 16, fontWeight: 500 }}>
+          <Link href="/pin" style={{ color: "var(--accent)", fontSize: 15 }}>
             {t("signin.operatorLink")} →
           </Link>
         </div>

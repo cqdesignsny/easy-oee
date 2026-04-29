@@ -24,17 +24,14 @@ export default async function SignUpPage({
         <div className="hero-grid" />
         <div className="sub-hero-inner fi">
           <div className="tag" style={{ justifyContent: "center", display: "inline-flex" }}>
-            {t("nav.signIn")}
+            {t("signup.tag")}
           </div>
           <h1>
-            START YOUR
+            {t("signup.h1.line1")}
             <br />
-            <em>FREE TRIAL.</em>
+            <em>{t("signup.h1.line2")}</em>
           </h1>
-          <p className="sub-lead">
-            14-day free trial. No credit card required to start. Pay only when you&apos;re ready
-            to keep tracking.
-          </p>
+          <p className="sub-lead">{t("signup.lead")}</p>
         </div>
       </section>
 
@@ -43,9 +40,9 @@ export default async function SignUpPage({
           <SignUpClient initialPlan={planFromUrl} initialLines={linesFromUrl} />
 
           <p style={{ textAlign: "center", marginTop: 32, color: "var(--muted2)" }}>
-            Already have an account?{" "}
+            {t("signup.haveAccount")}{" "}
             <Link href="/sign-in" style={{ color: "var(--accent)" }}>
-              Sign in here
+              {t("signup.signInHere")}
             </Link>
           </p>
         </div>
