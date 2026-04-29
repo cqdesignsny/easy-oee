@@ -2,10 +2,10 @@
 
 > Real-time OEE tracking for smart manufacturers. Built for the shop floor. Up and running in one shift.
 
-**Live:** [easy-oee.vercel.app](https://easy-oee.vercel.app)
+**Live:** [easy-oee.vercel.app](https://easy-oee.vercel.app) · **Demo (no login):** [easy-oee.vercel.app/demo](https://easy-oee.vercel.app/demo) · **Sign up (7-day free trial):** [easy-oee.vercel.app/sign-up](https://easy-oee.vercel.app/sign-up)
 **Domain:** [easy-oee.com](https://easy-oee.com) (currently serving Louis's static marketing HTML — DNS cutover pending)
 **GitHub:** https://github.com/cqdesignsny/easy-oee
-**Status:** Phase 1 shipped. Marketing site, operator flow, manager dashboard, admin pages, EN/ES/FR i18n, animated hero gauge, admin login, Stripe scaffold.
+**Status:** Phase 1 + Phase 2-foundation shipped. Marketing site, operator flow, manager dashboard, admin pages, EN/ES/FR i18n, animated hero gauge, **live machines grid**, **/demo with banner + per-route tips**, **self-serve 7-day trial signup**, **barcode/QR scanner for job numbers**, Tier 1-4 product upgrades. Stripe + Resend + Clerk on stubs.
 
 > **Picking this up on a new machine?** Start with [`docs/HANDOFF.md`](./docs/HANDOFF.md).
 
@@ -30,9 +30,10 @@ World-class is 85%+. Most SME plants have no idea what theirs is. We fix that.
 Operators tap-to-log shifts and machine stops on a tablet on the shop floor. Plant managers get live OEE dashboards on their phone or laptop. No spreadsheets. No paper. A hardware add-on for direct PLC ingest is on the roadmap as a paid upsell ([`docs/HARDWARE-INTEGRATION.md`](./docs/HARDWARE-INTEGRATION.md)).
 
 ### Core flows
-1. **Operator** — `/pin` (name + 4-digit PIN) → `/operator` (shift setup) → `/shift/[id]` (live tracking) → `/shift/[id]/summary` (OEE breakdown)
-2. **Manager** — `/sign-in` (email + admin password, Google/Microsoft SSO buttons placeholder) → `/dashboard` (today's OEE, live shifts, recent shifts, 7-day Pareto) → `/dashboard/lines`, `/dashboard/operators`, `/dashboard/shifts` (admin CRUD)
-3. **Customer** — `/pricing` (USD with CAD reference, line-count slider) → `/sign-up?plan=pro&lines=3` (Stripe checkout, scaffold for now)
+1. **Operator** — `/pin` (name + 4-digit PIN) → `/operator` (shift setup with optional **scan/type job number**) → `/shift/[id]` (live tracking) → `/shift/[id]/summary` (OEE breakdown)
+2. **Manager** — `/sign-in` (email + password, falls back to a legacy demo password) → `/dashboard` (live machines grid, today's OEE, live shifts, recent shifts, 7-day Pareto) → `/dashboard/lines`, `/dashboard/operators`, `/dashboard/shifts` (admin CRUD with edit-shift)
+3. **Customer (live demo)** — `/demo` → pick **Enter as Manager** or **Enter as Operator** → land in the seeded Maple Manufacturing tenant with a sticky DEMO MODE banner that has a Sign Up Free CTA
+4. **Customer (real signup)** — `/pricing` → `/sign-up` → fills form → real company + manager user created → `/dashboard` with a 7-day trial countdown banner. Stripe wires in later.
 
 ## Tech stack
 
@@ -63,14 +64,17 @@ See [`docs/ARCHITECTURE.md`](./docs/ARCHITECTURE.md) for the full rationale.
 - `/sign-up` — Stripe trial signup scaffold (plan + line count + email/company)
 
 ### App
-- `/sign-in` — manager login (email + password, Google/Microsoft SSO placeholder buttons, language switcher)
+- `/sign-in` — manager login (email + bcrypt password lookup, falls back to legacy `ADMIN_PASSWORD` env var, Demo + Sign Up CTAs, language switcher)
+- `/sign-up` — **real self-serve signup** with 7-day trial: creates `company` + manager `user`, sets HMAC admin cookie, lands on `/dashboard`. No credit card. Stripe wires in later.
+- `/demo` — **live sales demo**: pick "Enter as Manager" or "Enter as Operator" (no login). Both seed into the demo tenant. Sticky DEMO MODE banner with Sign Up Free CTA + per-route tip cards.
 - `/pin` — operator name picker + 4-digit keypad (bcrypt verify)
-- `/operator` — shift setup form, redirects in-progress shifts
+- `/operator` — shift setup form with **optional Job Number** field (type or scan barcode/QR), redirects in-progress shifts
 - `/shift/[id]` — live tracking with `useOptimistic`, 10 stop buttons, parts counters, end-shift confirm
-- `/shift/[id]/summary` — color-coded OEE breakdown
-- `/dashboard` — manager home: today's OEE, live shifts, recent shifts, 7-day Pareto stops
-- `/dashboard/lines` `/dashboard/operators` `/dashboard/shifts` — admin CRUD pages
-- **Shift export** — Download CSV / Print or save PDF / Email it (scaffold) buttons on `/shift/[id]/summary`. CSV via `/api/shifts/[id]/csv` route handler (auth-scoped, full per-shift export). Print uses a dedicated print stylesheet for clean PDF output.
+- `/shift/[id]/summary` — color-coded OEE breakdown, shows job number when set
+- `/dashboard` — manager home: **live machines grid** (per-line cards with running/stopped pill, big OEE, operator, parts, elapsed timer, top stop today, auto-refresh 10s), trial countdown banner, today's OEE, shift comparison, live shifts, recent shifts (with Job # column), 7-day Pareto stops, **Scan code → clipboard** utility button in header
+- `/dashboard/lines` `/dashboard/operators` `/dashboard/shifts` — admin CRUD pages. Shifts admin includes Job # column + edit-shift with scanner-enabled job number field.
+- `/board/[token]` — public TV board for shop-floor displays
+- **Shift export** — Download CSV / Print or save PDF / Email it (scaffold) buttons on `/shift/[id]/summary`. CSV via `/api/shifts/[id]/csv` route handler includes Job Number row.
 - API stubs at `/api/checkout/session` and `/api/webhooks/stripe` (return 501 until Stripe is wired)
 
 ### Internationalization
@@ -90,10 +94,19 @@ See [`docs/ARCHITECTURE.md`](./docs/ARCHITECTURE.md) for the full rationale.
 - Mobile hamburger menu (full-screen overlay, locks body scroll, closes on route change)
 - 56px+ tap targets across operator screens, 16px+ body text on mobile
 
-### Auth (temporary, until Clerk lands)
-- **Admin login**: `/sign-in` with shared password from `ADMIN_PASSWORD` env var. HMAC-signed cookie, 14-day TTL. Demo password: `EasyOEE2026Admin`
+### Auth (HMAC cookies — pre-Clerk)
+- **Manager login**: `/sign-in` with email + bcrypt password lookup against `user.password_hash`. HMAC-signed cookie `eo_admin`, 14-day TTL. Cookie payload now carries `userId` + `companyId`.
+- **Legacy demo password**: any email + `EasyOEE2026Admin` still works and lands you in the seeded Maple Manufacturing tenant. Backwards-compat backdoor for existing demo bookmarks; remove the env var when ready.
+- **Self-serve signup**: `/sign-up` creates a real `company` + manager `user` with bcrypt password and a 7-day `trial_ends_at`. Lands on `/dashboard` with a trial countdown banner.
+- **Demo mode**: `/demo` sets admin + operator cookies pointed at the seed user IDs and an `eo_demo` marker cookie that toggles the banner. Exit via the link in the banner.
 - **Operator PIN**: `/pin` with name picker + 4-digit PIN, bcrypt-hashed in Postgres. HMAC-signed cookie, 12-hour TTL.
 - Google/Microsoft SSO buttons present on `/sign-in` as placeholders (disabled with "Coming soon" tooltip)
+
+### Barcode / QR scanner
+- Native `BarcodeDetector` API with `@zxing/browser` fallback for Safari pre-TP.
+- **Job Number** input on operator shift setup (`/operator`) and manager edit-shift (`/dashboard/shifts/[id]/edit`) with a scan-icon button next to the input. Tap → camera modal → detected value fills the input.
+- Manager dashboard header has a **Scan code → clipboard** utility for ad-hoc reads (parts/material codes, etc.) with a green "Copied!" toast.
+- Schema: `shift.job_number text`. Visible on live shift, summary, dashboard recent shifts table, full shifts admin table, per-shift CSV export.
 
 ## Getting started
 
@@ -107,8 +120,10 @@ pnpm dev              # http://localhost:3000
 ```
 
 **Demo credentials:**
-- Manager: any email + password `EasyOEE2026Admin` at `/sign-in`
-- Operator: pick **Pierre Lavoie**, PIN `1234` at `/pin`
+- **No-login demo:** [easy-oee.vercel.app/demo](https://easy-oee.vercel.app/demo) — pick a side, click around the seeded tenant
+- **Real signup:** [easy-oee.vercel.app/sign-up](https://easy-oee.vercel.app/sign-up) — creates a fresh tenant with a 7-day trial
+- Legacy demo password: any email + `EasyOEE2026Admin` at `/sign-in`
+- Operator tablet: pick **Pierre Lavoie**, PIN `1234` at `/pin`
 
 ## Resend wiring (when ready)
 

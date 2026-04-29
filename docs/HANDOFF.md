@@ -1,23 +1,29 @@
 # HANDOFF — Pick this up on a different machine
 
-> **You are switching machines mid-build.** Read this top-to-bottom before doing anything else. Everything you need to continue is in this repo. Last updated: 2026-04-07 (Tier 1-4 product upgrades + auto-migration runner).
+> **You are switching machines mid-build.** Read this top-to-bottom before doing anything else. Everything you need to continue is in this repo. Last updated: 2026-04-28 (sales-ready batch: live demo, self-serve signup, live machines grid, barcode/job number, mobile audit).
 
 ## State of the world right now
 
 - ✅ App is **deployed and working** at https://easy-oee.vercel.app
-- ✅ Schema is **in sync with Neon** (auto-applied via `prebuild` migration runner)
-- ✅ All Tier 1-4 product upgrades are **live in production**: live shift timers, live OEE estimate, downtime card, long-stop notes, hand-off, dashboard shift comparison, loss tree on summary, calendar grid, edit-shift workflow, TV Board mode, daily digest cron, weekly anomaly scan cron, PWA manifest
+- ✅ **Sales demo path live** at `/demo` — prospects pick "Enter as Manager" or "Enter as Operator" with no login. Sticky `DEMO MODE` banner across every app screen with `Sign Up Free` CTA + per-route tip cards.
+- ✅ **Self-serve signup live** at `/sign-up` — real flow creates company + manager user (bcrypt password) with a 7-day trial, lands on `/dashboard` with countdown banner. No credit card. Stripe billing wires in later.
+- ✅ **Live machines grid** at top of `/dashboard` — per-line cards with running/stopped pill, big OEE, current operator, parts, elapsed timer, top stop today. Auto-refreshes every 10s.
+- ✅ **Barcode/QR scanner** wired for **job numbers** — scan or type a work-order/job number on operator shift setup AND on manager edit-shift; visible on live shift, summary, dashboards, CSV export. Native `BarcodeDetector` API with `@zxing/browser` fallback. Plus a header "Scan code → clipboard" utility on the manager dashboard.
+- ✅ **Mobile audit complete** — fixed broken hamburger menu (backdrop-filter containing-block trap), dashboard header overlap on phones, manager sidebar bottom-row layout. Verified at 375×812 across all marketing + app routes.
+- ✅ All Tier 1-4 product upgrades from the Apr 7 batch still live: live shift timers, downtime card, long-stop notes, hand-off, shift comparison, loss tree, calendar grid, edit-shift, TV Board, daily digest cron, weekly anomaly cron, PWA manifest.
+- ✅ Schema is **in sync with Neon** (auto-applied via `prebuild` migration runner; runner bug that silently skipped comment-headed migrations was fixed in `scripts/migrate.mjs`).
 - ✅ `pnpm test` 13/13 · `pnpm typecheck` clean · `pnpm lint` clean · `pnpm build` clean
-- 🟡 Stripe still on stub (501) — next biggest swing
-- 🟡 Resend still on stub — next biggest swing after Stripe
-- 🟡 Clerk still on stub (admin password gate) — needed before real customer pilots
-- 🟡 Loading/error/404 states + Sentry still pending
+- 🟡 Stripe still on stub (501) — wires into the existing `/sign-up` schema fields whenever you're ready.
+- 🟡 Resend still on stub — `src/server/actions/shift-export.ts` already validates input, just needs `resend.emails.send()` swapped in.
+- 🟡 Clerk migration is open — current per-company HMAC password works, can move to Clerk later without breaking accounts.
+- 🟡 Loading/error/404 states + Sentry still pending.
 
 **To test the live app:**
-1. Visit https://easy-oee.vercel.app/sign-in
-2. Email: anything · Password: `EasyOEE2026Admin`
-3. Land on `/dashboard`
-4. To try the operator side: visit `/pin`, pick "Pierre Lavoie", PIN `1234`
+
+1. **Quickest demo (no login):** visit https://easy-oee.vercel.app/demo → pick **Enter as Manager** for the dashboard or **Enter as Operator** for the tablet flow. The DEMO MODE banner has a Sign Up Free CTA at the top.
+2. **Real signup (creates a tenant):** https://easy-oee.vercel.app/sign-up → fill form → land on `/dashboard` with a 7-day trial banner.
+3. **Legacy demo password (still works for backwards compat):** https://easy-oee.vercel.app/sign-in with any email + `EasyOEE2026Admin` lands you in the seeded Maple Manufacturing tenant.
+4. **Operator tablet flow:** https://easy-oee.vercel.app/pin → pick **Pierre Lavoie**, PIN `1234`.
 
 ---
 
@@ -569,3 +575,202 @@ flow.
 If anything looks wrong, the source of truth is the GitHub repo — the local copy you make should match. Re-clone if in doubt.
 
 Good luck, future you. 🚀
+
+---
+
+## 2026-04-28 — Sales-ready batch (live demo, signup, live grid, scanner, mobile audit)
+
+Single-day push to make the app demo-able to Louis's prospects and let real
+trials start. Six commits, all green.
+
+### What shipped
+
+**1. `/demo` route — live sales demo with no login**
+- Two entrypoints: **Enter as Manager** (lands on `/dashboard` with the seeded
+  Maple Manufacturing tenant) and **Enter as Operator** (lands on `/operator`
+  signed in as Pierre Lavoie).
+- New `eo_demo` cookie + `setDemoCookie()` helper at
+  `src/lib/auth/demo-mode.ts`. Server actions in `src/server/actions/demo.ts`
+  set admin + operator cookies pointing at the seed user IDs and toggle the
+  banner.
+- Sticky **DEMO MODE** banner across every `(app)` route via the layout.
+  Banner has a **Sign Up Free** CTA that pushes prospects to `/sign-up` and
+  an Exit demo link. White button text on the dark pill — visibility bug
+  fixed in commit `cb1750d`.
+- Per-route tip card (`<DemoBanner />` is a client component using
+  `usePathname()`) explains what the prospect is looking at on dashboard,
+  lines admin, operators admin, shifts admin, operator setup, live shift,
+  summary, and PIN entry.
+- Marketing nav has a **See it Live** link going to `/demo`. Marketing CTA
+  switched from "Book a Demo" → "Start Free Trial" pointing at `/sign-up`.
+  Sign-in page also has a "Try the Live Demo" button.
+- Every demo string in EN/ES/FR.
+
+**2. `/sign-up` is now real — 7-day trial signup**
+- Form creates a `company` row (slug auto-generated, plan `'trial'`,
+  `trial_ends_at = now + 7 days`, `subscription_status = 'trialing'`) and a
+  `user` row with `role = 'manager'` and a bcrypt `password_hash`.
+- Sets the admin cookie (now carries `userId` + `companyId`) and redirects to
+  `/dashboard`.
+- Schema migration: `user.password_hash text` (nullable; null on operators).
+  See `drizzle/0001_user_password_hash.sql`.
+- `signInAdmin` updated to do an email + bcrypt lookup first, falling back to
+  the legacy `ADMIN_PASSWORD` env var which now resolves to the seed manager
+  of Maple Manufacturing (kept as a backwards-compat backdoor — you can
+  remove the env var when ready).
+- New **trial countdown banner** at the top of `/dashboard` showing days
+  remaining + a Choose a plan link. Hides itself when `trial_ends_at` is
+  null. Red "expired" variant when the trial is past due.
+- `getManagerCompanyId()` and the dashboard's company resolver now read from
+  the admin session first, falling back to the seed for the legacy demo path.
+
+**3. Live machines grid on `/dashboard`**
+- New section above the existing widgets: per-line cards in a responsive
+  CSS grid (auto-fill, min 280px). Each card shows running/stopped/idle
+  pill, big OEE number, current operator, product, **job number** when
+  set, parts, elapsed timer, current open stop with red highlight, top
+  stop today.
+- Backed by `getCompanyLiveLines(companyId)` in
+  `src/lib/db/queries/line-state.ts` — multi-line version of the
+  per-line snapshot the TV board uses.
+- Client wrapper (`live-lines-grid.tsx`) ticks elapsed timers every
+  second and triggers `router.refresh()` every 10s.
+
+**4. Barcode / QR scanner — primary use is job numbers**
+- `<ScanModal>` opens fullscreen camera. Tries native `BarcodeDetector`
+  API first (Chrome/Edge/Safari TP), falls back to `@zxing/browser`.
+  Releases stream cleanly on close. Handles permission denied + no
+  camera gracefully.
+- `<ScanButton targetInputId={...}>` — drop-in next to any input.
+  When triggered, fills the named input. Used for the **Job Number**
+  field on `/operator` (operator shift setup) and on `/dashboard/shifts/[id]/edit`.
+- `<DashboardScanButton />` lives in the manager dashboard header next
+  to Start Shift; scans → clipboard with a green "Copied!" toast.
+- Schema: `shift.job_number text` (nullable). See
+  `drizzle/0002_shift_job_number.sql`.
+- Display: live shift header, summary header (`· Job WO-12345`),
+  live machines grid card, dashboard recent shifts table, full shifts
+  admin table, per-shift CSV export.
+
+**5. Mobile responsiveness audit + fixes**
+- Hamburger menu was effectively broken — only the first link rendered.
+  Cause: `<nav>` has `backdrop-filter: blur(16px)` which silently makes
+  it a containing block for any `position: fixed` descendant. The
+  mobile menu was anchored to the 89px-tall nav instead of the
+  viewport. Moved the menu out of `<nav>` as a sibling so its
+  `position: fixed` resolves to the viewport.
+- Dashboard header (`/dashboard`): switched the inline flex with
+  `space-between` to a wrapping `.dash-header` / `.dash-header-actions`
+  pair. Under 600px the title block stacks above the action buttons,
+  Scan code button text no longer wraps to two lines.
+- Manager sidebar (`(app)/dashboard/layout.tsx`): the lang switcher and
+  Sign Out used to stack as two full-width blocks on mobile (sidebar
+  collapses to top bar). Now wrapped in `.mgr-side-foot`; on mobile
+  they sit inline and Sign Out is auto-width.
+- Marketing copy: home + pricing trial mentions changed from 14-day to
+  **7-day** in EN/ES/FR. The "14-day calendar grid" wording in the
+  dashboard tip is correct and stays.
+- Verified at 375×812: `/`, `/how-it-works`, `/pricing`,
+  `/roi-calculator`, `/contact`, `/sign-in`, `/sign-up`, `/pin`,
+  `/demo`, `/dashboard`, `/operator`. All clean.
+
+**6. Migration runner bug fix (root cause of an outage)**
+- `scripts/migrate.mjs` `splitStatements()` filtered out any chunk
+  whose first character was `--`, intending to skip commented-out
+  statements. Both `0001_user_password_hash.sql` and
+  `0002_shift_job_number.sql` opened with a doc-block comment header,
+  so the entire file got dropped. The runner still recorded each
+  migration as applied in `_eo_migrations`, so Drizzle's schema
+  believed the columns existed but they didn't — every
+  `db.select().from(s.user)` and `db.select().from(s.shift)` threw
+  `column "..." does not exist`, which broke `/demo`, signup, and the
+  dashboard.
+- Fixed: a chunk is dropped only if stripping `-- comment` lines and
+  whitespace leaves nothing executable. Files that open with a
+  doc-block but contain real DDL are correctly applied.
+- Production DB columns were added directly via
+  `ALTER TABLE ... ADD COLUMN IF NOT EXISTS` so the live deploy
+  recovered immediately. The `_eo_migrations` entries still match.
+
+### Schema additions (all backwards-compatible)
+
+| Table | Column | Type | Purpose |
+|---|---|---|---|
+| `user` | `password_hash` | `text` (nullable) | bcrypt for manager email+password login. Null on operators. |
+| `shift` | `job_number` | `text` (nullable) | Optional work-order / job ticket number, set on shift start or via manager edit. |
+
+### New i18n keys (all 3 languages)
+
+`signin.demoPrompt`, `signin.demoCta`, `signin.signupPrompt`,
+`signin.signupLink`, full `signup.*` block, full `trial.*` block,
+`nav.tryDemo`, `nav.startTrial`, full `demo.*` + `demo.banner.*` +
+`demo.tip.*` blocks, full `dashboard.lines.*` block, `dashboard.col.job`,
+`shift.job`, `operator.jobNumber*`, full `scan.*` block.
+
+### Auth model summary (where we are pre-Clerk)
+
+- **Operators** sign in at `/pin` with name + 4-digit PIN; bcrypt verify
+  against `user.pin_hash`. HMAC-signed cookie `eo_op`, 12h TTL,
+  payload `{ operatorId, companyId, exp }`. Unchanged.
+- **Managers** sign in at `/sign-in` with email + password. New flow
+  looks up the `user` by email, bcrypt-verifies `password_hash`. HMAC-signed
+  cookie `eo_admin`, 14d TTL, payload `{ role: "admin", userId, companyId, exp }`.
+  Falls back to the legacy `ADMIN_PASSWORD` env var that grants access to the
+  seed tenant — kept so older demo bookmarks still work.
+- **Demo users** hit `/demo` and click an entry button. The server
+  action sets both admin + operator cookies pointing at the seeded
+  Maple Manufacturing user IDs and a marker `eo_demo` cookie that
+  toggles the demo banner.
+- **Self-serve signup** at `/sign-up` creates a fresh company + manager
+  user (bcrypt password) and sets the admin cookie. 7-day
+  `trial_ends_at` populated; Stripe wiring takes it from there.
+
+### Files added today
+
+```
+drizzle/0001_user_password_hash.sql
+drizzle/0002_shift_job_number.sql
+src/app/demo/page.tsx
+src/app/(app)/dashboard/live-lines-grid.tsx
+src/app/(app)/dashboard/trial-banner.tsx
+src/lib/auth/demo-mode.ts
+src/lib/db/queries/line-state.ts
+src/server/actions/demo.ts
+src/components/demo/DemoBanner.tsx
+src/components/scanner/ScanModal.tsx
+src/components/scanner/ScanButton.tsx
+src/components/scanner/QuickScannerCard.tsx
+src/components/scanner/DashboardScanButton.tsx
+.gitignore  (added .claude/)
+```
+
+### Resume here on the next session
+
+Highest-leverage next steps in order:
+
+1. **Wire actual Stripe** — schema fields are populated already
+   (`stripe_subscription_id`, `licensed_lines`, `subscription_status`,
+   `trial_ends_at`). Replace 501 stubs in
+   `/api/checkout/session/route.ts` and `/api/webhooks/stripe/route.ts`
+   with real Checkout Session + webhook handling. Fill in `stripePriceId`
+   slots in `src/lib/pricing.ts`. Add `STRIPE_*` keys to Vercel env.
+2. **Wire Resend** — server action `emailShiftSummary` already validates
+   input. `pnpm add resend @react-email/components`, create
+   `src/emails/ShiftSummary.tsx`, swap `console.log` for
+   `resend.emails.send()` in `src/server/actions/shift-export.ts`. Add
+   `RESEND_API_KEY` + `EASY_OEE_FROM_EMAIL` to Vercel env. Then optionally
+   fire on shift end for managers who opt in.
+3. **Migrate to Clerk** when you outgrow per-company HMAC. The current
+   schema can co-exist with Clerk (`user.clerk_user_id` already exists);
+   migrate is additive.
+4. **Loading/error/404 states + Sentry** for production polish.
+5. **Daily reset cron for the demo tenant** so prospects don't see each
+   other's clicks. Wire `resetDemo()` to truncate non-seed shifts +
+   stops on a daily schedule (cron path: `/api/cron/reset-demo`).
+6. **Domain cutover** — point `easy-oee.com` from GitHub Pages to Vercel
+   when you're ready to retire Louis's static HTML.
+
+If anything looks wrong, the source of truth is GitHub. Re-clone if in
+doubt. SSD canonical path is `/Volumes/CQ-PRO-4TB/Easy OEE/easy-oee`.
+Auto-sync runs every 3 minutes + on every commit; Dropbox docs mirror is
+wired into the same script and updates the same cycle.

@@ -59,21 +59,20 @@ Legend: 🟢 done · 🟡 in progress · ⚪ queued · 🔵 blocked
 
 ### Manager dashboard
 - 🟢 `/dashboard` — Today's OEE big number, live shifts, recent 10 shifts, 7-day Pareto stops (revalidate=10)
-- ⚪ `/dashboard/lines` — manage lines
-- ⚪ `/dashboard/operators` — create operators + set PINs
-- ⚪ `/dashboard/shifts` — full history with filters
-- ⚪ Sidebar nav for manager routes
+- 🟢 **Live machines grid at top of `/dashboard`** — per-line cards, running/stopped/idle pill, big OEE, operator, parts, elapsed timer, top stop today, auto-refreshes every 10s
+- 🟢 **Trial countdown banner** when a tenant is in trial, expired variant when past due
+- 🟢 `/dashboard/lines` — manage lines (incl. board token rotation, target OEE)
+- 🟢 `/dashboard/operators` — create operators + set PINs
+- 🟢 `/dashboard/shifts` — full history with filters + 14-day calendar grid + edit-shift workflow + Job # column
+- 🟢 Sidebar nav for manager routes (collapses to top bar on mobile, lang + sign-out share a row)
+- 🟢 **Scan code → clipboard** utility in dashboard header
 
 ### Auth
-- ⚪ Clerk for managers (`@clerk/nextjs` already installed)
-  - `<ClerkProvider>` in root layout
-  - `src/middleware.ts` scoped to `(app)` routes
-  - `(auth)/sign-in/[[...rest]]` + `(auth)/sign-up/[[...rest]]`
-  - Webhook `api/webhooks/clerk/route.ts`: on `user.created` → create Company, set `publicMetadata.companyId`
-- ⚪ Operator PIN flow
-  - `/pin` name-picker + 4-digit entry
-  - `src/lib/auth/operator-session.ts` — signed HTTP-only cookie
-  - `OPERATOR_SESSION_SECRET` env var
+- 🟢 **Per-company HMAC manager auth (pre-Clerk)** — email + bcrypt `password_hash`, signed `eo_admin` cookie 14-day TTL with `userId` + `companyId`, legacy `ADMIN_PASSWORD` env var still resolves to seed tenant for backwards compat
+- 🟢 **Self-serve signup at `/sign-up`** — creates `company` + manager `user` with 7-day `trial_ends_at`, sets cookie, lands on `/dashboard`
+- 🟢 **`/demo` no-login entrypoint** — sets admin + operator cookies on the seeded tenant + `eo_demo` marker cookie. Sticky DEMO MODE banner across all `(app)` routes with `Sign Up Free` CTA + per-route tip cards.
+- 🟢 Operator PIN flow (`/pin`, `eo_op` cookie, 12h TTL, `OPERATOR_SESSION_SECRET`)
+- ⚪ Migrate to Clerk for managers when growth demands it (schema already has `user.clerk_user_id`; migration is additive)
 
 ### Polish
 - 🟢 App shell layout with sidebar nav for managers
@@ -135,6 +134,13 @@ Legend: 🟢 done · 🟡 in progress · ⚪ queued · 🔵 blocked
 - ⚪ Custom stop reason categories per company
 - ⚪ Operator leaderboard (manager-toggled setting)
 
+### Barcode / QR scanner (NEW — shipped 2026-04-28)
+- 🟢 Reusable `<ScanModal>` using native `BarcodeDetector` API + `@zxing/browser` fallback
+- 🟢 `<ScanButton targetInputId>` drop-in, fills any input on detection
+- 🟢 **Job number** schema column (`shift.job_number`) + scan-or-type input on operator shift setup + manager edit-shift
+- 🟢 Job number displayed on live shift, summary, dashboard recent shifts, full shifts admin, per-shift CSV export
+- 🟢 Dashboard header **Scan code → clipboard** utility for ad-hoc reads with green "Copied!" toast
+
 ## Phase 4 — Hardware ingest
 
 See `docs/HARDWARE-INTEGRATION.md`.
@@ -168,6 +174,17 @@ See `docs/HARDWARE-INTEGRATION.md`.
 
 ## Recent activity
 
+- **2026-04-28** — Sales-ready batch (6 commits, all green):
+  - **`/demo` route + DEMO MODE banner** with per-route tip cards. Two entry buttons (Manager / Operator) drop prospects into the seeded Maple Manufacturing tenant with no login. Marketing nav adds "See it Live" link, sign-in page adds Demo CTA.
+  - **Self-serve `/sign-up` is real:** creates a `company` + manager `user` (bcrypt password) with a 7-day `trial_ends_at`, sets the admin cookie, lands on `/dashboard` with a trial countdown banner. Schema migration `0001_user_password_hash.sql`. Marketing CTA switched to "Start Free Trial" → `/sign-up`.
+  - **Live machines grid** at the top of `/dashboard` — per-line cards backed by `getCompanyLiveLines()` (multi-line version of the TV board snapshot). Auto-refresh every 10s via `router.refresh()`.
+  - **Barcode/QR scanner** wired for **job numbers**: schema column `shift.job_number`, scan-or-type input on `/operator` shift setup AND `/dashboard/shifts/[id]/edit`, displayed on live shift, summary, dashboard recent table, full shifts admin, per-shift CSV export. Also a "Scan code → clipboard" header utility on `/dashboard`.
+  - **Mobile responsiveness audit + fixes:** hamburger menu was effectively broken (backdrop-filter on `<nav>` trapped the menu's `position:fixed`); moved menu to be a sibling. Dashboard header now stacks under 600px (was overlapping). Manager sidebar bottom-row (lang + sign-out) shares a row on mobile. Pricing/home trial copy updated 14→7 day in EN/ES/FR.
+  - **Migration runner bug fix:** `splitStatements` was dropping any chunk starting with `--`, causing 0001 + 0002 to be silently skipped while still recording as applied — every Drizzle `select().from(s.user)` and `select().from(s.shift)` then 500'd because the columns didn't exist. Fixed the regex; production columns recovered via direct `ALTER TABLE ... ADD COLUMN IF NOT EXISTS`.
+  - **Auth cookies** now carry `userId` + `companyId` in `eo_admin` payload. `signInAdmin` does email + bcrypt lookup first, falls back to legacy `ADMIN_PASSWORD` env var (which now resolves to the seed manager) for backwards compat.
+  - **Auto-sync expansion:** `scripts/auto-sync.sh` now mirrors top-level docs + `docs/` to `~/Library/CloudStorage/Dropbox/Easy OEE/easy-oee/` after every successful pull/push (Dropbox = backup of a backup, source code stays out).
+  - **i18n:** ~80 new keys × EN/ES/FR for demo, signup, trial, scanner, job number, dashboard live grid, mobile nav.
+  - **Verified clean:** `pnpm test` 13/13, `pnpm typecheck`, `pnpm lint`, `pnpm build` all green.
 - **2026-04-07 (late night)** — Auto-migration runner shipped. `scripts/migrate.mjs` walks `drizzle/*.sql` in order, applies anything not yet in the `_eo_migrations` tracking table, splits on `--> statement-breakpoint`. Wired into `package.json` as `"prebuild": "node scripts/migrate.mjs"` so every Vercel build runs migrations before `next build`. Workflow now: edit schema → `pnpm db:generate` → commit → push → Vercel applies and deploys atomically. Fixed the dashboard 500 that happened earlier in the day when Tier 1-4 schema changes never reached Neon. Baseline migration `drizzle/0000_baseline_tier_columns.sql` uses `IF NOT EXISTS` so it's safe against the already-patched dev branch.
 - **2026-04-07 (evening)** — Branded favicon + OG image actually fixed. The first attempt used `next/og` `ImageResponse` which routes through Satori, and Satori can't parse the logo SVG's `<style>` blocks, so iMessage previews came back blank. Replaced with real PNGs generated by sharp (`scripts/generate-brand-images.mjs`) — 512×512 favicon, 180×180 Apple touch icon, 1200×630 OG + Twitter, all the logo composited centered on the `#003038` teal background. Static files at `src/app/{icon,apple-icon,opengraph-image,twitter-image}.png` so Next.js metadata convention picks them up.
 - **2026-04-07 (evening)** — Sudo-free toolchain installed on the iMac (Node 22.20 + pnpm 10 + Vercel CLI in `~/.local`, no Homebrew, no admin rights). Auto-sync infrastructure shipped: post-commit hook + launchd agent (3-min interval) + `scripts/install-sync.sh` one-shot installer. SSD working copy now stays continuously in sync with `origin/main` across machines.

@@ -185,7 +185,21 @@ preceded the auto-migration system.
 | `line` | `board_token` | `text UNIQUE` | Public token for `/board/[token]` shop-floor TV view; manager rotates from `/dashboard/lines` |
 | `shift` | `ending_operator_id` | `uuid REFERENCES user(id)` | Set when shift is handed off mid-run to a different operator |
 
-To apply on Neon:
+## Recent additions (2026-04-28 — sales batch)
+
+| Table | Column | Type | Purpose | Migration |
+|---|---|---|---|---|
+| `user` | `password_hash` | `text` (nullable) | bcrypt for manager email+password login. Null on operators. | `drizzle/0001_user_password_hash.sql` |
+| `shift` | `job_number` | `text` (nullable) | Optional work-order / job ticket number. Operator types or scans on shift setup; manager can edit later. Visible on live shift, summary, dashboards, CSV export. | `drizzle/0002_shift_job_number.sql` |
+
+**Migration runner gotcha (fixed):** `scripts/migrate.mjs` previously
+filtered out any chunk starting with `--`, so SQL files that opened with
+a doc-block comment got silently skipped while still being recorded as
+applied. Both `0001` and `0002` were affected on the live DB. Fixed in
+the runner; columns recovered via direct `ALTER TABLE ... ADD COLUMN
+IF NOT EXISTS`.
+
+To apply pending migrations on Neon:
 
 ```bash
 pnpm db:push   # dev shortcut, no migration file
@@ -193,5 +207,13 @@ pnpm db:push   # dev shortcut, no migration file
 pnpm db:generate && pnpm db:migrate
 ```
 
-The 4 columns are all backwards-compatible (defaults / nullable), so the
-deploy can ship before the migration runs without breaking reads.
+All recent additions are backwards-compatible (nullable / defaults), so
+the deploy can ship before the migration runs without breaking reads.
+
+## Auth cookies (HMAC, signed with `OPERATOR_SESSION_SECRET`)
+
+| Cookie | TTL | Set by | Payload |
+|---|---|---|---|
+| `eo_admin` | 14 days | `/sign-in`, `/sign-up`, `/demo` (manager side) | `{ role: "admin", userId, companyId, exp }` |
+| `eo_op` | 12 hours | `/pin`, `/demo` (operator side), shift handoff | `{ operatorId, companyId, exp }` |
+| `eo_demo` | 4 hours | `/demo` | marker only — toggles the DEMO MODE banner across `(app)` routes. Cleared on Exit demo. |
