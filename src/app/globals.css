@@ -36,6 +36,11 @@
   --mgr-side-hover: rgba(239, 245, 249, 0.06);
   --mgr-side-active-bg: rgba(3, 191, 181, 0.14);
   --mgr-side-active-text: var(--accent);
+  /* Marketing nav bar — semi-transparent so the backdrop-filter blur
+     reads through. Dark teal in dark mode, near-white in light mode. */
+  --nav-bg: rgba(0, 48, 56, 0.92);
+  --nav-text: #eff5f9;
+  --nav-border: rgba(239, 245, 249, 0.10);
   /* Sticky offset (raised when the demo banner is present, see :has rule
      below). */
   --eo-sticky-top: 0px;
@@ -62,6 +67,9 @@
   --mgr-side-hover: rgba(0, 40, 46, 0.05);
   --mgr-side-active-bg: rgba(1, 138, 130, 0.10);
   --mgr-side-active-text: var(--accent);
+  --nav-bg: rgba(255, 255, 255, 0.92);
+  --nav-text: #002830;
+  --nav-border: rgba(0, 40, 46, 0.10);
 }
 
 /* Smooth color transitions on theme change */
@@ -111,27 +119,29 @@ h3 { font-size: clamp(18px, 2.5vw, 26px); letter-spacing: 1px; }
   position: fixed; top: 0; left: 0; right: 0; z-index: 200;
   display: flex; align-items: center; justify-content: space-between;
   padding: 18px 56px;
-  background: rgba(0, 48, 56, 0.96);
+  background: var(--nav-bg);
+  color: var(--nav-text);
   backdrop-filter: blur(16px);
-  border-bottom: 1px solid var(--border);
+  border-bottom: 1px solid var(--nav-border);
 }
 .nav-logo {
   display: inline-flex; align-items: center;
   text-decoration: none;
 }
-.nav-links { display: flex; gap: 36px; align-items: center; }
+.nav-links { display: flex; gap: 28px; align-items: center; flex-wrap: nowrap; }
 .nav-links a {
-  color: var(--white); text-decoration: none;
-  font-size: 16px; letter-spacing: 0.3px;
+  color: var(--nav-text); text-decoration: none;
+  font-size: 15px; letter-spacing: 0.3px;
   font-weight: 500;
+  white-space: nowrap;
   transition: color 0.2s;
 }
 .nav-links a:hover { color: var(--accent); }
 .nav-signin {
-  border: 1px solid var(--border2);
+  border: 1px solid var(--nav-border);
   padding: 10px 22px !important;
   border-radius: 4px !important;
-  color: var(--white) !important;
+  color: var(--nav-text) !important;
   font-weight: 500 !important;
   transition: all 0.2s !important;
 }
@@ -1936,32 +1946,40 @@ textarea.app-input { resize: vertical; min-height: 56px; font-family: var(--font
 html[data-theme="light"] .logo-swap-dark { display: none !important; }
 html[data-theme="light"] .logo-swap-light { display: block !important; }
 
-/* Theme toggle */
-.theme-toggle {
+/* Theme toggle — segmented two-option control. Both labels stay visible
+   so users always know what they're picking. */
+.theme-segment {
   display: inline-flex;
   align-items: center;
-  justify-content: center;
-  gap: 8px;
-  background: transparent;
+  padding: 3px;
+  border-radius: 999px;
+  background: var(--mid);
   border: 1px solid var(--border2);
-  color: var(--white);
-  width: 38px;
-  height: 38px;
-  border-radius: 999px;
-  cursor: pointer;
-  padding: 0;
+  gap: 2px;
   font: inherit;
-  transition: color 120ms ease, border-color 120ms ease, background 120ms ease;
 }
-.theme-toggle:hover { color: var(--accent); border-color: var(--accent); }
-.theme-toggle-labeled {
-  width: auto;
-  padding: 8px 14px;
-  font-size: 13px;
-  border-radius: 999px;
+.theme-segment-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border: 0;
+  background: transparent;
   color: var(--muted2);
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.3px;
+  cursor: pointer;
+  transition: color 120ms ease, background 120ms ease;
+  font-family: inherit;
 }
-.theme-toggle-labeled:hover { color: var(--white); }
+.theme-segment-btn:hover:not(.is-active) { color: var(--white); }
+.theme-segment-btn.is-active {
+  background: var(--accent);
+  color: #001b1f;
+}
+.theme-segment-compact .theme-segment-btn { padding: 6px 9px; }
 
 /* ═══════════════════════════════════════════════════════════════════════════
    Analytics module (/dashboard/analytics/*)

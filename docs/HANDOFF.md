@@ -962,3 +962,27 @@ and were fixed:
   raw `<Image>` to the shared `<Logo />` component for consistency.
 
 Lightning CSS gotcha: dropped a `.app-shell:has(.mgr-shell) > .app-wrap:has(> .demo-tip)` rule silently during minification (nested `:has()` with child combinators). Worked around it by adding a `demo-tip-wrap` class directly to the wrapper and targeting that.
+
+### Light-mode marketing nav + theme toggle redesign (same day, second pass)
+
+After the bug-fix addendum landed, the marketing nav was still unreadable in light mode and the theme toggle was a single icon nobody could decode. Two more fixes:
+
+- **Marketing nav now follows theme.** `.eo-nav` had a hardcoded
+  `background: rgba(0, 48, 56, 0.96)` and `.nav-links a` used
+  `var(--white)` for text. In light mode `--white` becomes dark teal,
+  so dark text rendered on a hardcoded dark teal background — invisible.
+  Replaced with `--nav-bg`, `--nav-text`, `--nav-border` tokens that
+  flip with the theme. Dark mode keeps the dark teal blur; light mode
+  becomes a near-white blur with dark text. Also tightened nav links
+  to 15px with `white-space: nowrap` and reduced gap to 28px so they
+  don't wrap awkwardly with the new theme toggle.
+- **ThemeToggle is now a segmented two-option control.** Single icon
+  was unclear (sun? moon? what does it do?). New UI is a pill with
+  two labeled buttons: `[☀ Light] [🌙 Dark]`. Both visible always; the
+  current theme has a teal background pill, the other is muted. Click
+  either to set that theme. Compact variant (icons only) ships in the
+  marketing mobile cluster where horizontal space is tight. Used
+  everywhere else with full labels: manager sidebar, operator setup,
+  sign-in, pin, demo landing, marketing desktop nav.
+- New i18n key `theme.toggleLabel` ("Theme" / "Tema" / "Thème") for
+  the `aria-label` on the segment group.

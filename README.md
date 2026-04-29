@@ -109,7 +109,9 @@ See [`docs/ARCHITECTURE.md`](./docs/ARCHITECTURE.md) for the full rationale.
 ### Theme system (light + dark)
 - Both themes share the brand teal accent. Dark theme is the existing look; light theme flips background and text while keeping accent colors.
 - `eo-theme` cookie read SSR-side by the root layout, so `<html data-theme>` is set before first paint (no flash).
-- `<ThemeToggle />` client component (sun/moon SVG, no emoji glyphs) wired into manager sidebar, operator setup, sign-in, pin, demo landing, and the marketing nav (desktop + mobile cluster). Persists to cookie + localStorage.
+- `<ThemeToggle />` is a **segmented two-option control** with both labels visible: `[☀ Light] [🌙 Dark]`. The current theme is highlighted with a teal pill; click either side to set that theme. A `compact` variant (icons only) ships in the marketing mobile nav cluster where space is tight. Wired into manager sidebar, operator setup, sign-in, pin, demo landing, and the marketing nav (desktop + mobile). Persists to cookie + localStorage.
+- The marketing nav, manager sidebar, demo banner, cards, fields, and buttons all use theme-aware CSS tokens (`--nav-bg`, `--mgr-side-bg`, `--white`, `--black`, `--accent`, `--border`, etc.) so contrast stays readable in both modes.
+- Logo swap: white-ink wordmark on dark, dark-ink on light, served from two SVG variants.
 - Smooth color transitions across body, cards, nav, sidebar, fields, buttons, banners.
 
 ### Barcode / QR scanner

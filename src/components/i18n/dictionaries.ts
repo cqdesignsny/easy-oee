@@ -724,6 +724,7 @@ export const dictionaries: Record<Locale, Dictionary> = {
     "theme.dark": "Dark",
     "theme.toLight": "Switch to light theme",
     "theme.toDark": "Switch to dark theme",
+    "theme.toggleLabel": "Theme",
 
     // ANALYTICS
     "analytics.tag": "Analytics",
@@ -1471,6 +1472,7 @@ export const dictionaries: Record<Locale, Dictionary> = {
     "theme.dark": "Oscuro",
     "theme.toLight": "Cambiar a tema claro",
     "theme.toDark": "Cambiar a tema oscuro",
+    "theme.toggleLabel": "Tema",
 
     // ANALYTICS
     "analytics.tag": "Analíticas",
@@ -2218,6 +2220,7 @@ export const dictionaries: Record<Locale, Dictionary> = {
     "theme.dark": "Sombre",
     "theme.toLight": "Passer au thème clair",
     "theme.toDark": "Passer au thème sombre",
+    "theme.toggleLabel": "Thème",
 
     // ANALYTICS
     "analytics.tag": "Analyses",

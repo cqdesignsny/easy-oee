@@ -60,7 +60,7 @@ export function SiteNav() {
         {/* Mobile right cluster: language switcher + hamburger (always visible) */}
         <div className="nav-mobile-cluster">
           <LanguageSwitcher />
-          <ThemeToggle />
+          <ThemeToggle compact />
           <button
             type="button"
             className="nav-burger"

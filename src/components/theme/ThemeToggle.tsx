@@ -1,10 +1,12 @@
 "use client";
 
 /**
- * Theme toggle button. Sets the `eo-theme` cookie + `data-theme` attribute
- * on <html>. Two layouts:
- *   - "icon":    single round button that flips between sun/moon
- *   - "labeled": same icon plus a text label; used in the manager sidebar
+ * Theme toggle. Renders as a segmented two-option control with both
+ * Light and Dark labels visible at all times so users always know
+ * what they're picking.
+ *
+ *   compact=false (default): full pill with [☀ Light][🌙 Dark]
+ *   compact=true:             icon-only segmented [☀][🌙] for tight spots
  */
 
 import { useCallback, useEffect, useState } from "react";
@@ -20,75 +22,61 @@ function readCurrent(): Theme {
   return attr === "light" ? "light" : "dark";
 }
 
-export function ThemeToggle({
-  variant = "icon",
-}: {
-  variant?: "icon" | "labeled";
-}) {
+export function ThemeToggle({ compact = false }: { compact?: boolean }) {
   const t = useT();
-  // Lazy init reads the SSR-rendered data-theme on mount.
   const [theme, setTheme] = useState<Theme>(() => readCurrent());
-  const [mounted, setMounted] = useState(false);
 
-  // Required to avoid SSR/hydration mismatch: the server can't know the
-  // user's chosen theme until the cookie is read, so we render a stable
-  // placeholder for the first paint and upgrade to the real toggle after
-  // hydration. The setState here is the canonical mounted-flag pattern.
+  // Mounted flag so we can render a stable placeholder for SSR/hydration
+  // and only show the actual selection state after we read the DOM.
+  const [mounted, setMounted] = useState(false);
   // eslint-disable-next-line react-hooks/set-state-in-effect
   useEffect(() => { setMounted(true); }, []);
 
-  const toggle = useCallback(() => {
-    const next: Theme = theme === "light" ? "dark" : "light";
+  const set = useCallback((next: Theme) => {
     setTheme(next);
     document.documentElement.setAttribute("data-theme", next);
     document.cookie = `${COOKIE_NAME}=${next}; Path=/; Max-Age=${ONE_YEAR}; SameSite=Lax`;
-    try {
-      localStorage.setItem(COOKIE_NAME, next);
-    } catch {
-      // storage may be blocked; cookie is the source of truth
-    }
-  }, [theme]);
+    try { localStorage.setItem(COOKIE_NAME, next); } catch { /* storage blocked */ }
+  }, []);
 
-  // Render a placeholder before mount so SSR + hydration match without
-  // a layout shift, then upgrade to the real button.
-  if (!mounted) {
-    return (
-      <button
-        type="button"
-        className={variant === "labeled" ? "theme-toggle theme-toggle-labeled" : "theme-toggle"}
-        aria-hidden
-        tabIndex={-1}
-        suppressHydrationWarning
-      >
-        <SunIcon />
-      </button>
-    );
-  }
-
-  const next: Theme = theme === "light" ? "dark" : "light";
-  const label = next === "light" ? t("theme.toLight") : t("theme.toDark");
+  const isLight = mounted && theme === "light";
+  const isDark = !mounted || theme === "dark";
 
   return (
-    <button
-      type="button"
-      onClick={toggle}
-      className={variant === "labeled" ? "theme-toggle theme-toggle-labeled" : "theme-toggle"}
-      aria-label={label}
-      title={label}
+    <div
+      role="group"
+      aria-label={t("theme.toggleLabel")}
+      className={`theme-segment${compact ? " theme-segment-compact" : ""}`}
     >
-      {theme === "light" ? <MoonIcon /> : <SunIcon />}
-      {variant === "labeled" && (
-        <span>{theme === "light" ? t("theme.dark") : t("theme.light")}</span>
-      )}
-    </button>
+      <button
+        type="button"
+        onClick={() => set("light")}
+        aria-pressed={isLight}
+        className={`theme-segment-btn${isLight ? " is-active" : ""}`}
+        title={t("theme.toLight")}
+      >
+        <SunIcon />
+        {!compact && <span>{t("theme.light")}</span>}
+      </button>
+      <button
+        type="button"
+        onClick={() => set("dark")}
+        aria-pressed={isDark}
+        className={`theme-segment-btn${isDark ? " is-active" : ""}`}
+        title={t("theme.toDark")}
+      >
+        <MoonIcon />
+        {!compact && <span>{t("theme.dark")}</span>}
+      </button>
+    </div>
   );
 }
 
 function SunIcon() {
   return (
     <svg
-      width="18"
-      height="18"
+      width="16"
+      height="16"
       viewBox="0 0 24 24"
       fill="none"
       stroke="currentColor"
@@ -113,8 +101,8 @@ function SunIcon() {
 function MoonIcon() {
   return (
     <svg
-      width="18"
-      height="18"
+      width="16"
+      height="16"
       viewBox="0 0 24 24"
       fill="none"
       stroke="currentColor"

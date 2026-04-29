@@ -176,6 +176,10 @@ See `docs/HARDWARE-INTEGRATION.md`.
 
 ## Recent activity
 
+- **2026-04-29 (late)** — Light-mode polish + theme toggle redesign (commit on top of `a3427ab`):
+  - Marketing nav now follows the theme. Replaced hardcoded dark-teal background and `--white` text with `--nav-bg` / `--nav-text` / `--nav-border` tokens that flip per theme. Tightened nav links to 15px with `white-space: nowrap` so they fit alongside the new toggle.
+  - **ThemeToggle restyled as a segmented two-option control** with both labels visible: `[☀ Light] [🌙 Dark]`. Current theme highlighted with a teal pill, the other muted. `compact` variant (icons only) ships in the marketing mobile cluster. Used full-label everywhere else (manager sidebar, operator, sign-in, pin, demo landing, desktop marketing nav). New i18n key `theme.toggleLabel` × EN/ES/FR.
+  - Bug-fix addendum landed earlier in the day in `a3427ab`: logo dual-render in light, hardcoded sidebar bg, sidebar disconnect from demo banner, demo tip card spanning over the sidebar. All resolved.
 - **2026-04-29** — Analytics module + light/dark theme + style sweep (commit `5e1f298`, all green):
   - **Analytics module at `/dashboard/analytics`** — overview page (OEE / A / P / Q for last 30 days, production volumes, 14-day SVG sparkline with 85% target line, drill-in cards) plus three deep-dives: shifts (per-type cards + table + Pareto), machines (summary table, OEE-vs-target bars, Pareto per line), operators (leaderboard cards with rank + table + Pareto per operator).
   - **Backed by** `src/lib/db/queries/analytics.ts` — Drizzle queries (`avg`, `count`, `sum`, `groupBy`) all multi-tenant scoped. Sub-nav at the top of every analytics route. Manager sidebar gets an Analytics tab. Demo banner has per-route tip cards for all 4 analytics pages.
