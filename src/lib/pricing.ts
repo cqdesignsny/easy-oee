@@ -54,8 +54,6 @@ export const PLANS: Record<PlanId, Plan> = {
     stripePriceId: null,
     stripeExtraLinePriceId: null,
     featureKeys: [
-      "pricing.feature.lines.starter",
-      "pricing.feature.ops.starter",
       "pricing.feature.stops",
       "pricing.feature.dash",
       "pricing.feature.reports",
@@ -73,8 +71,6 @@ export const PLANS: Record<PlanId, Plan> = {
     stripePriceId: null,
     stripeExtraLinePriceId: null,
     featureKeys: [
-      "pricing.feature.lines.pro",
-      "pricing.feature.ops.pro",
       "pricing.feature.compare",
       "pricing.feature.supervisor",
       "pricing.feature.csv",
@@ -139,4 +135,29 @@ export function recommendedTier(lines: number): PlanId {
 
 export function fitsTier(planId: PlanId, lines: number): boolean {
   return lines <= PLANS[planId].maxLines;
+}
+
+/**
+ * Operator allowance for a given line count on a tier.
+ * Each extra line above the tier's bundled minimum adds 2 operators on
+ * top of the base cap (so Pro at 5 lines = 15 ops, 6 = 17, ..., 20 = 45).
+ * Returns null for Enterprise or when the line count exceeds the tier cap.
+ */
+export function operatorCap(planId: PlanId, lines: number): number | null {
+  const plan = PLANS[planId];
+  if (planId === "enterprise") return null;
+  if (plan.maxOperators == null) return null;
+  if (lines > plan.maxLines) return null;
+  const extra = Math.max(0, lines - plan.includedLines);
+  return plan.maxOperators + extra * 2;
+}
+
+/**
+ * Lines to *display* on a tier's feature card for a given slider value.
+ * Floors at the tier's bundled minimum (so Pro stays at 5 below 5)
+ * and caps at the tier's hard maximum.
+ */
+export function displayLinesForTier(planId: PlanId, lines: number): number {
+  const plan = PLANS[planId];
+  return Math.min(Math.max(lines, plan.includedLines), plan.maxLines);
 }

@@ -6,9 +6,11 @@ import { useT } from "@/components/i18n/LanguageProvider";
 import {
   PLANS,
   MAX_SELF_SERVE_LINES,
+  displayLinesForTier,
   fmtCAD,
   fmtUSD,
   monthlyCostUSD,
+  operatorCap,
   recommendedTier,
   usdToCad,
   type PlanId,
@@ -217,32 +219,56 @@ export function PricingClient() {
               </Link>
 
               <ul style={{ listStyle: "none", padding: 0, display: "grid", gap: 14 }}>
-                {plan.featureKeys.map((key) => (
-                  <li
-                    key={key}
-                    style={{
-                      color: "var(--muted2)",
-                      fontSize: 16,
-                      display: "flex",
-                      gap: 12,
-                      alignItems: "flex-start",
-                      lineHeight: 1.5,
-                    }}
-                  >
-                    <svg
-                      width="16"
-                      height="16"
-                      viewBox="0 0 16 16"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2.5"
-                      style={{ color: "var(--accent)", flexShrink: 0, marginTop: 4 }}
+                {(() => {
+                  // Enterprise has a single combined "unlimited" feature key;
+                  // the other tiers get dynamic lines + operator counts that
+                  // track the slider, then the rest of the static features.
+                  const dynamic: string[] = [];
+                  if (!isEnterprise) {
+                    const dLines = displayLinesForTier(id, lines);
+                    const dOps = operatorCap(id, dLines);
+                    dynamic.push(
+                      dLines === 1
+                        ? t("pricing.feature.lines.one")
+                        : t("pricing.feature.lines.many").replace("{n}", String(dLines)),
+                    );
+                    if (dOps != null) {
+                      dynamic.push(
+                        t("pricing.feature.ops.dynamic").replace("{n}", String(dOps)),
+                      );
+                    }
+                  }
+                  const items = [
+                    ...dynamic.map((text, i) => ({ key: `dyn-${i}`, text })),
+                    ...plan.featureKeys.map((key) => ({ key, text: t(key) })),
+                  ];
+                  return items.map((item) => (
+                    <li
+                      key={item.key}
+                      style={{
+                        color: "var(--muted2)",
+                        fontSize: 16,
+                        display: "flex",
+                        gap: 12,
+                        alignItems: "flex-start",
+                        lineHeight: 1.5,
+                      }}
                     >
-                      <path d="M3 8.5l3.5 3.5L13 5" strokeLinecap="round" strokeLinejoin="round" />
-                    </svg>
-                    {t(key)}
-                  </li>
-                ))}
+                      <svg
+                        width="16"
+                        height="16"
+                        viewBox="0 0 16 16"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2.5"
+                        style={{ color: "var(--accent)", flexShrink: 0, marginTop: 4 }}
+                      >
+                        <path d="M3 8.5l3.5 3.5L13 5" strokeLinecap="round" strokeLinejoin="round" />
+                      </svg>
+                      {item.text}
+                    </li>
+                  ));
+                })()}
               </ul>
             </div>
           );
