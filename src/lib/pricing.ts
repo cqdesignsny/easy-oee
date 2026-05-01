@@ -1,28 +1,37 @@
 /**
  * Easy OEE pricing — single source of truth.
  *
- * Prices are in USD (the canonical currency for the SaaS). CAD is shown as
- * a converted reference for Canadian customers. The rate is updated monthly
- * by hand; if you wire a live FX feed later, swap USD_TO_CAD with that.
+ * Prices are in USD. CAD is shown as a converted reference.
  *
- * Each tier has a Stripe price ID slot. Fill these in after you create the
- * products + prices in your Stripe dashboard. Until then the sign-up flow
- * shows the price card and a "Coming soon" checkout placeholder.
+ * The slider on /pricing and /sign-up drives a real per-line scale:
+ * - Starter scales 1→4 lines: $49 base + $34 per extra line.
+ *   By 4 lines you're at $151 — making Pro at $129 the obvious upsell.
+ * - Pro is flat $129 for 5 lines, then $30 per extra line up to 20.
+ *   Past 20, it's a custom Enterprise quote.
+ *
+ * The per-line surcharge isn't shown as a "+$X/line" line on the cards —
+ * the slider just makes the price react. Users see the real number for
+ * their actual line count instead of "from $49".
  */
 
 export const USD_TO_CAD = 1.37;
+
+/** Hard ceiling for the slider; past this it's Enterprise / custom quote. */
+export const MAX_SELF_SERVE_LINES = 20;
 
 export type PlanId = "starter" | "pro" | "enterprise";
 
 export type Plan = {
   id: PlanId;
   name: string;
-  /** Monthly price in USD (per-account, includes the bundled line allowance). */
+  /** Monthly price in USD at `includedLines`. */
   baseMonthlyUSD: number;
   /** Lines included in the base price. */
   includedLines: number;
   /** Per-line surcharge above the included allowance, USD/month. */
   extraLineUSD: number;
+  /** Hard cap on lines for this tier. Sliding past forces the next tier up. */
+  maxLines: number;
   /** Up to N operators included. null = unlimited. */
   maxOperators: number | null;
   /** Stripe price ID — fill in after creating the product in Stripe. */
@@ -39,7 +48,8 @@ export const PLANS: Record<PlanId, Plan> = {
     name: "Starter",
     baseMonthlyUSD: 49,
     includedLines: 1,
-    extraLineUSD: 0,
+    extraLineUSD: 34,
+    maxLines: 4,
     maxOperators: 3,
     stripePriceId: null,
     stripeExtraLinePriceId: null,
@@ -57,7 +67,8 @@ export const PLANS: Record<PlanId, Plan> = {
     name: "Professional",
     baseMonthlyUSD: 129,
     includedLines: 5,
-    extraLineUSD: 0,
+    extraLineUSD: 30,
+    maxLines: MAX_SELF_SERVE_LINES,
     maxOperators: 15,
     stripePriceId: null,
     stripeExtraLinePriceId: null,
@@ -73,9 +84,10 @@ export const PLANS: Record<PlanId, Plan> = {
   enterprise: {
     id: "enterprise",
     name: "Enterprise",
-    baseMonthlyUSD: 0, // custom
+    baseMonthlyUSD: 0, // custom quote
     includedLines: 0,
     extraLineUSD: 0,
+    maxLines: Number.POSITIVE_INFINITY,
     maxOperators: null,
     stripePriceId: null,
     stripeExtraLinePriceId: null,
@@ -103,17 +115,28 @@ export function fmtCAD(n: number): string {
 }
 
 /**
- * Compute monthly cost for a plan + line count.
- * Returns USD; CAD is derived via usdToCad().
- *
- * Starter and Pro are flat-priced — anyone needing more than the included
- * lines goes to Enterprise. There is no per-line surcharge. The lines
- * argument is kept in the signature so callers (the sign-up slider, the
- * pricing card) can keep their existing call sites; it has no effect today.
+ * Monthly cost in USD for a given plan + line count.
+ * Returns null when the line count exceeds the plan's hard cap (caller
+ * should render a "Talk to us" / Enterprise CTA instead of a price).
  */
-export function monthlyCostUSD(planId: PlanId, lines: number): number {
+export function monthlyCostUSD(planId: PlanId, lines: number): number | null {
   const plan = PLANS[planId];
-  if (planId === "enterprise") return 0;
-  void lines;
-  return plan.baseMonthlyUSD;
+  if (planId === "enterprise") return null;
+  if (lines > plan.maxLines) return null;
+  const extra = Math.max(0, lines - plan.includedLines);
+  return plan.baseMonthlyUSD + extra * plan.extraLineUSD;
+}
+
+/**
+ * The tier that fits a given line count. Used to highlight a "Recommended"
+ * badge on the pricing page and to auto-clamp the sign-up form.
+ */
+export function recommendedTier(lines: number): PlanId {
+  if (lines <= PLANS.starter.maxLines) return "starter";
+  if (lines <= PLANS.pro.maxLines) return "pro";
+  return "enterprise";
+}
+
+export function fitsTier(planId: PlanId, lines: number): boolean {
+  return lines <= PLANS[planId].maxLines;
 }

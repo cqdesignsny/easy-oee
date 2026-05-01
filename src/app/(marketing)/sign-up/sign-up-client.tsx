@@ -1,7 +1,16 @@
 "use client";
 
-import { useActionState, useEffect, useState } from "react";
-import { fmtCAD, fmtUSD, monthlyCostUSD, usdToCad, type PlanId } from "@/lib/pricing";
+import Link from "next/link";
+import { useActionState, useEffect, useMemo, useState } from "react";
+import {
+  PLANS,
+  fmtCAD,
+  fmtUSD,
+  monthlyCostUSD,
+  recommendedTier,
+  usdToCad,
+  type PlanId,
+} from "@/lib/pricing";
 import { useT } from "@/components/i18n/LanguageProvider";
 import { signUpManager, type SignUpState } from "@/server/actions/admin-auth";
 import { COMMON_TIMEZONES, DEFAULT_TIMEZONE, detectBrowserTimezone } from "@/lib/time";
@@ -23,17 +32,31 @@ export function SignUpClient({
     {},
   );
 
-  // Auto-detect plant timezone on mount. The form ships the value as a
-  // hidden input so the manager doesn't have to think about it; the dropdown
-  // is opt-in if the auto-detect is wrong (VPN, traveling, multi-plant, etc.).
-  // Hydration-time read of an external (browser) value, then sync into state.
+  // Auto-detect plant timezone on mount.
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setTimezone(detectBrowserTimezone());
   }, []);
 
-  const usd = monthlyCostUSD(plan, lines);
-  const cad = usdToCad(usd);
+  const planMaxLines = PLANS[plan].maxLines;
+  // Clamp the slider to the current plan's hard cap so a user on Starter
+  // can't accidentally try to provision 12 lines.
+  const sliderMax = Math.min(planMaxLines, 20);
+  const effectiveLines = Math.min(lines, sliderMax);
+
+  const usd = monthlyCostUSD(plan, effectiveLines);
+  const cad = usd != null ? usdToCad(usd) : null;
+
+  // Used to show "switch to Pro" hint when user is on Starter at the cap.
+  const trueRecommendation = useMemo(() => recommendedTier(lines), [lines]);
+  void trueRecommendation;
+
+  // Choosing a different plan? Pull the slider into the new range.
+  function pickPlan(next: PlanId) {
+    setPlan(next);
+    const max = Math.min(PLANS[next].maxLines, 20);
+    setLines((current) => Math.min(current, max));
+  }
 
   return (
     <form action={formAction} className="card" style={{ padding: 36 }}>
@@ -44,7 +67,7 @@ export function SignUpClient({
           <button
             key={p}
             type="button"
-            onClick={() => setPlan(p)}
+            onClick={() => pickPlan(p)}
             className={plan === p ? "btn" : "btn btn-ghost"}
             style={{ minHeight: 56 }}
           >
@@ -65,26 +88,57 @@ export function SignUpClient({
         }}
       >
         <span style={{ fontFamily: "var(--font-bebas)", fontSize: 56, color: "var(--accent)", lineHeight: 1 }}>
-          {lines}
+          {effectiveLines}
         </span>
         <span style={{ fontFamily: "var(--font-bebas)", fontSize: 32, color: "var(--white)" }}>
-          {fmtUSD(usd)}{" "}
-          <span style={{ fontSize: 14, color: "var(--muted2)" }}>USD/mo</span>
+          {usd != null ? fmtUSD(usd) : t("pricing.talkToUs")}{" "}
+          {usd != null && (
+            <span style={{ fontSize: 14, color: "var(--muted2)" }}>USD/mo</span>
+          )}
         </span>
       </div>
       <input
         type="range"
         min={1}
-        max={20}
+        max={sliderMax}
         step={1}
-        value={lines}
+        value={effectiveLines}
         onChange={(e) => setLines(Number(e.target.value))}
         name="lines"
         style={{ width: "100%", accentColor: "var(--accent)" }}
       />
-      <p style={{ color: "var(--muted2)", fontSize: 13, marginTop: 6, marginBottom: 24, fontFamily: "var(--font-dm-mono)", letterSpacing: 0.5 }}>
-        ≈ {fmtCAD(cad)} CAD/mo · {t("signup.afterTrial")}
+      <p style={{ color: "var(--muted2)", fontSize: 13, marginTop: 6, marginBottom: 12, fontFamily: "var(--font-dm-mono)", letterSpacing: 0.5 }}>
+        {cad != null && <>≈ {fmtCAD(cad)} CAD/mo · </>}{t("signup.afterTrial")}
       </p>
+
+      {/* Plan-fit hint: surface when the chosen plan is the wrong tier
+          for the line count the user actually needs. */}
+      {plan === "starter" && effectiveLines === planMaxLines && (
+        <p style={{ color: "var(--muted2)", fontSize: 13, marginBottom: 24, lineHeight: 1.5 }}>
+          {t("signup.proTease.starter").replace("{n}", String(PLANS.starter.maxLines))}
+          {" "}
+          <button
+            type="button"
+            onClick={() => pickPlan("pro")}
+            style={{ background: "none", border: 0, color: "var(--accent)", cursor: "pointer", padding: 0, font: "inherit" }}
+          >
+            {t("signup.proTease.switch")}
+          </button>
+        </p>
+      )}
+      {plan === "pro" && effectiveLines === sliderMax && (
+        <p style={{ color: "var(--muted2)", fontSize: 13, marginBottom: 24, lineHeight: 1.5 }}>
+          {t("signup.entTease")}
+          {" "}
+          <Link href="/contact" style={{ color: "var(--accent)" }}>
+            {t("signup.entTease.cta")}
+          </Link>
+        </p>
+      )}
+      {!(plan === "starter" && effectiveLines === planMaxLines) &&
+        !(plan === "pro" && effectiveLines === sliderMax) && (
+          <div style={{ marginBottom: 24 }} />
+        )}
 
       {/* Company + email + name + password */}
       <label className="field-label">{t("signup.companyName")}</label>
