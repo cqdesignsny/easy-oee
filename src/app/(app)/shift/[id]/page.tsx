@@ -25,6 +25,7 @@ export default async function ShiftPage({ params }: { params: Promise<{ id: stri
       stops={data.stops}
       operators={operators}
       currentOperatorId={session.operatorId}
+      timezone={data.timezone}
     />
   );
 }

@@ -20,6 +20,7 @@ import { Logo } from "@/components/Logo";
 import { useT } from "@/components/i18n/LanguageProvider";
 import { LanguageSwitcher } from "@/components/i18n/LanguageSwitcher";
 import { computeOEE, formatPercent, oeeBucket } from "@/lib/oee";
+import { formatPlantTime } from "@/lib/time";
 
 const STOP_LABEL_KEYS: Record<string, string> = {
   mechanical_failure: "stop.01.label",
@@ -63,10 +64,6 @@ function fmtClock(totalSeconds: number): string {
     : `${m}:${String(sec).padStart(2, "0")}`;
 }
 
-function fmtTimeOfDay(d: Date): string {
-  return d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
-}
-
 export function LiveShift({
   shiftId,
   initialShift,
@@ -74,6 +71,7 @@ export function LiveShift({
   stops,
   operators,
   currentOperatorId,
+  timezone,
 }: {
   shiftId: string;
   initialShift: ShiftRow;
@@ -81,6 +79,7 @@ export function LiveShift({
   stops: StopRow[];
   operators: OperatorOpt[];
   currentOperatorId: string;
+  timezone: string;
 }) {
   const t = useT();
 
@@ -294,11 +293,11 @@ export function LiveShift({
           </div>
           <div>
             <div className="kpi-label">{t("shift.startedAt")}</div>
-            <div className="timer-sub">{fmtTimeOfDay(new Date(startedAtMs))}</div>
+            <div className="timer-sub">{formatPlantTime(new Date(startedAtMs), timezone)}</div>
           </div>
           <div>
             <div className="kpi-label">{t("shift.projectedEnd")}</div>
-            <div className="timer-sub">{fmtTimeOfDay(new Date(projectedEndMs))}</div>
+            <div className="timer-sub">{formatPlantTime(new Date(projectedEndMs), timezone)}</div>
           </div>
           <div>
             <div className="kpi-label">{t("shift.totalStops")}</div>

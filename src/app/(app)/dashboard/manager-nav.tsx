@@ -13,6 +13,7 @@ export function ManagerNav() {
     { href: "/dashboard/shifts", label: t("mgr.nav.shifts") },
     { href: "/dashboard/lines", label: t("mgr.nav.lines") },
     { href: "/dashboard/operators", label: t("mgr.nav.operators") },
+    { href: "/dashboard/settings", label: t("mgr.nav.settings") },
     { href: "/operator", label: `${t("mgr.nav.startShift")} →` },
   ];
   return (

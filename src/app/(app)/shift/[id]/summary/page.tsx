@@ -7,6 +7,7 @@ import { Logo } from "@/components/Logo";
 import { LanguageSwitcher } from "@/components/i18n/LanguageSwitcher";
 import { getServerT } from "@/components/i18n/server";
 import { ShiftExportButtons } from "./export-buttons";
+import { formatPlantTime } from "@/lib/time";
 
 const STOP_LABEL_KEYS: Record<string, string> = {
   mechanical_failure: "stop.01.label",
@@ -187,7 +188,7 @@ export default async function SummaryPage({
               {data.stops.map((s) => (
                 <tr key={s.id}>
                   <td>{t(STOP_LABEL_KEYS[s.reason] ?? s.reason)}</td>
-                  <td>{new Date(s.startedAt).toLocaleTimeString()}</td>
+                  <td>{formatPlantTime(s.startedAt, data.timezone)}</td>
                   <td>{s.minutes ? Number(s.minutes).toFixed(1) : "..."}</td>
                 </tr>
               ))}

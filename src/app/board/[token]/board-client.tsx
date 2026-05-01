@@ -11,6 +11,7 @@ import { useRouter } from "next/navigation";
 import { Logo } from "@/components/Logo";
 import { formatPercent } from "@/lib/oee";
 import { STOP_REASONS } from "@/lib/stop-reasons";
+import { formatPlantTime } from "@/lib/time";
 
 const reasonLabel: Record<string, string> = Object.fromEntries(
   STOP_REASONS.map((r) => [r.value, r.label]),
@@ -48,6 +49,7 @@ export function BoardClient({
   topStops,
   bucket,
   todayLabel,
+  timezone,
 }: {
   lineName: string;
   target: number;
@@ -57,6 +59,7 @@ export function BoardClient({
   topStops: { reason: string; minutes: number }[];
   bucket: "world-class" | "typical" | "low" | "na";
   todayLabel: string;
+  timezone: string;
 }) {
   const router = useRouter();
   const [now, setNow] = useState<number>(0);
@@ -182,7 +185,7 @@ export function BoardClient({
           <Logo height={28} />
           <span>EASY OEE · LIVE BOARD</span>
         </div>
-        <div>{new Date(now).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}</div>
+        <div>{now > 0 ? formatPlantTime(new Date(now), timezone) : ""}</div>
       </div>
     </main>
   );

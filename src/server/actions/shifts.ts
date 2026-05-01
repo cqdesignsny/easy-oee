@@ -20,6 +20,8 @@ import * as s from "@/lib/db/schema";
 import { requireOperator, setOperatorCookie } from "@/lib/auth/operator-session";
 import { computeOEE } from "@/lib/oee";
 import { STOP_REASON_VALUES, type StopReasonValue } from "@/lib/stop-reasons";
+import { getCompanyTimezone } from "@/lib/db/queries/company";
+import { plantDateString } from "@/lib/time";
 
 const StartShiftSchema = z.object({
   lineId: z.string().uuid(),
@@ -49,6 +51,7 @@ export async function startShift(formData: FormData) {
 
   const now = new Date();
   const jobNumber = parsed.jobNumber && parsed.jobNumber.length > 0 ? parsed.jobNumber : null;
+  const tz = await getCompanyTimezone(session.companyId);
   const [created] = await db
     .insert(s.shift)
     .values({
@@ -64,7 +67,7 @@ export async function startShift(formData: FormData) {
       badParts: 0,
       startedAt: now,
       status: "in_progress",
-      shiftDate: now.toISOString().slice(0, 10),
+      shiftDate: plantDateString(now, tz),
     })
     .returning();
 
@@ -300,7 +303,8 @@ export async function getShiftForOperator(shiftId: string) {
     .from(s.stop)
     .where(and(eq(s.stop.companyId, session.companyId), eq(s.stop.shiftId, shiftId)))
     .orderBy(asc(s.stop.startedAt));
-  return { shift: row, line: lineRow, stops };
+  const timezone = await getCompanyTimezone(session.companyId);
+  return { shift: row, line: lineRow, stops, timezone };
 }
 
 /** Roster of active operators for the hand-off picker. */

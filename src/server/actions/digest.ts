@@ -15,6 +15,7 @@ import { db } from "@/lib/db/client";
 import * as s from "@/lib/db/schema";
 import { formatPercent } from "@/lib/oee";
 import { STOP_REASONS } from "@/lib/stop-reasons";
+import { plantDateString, plantDayStartUTC, safeTimezone } from "@/lib/time";
 
 export type DigestStop = { reason: string; minutes: number };
 export type DigestLine = {
@@ -48,16 +49,22 @@ export async function buildDailyDigest(companyId: string): Promise<DigestPayload
     .limit(1);
   if (!companyRow) return null;
 
-  // "Yesterday" in server time. (Once company.timezone exists, format here.)
-  const now = new Date();
-  const start = new Date(now);
-  start.setUTCHours(0, 0, 0, 0);
-  start.setUTCDate(start.getUTCDate() - 1);
-  const end = new Date(start);
-  end.setUTCDate(end.getUTCDate() + 1);
-  const dateStr = start.toISOString().slice(0, 10);
+  // "Yesterday" in plant-tz, not server-UTC. The digest cron fires at ~6am
+  // local plant time, so "yesterday" means the previous calendar day in the
+  // plant's timezone. Filter by shift.shiftDate text so we don't have to
+  // compute UTC bounds for stops queried separately.
+  const tz = safeTimezone(companyRow.timezone);
+  const todayStr = plantDateString(new Date(), tz);
+  // dateStr = yesterday's plant-tz YYYY-MM-DD
+  const dateStr = plantDateString(
+    new Date(Date.now() - 24 * 3600 * 1000),
+    tz,
+  );
+  // UTC bounds for the day, used by stop and baseline queries
+  const start = plantDayStartUTC(dateStr, tz);
+  const end = plantDayStartUTC(todayStr, tz);
 
-  // Pull yesterday's completed shifts
+  // Pull yesterday's completed shifts (filter by plant-tz shiftDate)
   const shifts = await db
     .select({
       lineId: s.shift.lineId,
@@ -71,8 +78,7 @@ export async function buildDailyDigest(companyId: string): Promise<DigestPayload
       and(
         eq(s.shift.companyId, companyId),
         eq(s.shift.status, "complete"),
-        gte(s.shift.startedAt, start),
-        lt(s.shift.startedAt, end),
+        eq(s.shift.shiftDate, dateStr),
       ),
     );
   if (shifts.length === 0) return null;

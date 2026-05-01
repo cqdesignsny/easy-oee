@@ -9,6 +9,7 @@ import { LiveLinesGrid } from "./live-lines-grid";
 import { TrialBanner } from "./trial-banner";
 import { getAdminSession } from "@/lib/auth/admin-session";
 import { DashboardScanButton } from "@/components/scanner/DashboardScanButton";
+import { formatPlantDate, formatPlantTime, plantDateString, safeTimezone } from "@/lib/time";
 
 type ShiftType = "morning" | "afternoon" | "night";
 
@@ -35,22 +36,27 @@ export const dynamic = "force-dynamic";
  * /sign-up or /sign-in); falls back to the seeded demo tenant for the
  * legacy ADMIN_PASSWORD demo gate while we migrate everyone onto real signup.
  */
-async function getDashboardCompanyId(): Promise<{ id: string | null; trialEndsAt: Date | null; companyName: string | null }> {
+async function getDashboardCompanyId(): Promise<{ id: string | null; trialEndsAt: Date | null; companyName: string | null; timezone: string }> {
   const session = await getAdminSession();
   if (session) {
     const [row] = await db
-      .select({ id: s.company.id, name: s.company.name, trialEndsAt: s.company.trialEndsAt })
+      .select({ id: s.company.id, name: s.company.name, trialEndsAt: s.company.trialEndsAt, timezone: s.company.timezone })
       .from(s.company)
       .where(eq(s.company.id, session.companyId))
       .limit(1);
-    if (row) return { id: row.id, trialEndsAt: row.trialEndsAt, companyName: row.name };
+    if (row) return { id: row.id, trialEndsAt: row.trialEndsAt, companyName: row.name, timezone: safeTimezone(row.timezone) };
   }
   const [c] = await db
-    .select({ id: s.company.id, name: s.company.name, trialEndsAt: s.company.trialEndsAt })
+    .select({ id: s.company.id, name: s.company.name, trialEndsAt: s.company.trialEndsAt, timezone: s.company.timezone })
     .from(s.company)
     .where(eq(s.company.slug, "maple-manufacturing"))
     .limit(1);
-  return { id: c?.id ?? null, trialEndsAt: c?.trialEndsAt ?? null, companyName: c?.name ?? null };
+  return {
+    id: c?.id ?? null,
+    trialEndsAt: c?.trialEndsAt ?? null,
+    companyName: c?.name ?? null,
+    timezone: safeTimezone(c?.timezone),
+  };
 }
 
 function bucketClass(v: number | null) {
@@ -60,6 +66,7 @@ function bucketClass(v: number | null) {
 export default async function DashboardPage() {
   const company = await getDashboardCompanyId();
   const companyId = company.id;
+  const tz = company.timezone;
   const t = await getServerT();
 
   if (!companyId) {
@@ -76,10 +83,10 @@ export default async function DashboardPage() {
     );
   }
 
-  const todayStr = new Date().toISOString().slice(0, 10);
+  const todayStr = plantDateString(new Date(), tz);
 
   // Live per-line snapshot for the new grid
-  const liveLines = await getCompanyLiveLines(companyId);
+  const liveLines = await getCompanyLiveLines(companyId, tz);
 
   // Today's shifts → today's OEE (avg of completed shifts today)
   const todayShifts = await db
@@ -245,7 +252,7 @@ export default async function DashboardPage() {
                     <td>{sh.operatorName}</td>
                     <td>{t(`operator.shift.${sh.shiftType}`)}</td>
                     <td>{(sh.goodParts + sh.badParts).toLocaleString()}</td>
-                    <td>{new Date(sh.startedAt).toLocaleTimeString()}</td>
+                    <td>{formatPlantTime(sh.startedAt, tz)}</td>
                     <td><span className="pill pill-live">{t("dashboard.live")}</span></td>
                   </tr>
                 ))}
@@ -279,7 +286,7 @@ export default async function DashboardPage() {
                   const oeeNum = r.oee != null ? Number(r.oee) : null;
                   return (
                     <tr key={r.id}>
-                      <td>{r.shiftDate}</td>
+                      <td>{formatPlantDate(`${r.shiftDate}T12:00:00Z`, tz)}</td>
                       <td>{r.lineName}</td>
                       <td>{r.operatorName}</td>
                       <td>{t(`operator.shift.${r.shiftType}`)}</td>

@@ -6,10 +6,11 @@
  * current open stop, today's average OEE, and top stop reason today.
  */
 
-import { and, asc, desc, eq, gte, sql } from "drizzle-orm";
+import { and, asc, desc, eq, sql } from "drizzle-orm";
 import { db } from "../client";
 import * as s from "../schema";
 import { computeOEE } from "@/lib/oee";
+import { plantDateString, safeTimezone } from "@/lib/time";
 
 export type LineLiveState = {
   lineId: string;
@@ -34,7 +35,10 @@ export type LineLiveState = {
   topStopToday: { reason: string; minutes: number } | null;
 };
 
-export async function getCompanyLiveLines(companyId: string): Promise<LineLiveState[]> {
+export async function getCompanyLiveLines(
+  companyId: string,
+  timezone?: string,
+): Promise<LineLiveState[]> {
   const lines = await db
     .select()
     .from(s.line)
@@ -43,8 +47,18 @@ export async function getCompanyLiveLines(companyId: string): Promise<LineLiveSt
 
   if (lines.length === 0) return [];
 
-  const todayStr = new Date().toISOString().slice(0, 10);
-  const todayStart = new Date(`${todayStr}T00:00:00.000Z`);
+  // If the caller didn't pass a timezone, look it up. Caller should pass
+  // it though, to avoid a redundant company query on every dashboard tick.
+  let tz = timezone;
+  if (!tz) {
+    const [c] = await db
+      .select({ timezone: s.company.timezone })
+      .from(s.company)
+      .where(eq(s.company.id, companyId))
+      .limit(1);
+    tz = safeTimezone(c?.timezone);
+  }
+  const todayStr = plantDateString(new Date(), tz);
 
   const results: LineLiveState[] = [];
 
@@ -133,7 +147,9 @@ export async function getCompanyLiveLines(companyId: string): Promise<LineLiveSt
       };
     }
 
-    // Top stop reason today on this line
+    // Top stop reason today on this line. Filter by parent shift.shiftDate
+    // (plant-tz), not by stop.startedAt (UTC), so a 10pm-EDT shift on Apr 29
+    // doesn't have its first hour of stops counted as "Apr 30" data.
     const stopAgg = await db
       .select({
         reason: s.stop.reason,
@@ -145,7 +161,7 @@ export async function getCompanyLiveLines(companyId: string): Promise<LineLiveSt
         and(
           eq(s.stop.companyId, companyId),
           eq(s.shift.lineId, line.id),
-          gte(s.stop.startedAt, todayStart),
+          eq(s.shift.shiftDate, todayStr),
         ),
       )
       .groupBy(s.stop.reason)

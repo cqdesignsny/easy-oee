@@ -13,6 +13,7 @@ import { db } from "@/lib/db/client";
 import * as s from "@/lib/db/schema";
 import { computeOEE, formatPercent, oeeBucket } from "@/lib/oee";
 import { BoardClient } from "./board-client";
+import { plantDateString, safeTimezone } from "@/lib/time";
 
 export const revalidate = 10;
 export const dynamic = "force-dynamic";
@@ -29,8 +30,17 @@ export default async function BoardPage({
   const [line] = await db.select().from(s.line).where(eq(s.line.boardToken, token)).limit(1);
   if (!line) notFound();
 
+  // Look up the plant timezone via the line's company so the board's "today"
+  // and clock match what the manager sees on the dashboard.
+  const [companyRow] = await db
+    .select({ timezone: s.company.timezone })
+    .from(s.company)
+    .where(eq(s.company.id, line.companyId))
+    .limit(1);
+  const tz = safeTimezone(companyRow?.timezone);
+
   // Most recent in-progress shift on this line, or fall back to today's last
-  const todayStr = new Date().toISOString().slice(0, 10);
+  const todayStr = plantDateString(new Date(), tz);
   const [active] = await db
     .select()
     .from(s.shift)
@@ -156,6 +166,7 @@ export default async function BoardPage({
       topStops={stopAgg.map((x) => ({ reason: x.reason, minutes: Number(x.total) }))}
       bucket={oeeBucket(liveOee ?? todayAvgOee)}
       todayLabel={formatPercent(todayAvgOee)}
+      timezone={tz}
     />
   );
 }

@@ -15,6 +15,7 @@ import { revalidatePath } from "next/cache";
 import { db } from "@/lib/db/client";
 import * as s from "@/lib/db/schema";
 import { getAdminSession } from "@/lib/auth/admin-session";
+import { isValidTimezone } from "@/lib/time";
 
 export async function getManagerCompanyId(): Promise<string> {
   const session = await getAdminSession();
@@ -245,4 +246,41 @@ export async function deactivateOperator(formData: FormData) {
       and(eq(s.user.id, id), eq(s.user.companyId, companyId), eq(s.user.role, "operator")),
     );
   revalidatePath("/dashboard/operators");
+}
+
+// ─── Settings (company name + plant timezone) ──────────────────────────────
+
+const SettingsSchema = z.object({
+  name: z.string().min(1).max(120),
+  timezone: z.string().min(1).max(80),
+});
+
+export type SettingsState = { ok?: boolean; error?: string };
+
+export async function updateCompanySettings(
+  _prev: SettingsState,
+  formData: FormData,
+): Promise<SettingsState> {
+  const companyId = await getManagerCompanyId();
+  const parsed = SettingsSchema.safeParse({
+    name: formData.get("name"),
+    timezone: formData.get("timezone"),
+  });
+  if (!parsed.success) {
+    return { error: parsed.error.issues[0]?.message ?? "Invalid input." };
+  }
+  if (!isValidTimezone(parsed.data.timezone)) {
+    return { error: "That timezone isn't recognized. Pick one from the list." };
+  }
+  await db
+    .update(s.company)
+    .set({
+      name: parsed.data.name,
+      timezone: parsed.data.timezone,
+      updatedAt: new Date(),
+    })
+    .where(eq(s.company.id, companyId));
+  revalidatePath("/dashboard");
+  revalidatePath("/dashboard/settings");
+  return { ok: true };
 }

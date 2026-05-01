@@ -117,9 +117,9 @@ se les cobra en USD.
 
 | Plan             | Precio              | Líneas de producción | Operadores       | Historial   |
 |------------------|---------------------|----------------------|------------------|-------------|
-| **Starter**      | **$49** USD/mes     | 1 línea              | Hasta 5          | 90 días     |
-| **Professional** | **$129** USD/mes    | Hasta 5 líneas       | Hasta 25         | 1 año       |
-| **Enterprise**   | Personalizado       | Ilimitado            | Ilimitado        | Para siempre |
+| **Starter**      | **$49** USD/mes     | 1 línea              | Hasta 3                       | 30 días     |
+| **Professional** | **$129** USD/mes    | Hasta 5 líneas       | Hasta 3 por línea (15)        | 90 días     |
+| **Enterprise**   | Personalizado       | Ilimitado            | Ilimitado                     | Para siempre |
 
 **Pagas por máquina, no por trabajador.** Este es el modelo correcto
 porque el valor de medir el OEE escala con el número de máquinas
@@ -127,17 +127,17 @@ que se miden, no con el número de personas. Una planta con 100
 trabajadores y 2 máquinas paga lo mismo que una planta con 10
 trabajadores y 2 máquinas — ambas obtienen la misma información.
 
-**Prueba gratis de 14 días, sin tarjeta de crédito.**
+**Prueba gratis de 7 días, sin tarjeta de crédito.**
 
-Hay un **deslizador de número de líneas** en la página de precios
-para que los clientes puedan ver exactamente cuánto pagarían según
-su configuración antes de comprometerse.
+Precios planos por nivel — quien necesite más de 5 líneas pasa a
+Enterprise, donde cotizamos según el tamaño de la planta, número de
+líneas y necesidades de integración.
 
 ### Qué incluye cada plan
 
 **Starter ($49/mes) incluye:**
 - 1 línea de producción
-- Hasta 5 cuentas de operador
+- Hasta 3 cuentas de operador
 - Las 10 categorías de razones de paro
 - Panel de OEE en tiempo real
 - Seguimiento de turno en vivo con cronómetros
@@ -145,11 +145,11 @@ su configuración antes de comprometerse.
 - Reportes de resumen de turno
 - Exportación a CSV
 - Exportación a PDF / impresión
-- Historial de 90 días
+- Historial de 30 días
 
 **Professional ($129/mes) incluye todo lo de Starter, más:**
 - Hasta 5 líneas de producción
-- Hasta 25 cuentas de operador
+- Hasta 3 operadores por línea (15 en total)
 - Panel multi-línea con comparación de turnos
 - Gráfica de Pareto de razones de paro de los últimos 7 días
 - Vista de calendario de turnos recientes
@@ -157,7 +157,7 @@ su configuración antes de comprometerse.
 - Modo TV Board público para pantallas en piso de producción
 - Resúmenes de turno por correo
 - Resumen diario por correo (cuando se conecte Resend)
-- Historial de 1 año
+- Historial de 90 días
 
 **Enterprise (precio personalizado) incluye todo lo de Professional, más:**
 - Líneas y operadores ilimitados

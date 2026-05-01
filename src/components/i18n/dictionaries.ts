@@ -186,7 +186,7 @@ export const dictionaries: Record<Locale, Dictionary> = {
 
     // HOME — PRICING TEASE
     "home.pt.tag": "Pricing",
-    "home.pt.title.line1": "STARTS AT $39 USD/LINE/MONTH.",
+    "home.pt.title.line1": "STARTS AT $49 USD/MONTH.",
     "home.pt.title.line2": "NO SETUP FEES. EVER.",
     "home.pt.intro":
       "Priced per production line. You only pay for the lines you track. A single hour of downtime costs more than a full month of Easy OEE. The math is obvious on day one.",
@@ -198,7 +198,7 @@ export const dictionaries: Record<Locale, Dictionary> = {
     "home.pt.roi.p2.before": "At a conservative $85/minute throughput value, that's ",
     "home.pt.roi.p2.strong": "$14,280 lost per week",
     "home.pt.roi.p2.after": " on a single line.",
-    "home.pt.roi.p3": "Easy OEE Professional covers up to 5 lines for $99/month USD.",
+    "home.pt.roi.p3": "Easy OEE Professional covers up to 5 lines for $129/month USD.",
     "home.pt.roi.p4": "A 5% OEE improvement returns the entire annual cost in under 3 days.",
 
     // HOME — CTA BAND
@@ -347,7 +347,7 @@ export const dictionaries: Record<Locale, Dictionary> = {
     "roi.recover": "Recover with +{pct}% OEE",
     "roi.gained": "gained per year · +{min} min / shift / line",
     "roi.payback.label": "Easy OEE payback",
-    "roi.payback.refLine": "Reference: Easy OEE Professional at $99 USD/month ($1,188 USD/year, 5 lines).",
+    "roi.payback.refLine": "Reference: Easy OEE Professional at $129 USD/month ($1,548 USD/year, 5 lines).",
     "roi.payback.over1y": "> 1 year",
     "roi.cta": "Book a Free Demo",
 
@@ -382,11 +382,12 @@ export const dictionaries: Record<Locale, Dictionary> = {
     "pricing.feature.lines.starter": "1 production line",
     "pricing.feature.lines.pro": "Up to 5 production lines",
     "pricing.feature.lines.ent": "Unlimited lines and operators",
-    "pricing.feature.ops.starter": "Up to 5 operators",
-    "pricing.feature.ops.pro": "Up to 25 operator accounts",
+    "pricing.feature.ops.starter": "Up to 3 operators",
+    "pricing.feature.ops.pro": "Up to 3 operators per line (15 total)",
     "pricing.feature.stops": "All 10 stop reason categories",
     "pricing.feature.dash": "Real-time OEE dashboard",
     "pricing.feature.reports": "Shift summary reports",
+    "pricing.feature.history30": "30-day data history",
     "pricing.feature.history90": "90-day data history",
     "pricing.feature.compare": "Multi-line comparison",
     "pricing.feature.supervisor": "Supervisor dashboard",
@@ -621,6 +622,8 @@ export const dictionaries: Record<Locale, Dictionary> = {
     "signup.disclaimer": "No charge today. We'll prompt for billing on day 8 if you decide to keep going.",
     "signup.haveAccount": "Already have an account?",
     "signup.signInHere": "Sign in here",
+    "signup.timezone.label": "Plant timezone (auto-detected):",
+    "signup.timezone.change": "Change",
 
     // TRIAL BANNER
     "trial.daysLeft": "{n} days left in your free trial",
@@ -716,8 +719,24 @@ export const dictionaries: Record<Locale, Dictionary> = {
     "mgr.nav.shifts": "Shifts",
     "mgr.nav.lines": "Lines",
     "mgr.nav.operators": "Operators",
+    "mgr.nav.settings": "Settings",
     "mgr.nav.startShift": "Start Shift",
     "mgr.nav.signOut": "Sign out",
+
+    // SETTINGS
+    "settings.tag": "Settings",
+    "settings.title": "PLANT SETTINGS",
+    "settings.lead": "Plant name and timezone. Changing the timezone affects how dates appear in exports, the dashboard, and the daily digest.",
+    "settings.companyName": "Plant / Company Name",
+    "settings.timezone": "Plant Timezone",
+    "settings.timezone.help": "Used for shift dates, the daily digest, and the CSV export. Should match the local time at your plant.",
+    "settings.timezone.preview": "Right now in this timezone:",
+    "settings.timezone.previewSavedAs": "saved value:",
+    "settings.slugLabel": "Account slug:",
+    "settings.planLabel": "Plan:",
+    "settings.save": "Save changes",
+    "settings.saving": "Saving…",
+    "settings.saved": "Saved.",
 
     // THEME
     "theme.light": "Light",
@@ -950,7 +969,7 @@ export const dictionaries: Record<Locale, Dictionary> = {
       "Las plataformas empresariales de OEE quieren $2,000 al mes y seis meses para implementarse. Easy OEE estaba corriendo en nuestro piso la misma tarde que nos registramos. La diferencia es del cielo a la tierra.",
 
     "home.pt.tag": "Precios",
-    "home.pt.title.line1": "DESDE $39 USD/LÍNEA/MES.",
+    "home.pt.title.line1": "DESDE $49 USD/MES.",
     "home.pt.title.line2": "SIN COSTOS DE INSTALACIÓN. NUNCA.",
     "home.pt.intro":
       "Precio por línea de producción. Solo pagas por las líneas que rastreas. Una sola hora de paro cuesta más que un mes completo de Easy OEE. La cuenta es obvia desde el primer día.",
@@ -962,7 +981,7 @@ export const dictionaries: Record<Locale, Dictionary> = {
     "home.pt.roi.p2.before": "A un valor conservador de $85/minuto de producción, eso es ",
     "home.pt.roi.p2.strong": "$14,280 perdidos por semana",
     "home.pt.roi.p2.after": " en una sola línea.",
-    "home.pt.roi.p3": "Easy OEE Professional cubre hasta 5 líneas por $99 USD/mes.",
+    "home.pt.roi.p3": "Easy OEE Professional cubre hasta 5 líneas por $129 USD/mes.",
     "home.pt.roi.p4":
       "Una mejora de 5% en OEE recupera el costo anual completo en menos de 3 días.",
 
@@ -1107,7 +1126,7 @@ export const dictionaries: Record<Locale, Dictionary> = {
     "roi.losing": "Estás perdiendo",
     "roi.recover": "Recupera con +{pct}% de OEE",
     "roi.payback.label": "Retorno de Easy OEE",
-    "roi.payback.refLine": "Referencia: Easy OEE Professional a $99 USD/mes ($1,188 USD/año, 5 líneas).",
+    "roi.payback.refLine": "Referencia: Easy OEE Professional a $129 USD/mes ($1,548 USD/año, 5 líneas).",
     "roi.payback.over1y": "> 1 año",
     "roi.cta": "Reserva una Demo Gratis",
 
@@ -1141,11 +1160,12 @@ export const dictionaries: Record<Locale, Dictionary> = {
     "pricing.feature.lines.starter": "1 línea de producción",
     "pricing.feature.lines.pro": "Hasta 5 líneas de producción",
     "pricing.feature.lines.ent": "Líneas y operadores ilimitados",
-    "pricing.feature.ops.starter": "Hasta 5 operadores",
-    "pricing.feature.ops.pro": "Hasta 25 cuentas de operador",
+    "pricing.feature.ops.starter": "Hasta 3 operadores",
+    "pricing.feature.ops.pro": "Hasta 3 operadores por línea (15 en total)",
     "pricing.feature.stops": "Las 10 categorías de razones de paro",
     "pricing.feature.dash": "Panel OEE en tiempo real",
     "pricing.feature.reports": "Reportes de resumen de turno",
+    "pricing.feature.history30": "30 días de historial",
     "pricing.feature.history90": "90 días de historial",
     "pricing.feature.compare": "Comparación multilínea",
     "pricing.feature.supervisor": "Panel de supervisor",
@@ -1371,6 +1391,8 @@ export const dictionaries: Record<Locale, Dictionary> = {
     "signup.disclaimer": "Sin cargo hoy. Le solicitaremos el pago el día 8 si decide continuar.",
     "signup.haveAccount": "¿Ya tiene una cuenta?",
     "signup.signInHere": "Inicie sesión aquí",
+    "signup.timezone.label": "Zona horaria de la planta (detectada automáticamente):",
+    "signup.timezone.change": "Cambiar",
 
     // TRIAL BANNER
     "trial.daysLeft": "Quedan {n} días en su prueba gratuita",
@@ -1464,8 +1486,24 @@ export const dictionaries: Record<Locale, Dictionary> = {
     "mgr.nav.shifts": "Turnos",
     "mgr.nav.lines": "Líneas",
     "mgr.nav.operators": "Operadores",
+    "mgr.nav.settings": "Configuración",
     "mgr.nav.startShift": "Iniciar Turno",
     "mgr.nav.signOut": "Cerrar sesión",
+
+    // SETTINGS
+    "settings.tag": "Configuración",
+    "settings.title": "CONFIGURACIÓN DE PLANTA",
+    "settings.lead": "Nombre de la planta y zona horaria. Cambiar la zona horaria afecta cómo aparecen las fechas en exportaciones, el panel y el resumen diario.",
+    "settings.companyName": "Nombre de la Planta / Empresa",
+    "settings.timezone": "Zona Horaria de la Planta",
+    "settings.timezone.help": "Se usa para fechas de turnos, el resumen diario y la exportación a CSV. Debe coincidir con la hora local de su planta.",
+    "settings.timezone.preview": "Ahora mismo en esta zona:",
+    "settings.timezone.previewSavedAs": "valor guardado:",
+    "settings.slugLabel": "Identificador de cuenta:",
+    "settings.planLabel": "Plan:",
+    "settings.save": "Guardar cambios",
+    "settings.saving": "Guardando…",
+    "settings.saved": "Guardado.",
 
     // THEME
     "theme.light": "Claro",
@@ -1697,7 +1735,7 @@ export const dictionaries: Record<Locale, Dictionary> = {
       "Les plateformes OEE d'entreprise demandent 2 000 $ par mois et six mois pour la mise en place. Easy OEE tournait sur notre plancher l'après-midi même de l'inscription. La différence est le jour et la nuit.",
 
     "home.pt.tag": "Tarifs",
-    "home.pt.title.line1": "À PARTIR DE 39 $ USD/LIGNE/MOIS.",
+    "home.pt.title.line1": "À PARTIR DE 49 $ USD/MOIS.",
     "home.pt.title.line2": "AUCUNS FRAIS D'INSTALLATION. JAMAIS.",
     "home.pt.intro":
       "Tarifé par ligne de production. Vous ne payez que pour les lignes que vous suivez. Une seule heure d'arrêt coûte plus qu'un mois complet d'Easy OEE. Le calcul est évident dès le premier jour.",
@@ -1709,7 +1747,7 @@ export const dictionaries: Record<Locale, Dictionary> = {
     "home.pt.roi.p2.before": "À une valeur conservatrice de 85 $/minute de production, c'est ",
     "home.pt.roi.p2.strong": "14 280 $ perdus par semaine",
     "home.pt.roi.p2.after": " sur une seule ligne.",
-    "home.pt.roi.p3": "Easy OEE Professional couvre jusqu'à 5 lignes pour 99 $ USD/mois.",
+    "home.pt.roi.p3": "Easy OEE Professional couvre jusqu'à 5 lignes pour 129 $ USD/mois.",
     "home.pt.roi.p4":
       "Une amélioration de 5 % du OEE rembourse le coût annuel complet en moins de 3 jours.",
 
@@ -1854,7 +1892,7 @@ export const dictionaries: Record<Locale, Dictionary> = {
     "roi.losing": "Vous perdez",
     "roi.recover": "Récupérez avec +{pct} % d'OEE",
     "roi.payback.label": "Retour Easy OEE",
-    "roi.payback.refLine": "Référence : Easy OEE Professional à 99 $ USD/mois (1 188 $ USD/an, 5 lignes).",
+    "roi.payback.refLine": "Référence : Easy OEE Professional à 129 $ USD/mois (1 548 $ USD/an, 5 lignes).",
     "roi.payback.over1y": "> 1 an",
     "roi.cta": "Réserver une Démo Gratuite",
 
@@ -1889,11 +1927,12 @@ export const dictionaries: Record<Locale, Dictionary> = {
     "pricing.feature.lines.starter": "1 ligne de production",
     "pricing.feature.lines.pro": "Jusqu'à 5 lignes de production",
     "pricing.feature.lines.ent": "Lignes et opérateurs illimités",
-    "pricing.feature.ops.starter": "Jusqu'à 5 opérateurs",
-    "pricing.feature.ops.pro": "Jusqu'à 25 comptes opérateur",
+    "pricing.feature.ops.starter": "Jusqu'à 3 opérateurs",
+    "pricing.feature.ops.pro": "Jusqu'à 3 opérateurs par ligne (15 au total)",
     "pricing.feature.stops": "Les 10 catégories de raisons d'arrêt",
     "pricing.feature.dash": "Tableau de bord OEE en temps réel",
     "pricing.feature.reports": "Rapports de résumé de quart",
+    "pricing.feature.history30": "30 jours d'historique",
     "pricing.feature.history90": "90 jours d'historique",
     "pricing.feature.compare": "Comparaison multi-lignes",
     "pricing.feature.supervisor": "Tableau de bord superviseur",
@@ -2119,6 +2158,8 @@ export const dictionaries: Record<Locale, Dictionary> = {
     "signup.disclaimer": "Aucun frais aujourd'hui. Nous demanderons un mode de paiement au jour 8 si vous continuez.",
     "signup.haveAccount": "Vous avez déjà un compte ?",
     "signup.signInHere": "Connectez-vous ici",
+    "signup.timezone.label": "Fuseau horaire de l'usine (détecté automatiquement) :",
+    "signup.timezone.change": "Modifier",
 
     // TRIAL BANNER
     "trial.daysLeft": "Il reste {n} jours à votre essai gratuit",
@@ -2212,8 +2253,24 @@ export const dictionaries: Record<Locale, Dictionary> = {
     "mgr.nav.shifts": "Quarts",
     "mgr.nav.lines": "Lignes",
     "mgr.nav.operators": "Opérateurs",
+    "mgr.nav.settings": "Paramètres",
     "mgr.nav.startShift": "Démarrer un Quart",
     "mgr.nav.signOut": "Déconnexion",
+
+    // SETTINGS
+    "settings.tag": "Paramètres",
+    "settings.title": "PARAMÈTRES DE L'USINE",
+    "settings.lead": "Nom de l'usine et fuseau horaire. Modifier le fuseau horaire affecte l'affichage des dates dans les exports, le tableau de bord et le résumé quotidien.",
+    "settings.companyName": "Nom de l'Usine / Entreprise",
+    "settings.timezone": "Fuseau Horaire de l'Usine",
+    "settings.timezone.help": "Utilisé pour les dates de quart, le résumé quotidien et l'export CSV. Doit correspondre à l'heure locale de votre usine.",
+    "settings.timezone.preview": "Maintenant dans ce fuseau :",
+    "settings.timezone.previewSavedAs": "valeur enregistrée :",
+    "settings.slugLabel": "Identifiant du compte :",
+    "settings.planLabel": "Plan :",
+    "settings.save": "Enregistrer",
+    "settings.saving": "Enregistrement…",
+    "settings.saved": "Enregistré.",
 
     // THEME
     "theme.light": "Clair",

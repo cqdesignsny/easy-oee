@@ -1,24 +1,28 @@
 # HANDOFF — Pick this up on a different machine
 
-> **You are switching machines mid-build.** Read this top-to-bottom before doing anything else. Everything you need to continue is in this repo. Last updated: 2026-04-29 (analytics module + light/dark theme toggle + style sweep).
+> **You are switching machines mid-build.** Read this top-to-bottom before doing anything else. Everything you need to continue is in this repo. Last updated: 2026-05-01 (timezone overhaul + new pricing tiers + manager settings page).
 
 ## State of the world right now
 
-- ✅ App is **deployed and working** at https://easy-oee.vercel.app
+- ✅ App is **deployed and working** at https://easy-oee.com (cutover from `vercel.app` complete) and https://easy-oee.vercel.app
+- ✅ **Time and dates are now plant-timezone correct everywhere.** Single source of truth in `src/lib/time.ts` (`plantDateString`, `formatPlantDate`, `formatPlantTime`, `formatPlantDateTime`, `formatPlantDateTimeMachine`, `plantDayStartUTC`). Every shift writes its `shiftDate` in plant-tz, not UTC, so a 10pm-EDT shift no longer shows up as "tomorrow." Dashboard "today" boundaries, daily digest "yesterday", line-state "top stop today", CSV export — all use the company's IANA `timezone` field. Auto-detected on signup via `Intl.DateTimeFormat().resolvedOptions().timeZone`, changeable in `/dashboard/settings`.
+- ✅ **CSV export now machine-readable in plant-tz.** Started At / Ended At / stop times all formatted as `YYYY-MM-DD HH:MM:SS TZ` (e.g. `2026-04-30 10:26:00 EDT`) with an explicit `Timezone` row at the top. No more ISO `Z` strings.
+- ✅ **Pricing updated** (2026-05-01): Starter $49 USD/mo (1 line, 3 operators, 30-day history) · Pro $129 USD/mo (5 lines, 3 ops/line / 15 total, 90-day history) · Enterprise (custom, anyone needing more lines). Flat pricing — no per-line surcharge. Stripe price IDs still pending Louis's RBC verification.
+- ✅ **Manager Settings page live** at `/dashboard/settings` — change plant name + IANA timezone, with a live "now" preview that updates as you switch zones, plus the saved value for comparison.
 - ✅ **Analytics module live** at `/dashboard/analytics` — overview (OEE / A / P / Q for last 30 days, 14-day sparkline, drill-in cards), plus three deep-dives: by shift type, by machine (with vs-target bars), by operator (leaderboard cards + table). Multi-tenant, scoped via `getAdminSession` with seed fallback. Adapted from Louis's spec into i18n + real theme tokens.
 - ✅ **Light / dark theme toggle** on every surface — manager sidebar, operator setup, sign-in, pin, demo landing, marketing nav (desktop + mobile). `eo-theme` cookie read SSR-side so first paint matches preference. Both themes share the brand teal accent; light theme flips background + text.
 - ✅ **Sales demo path live** at `/demo` — prospects pick "Enter as Manager" or "Enter as Operator" with no login. Sticky `DEMO MODE` banner across every app screen with `Sign Up Free` CTA + per-route tip cards (now including all four analytics routes).
-- ✅ **Self-serve signup live** at `/sign-up` — real flow creates company + manager user (bcrypt password) with a 7-day trial, lands on `/dashboard` with countdown banner. No credit card. Stripe billing wires in later.
+- ✅ **Self-serve signup live** at `/sign-up` — real flow creates company + manager user (bcrypt password) with a 7-day trial, lands on `/dashboard` with countdown banner. No credit card. Plant timezone is auto-detected from the browser at signup (e.g. "America/Toronto") and stored on `company.timezone`. Stripe billing wires in later.
 - ✅ **Live machines grid** at top of `/dashboard` — per-line cards with running/stopped pill, big OEE, current operator, parts, elapsed timer, top stop today. Auto-refreshes every 10s.
 - ✅ **Barcode/QR scanner** wired for **job numbers** — scan or type a work-order/job number on operator shift setup AND on manager edit-shift; visible on live shift, summary, dashboards, CSV export. Native `BarcodeDetector` API with `@zxing/browser` fallback. Plus a header "Scan code → clipboard" utility on the manager dashboard.
 - ✅ **Mobile audit complete** — fixed broken hamburger menu (backdrop-filter containing-block trap), dashboard header overlap on phones, manager sidebar bottom-row layout. Verified at 375×812 across all marketing + app routes.
 - ✅ **Style sweep done** — em-dash pause-breaks gone from user-facing strings (EN/ES/FR), JSDoc headers cleaned. No decoration emojis in user strings. `"—"` still used as null-data placeholder in tables (that's correct typography).
 - ✅ All Tier 1-4 product upgrades from the Apr 7 batch still live: live shift timers, downtime card, long-stop notes, hand-off, shift comparison, loss tree, calendar grid, edit-shift, TV Board, daily digest cron, weekly anomaly cron, PWA manifest.
 - ✅ Schema is **in sync with Neon** (auto-applied via `prebuild` migration runner; runner bug that silently skipped comment-headed migrations was fixed in `scripts/migrate.mjs`).
-- ✅ `pnpm test` 13/13 · `pnpm typecheck` clean · `pnpm lint` clean · `pnpm build` clean
-- 🟡 Stripe still on stub (501) — wires into the existing `/sign-up` schema fields whenever you're ready.
-- 🟡 Resend still on stub — `src/server/actions/shift-export.ts` already validates input, just needs `resend.emails.send()` swapped in.
-- 🟡 Clerk migration is open — current per-company HMAC password works, can move to Clerk later without breaking accounts.
+- ✅ `pnpm test` 30/30 · `pnpm typecheck` clean · `pnpm lint` clean · `pnpm build` clean
+- 🟡 Stripe wiring queued for when Louis finishes RBC + Stripe live-mode verification — stubs at `/api/checkout/session` and `/api/webhooks/stripe` are 501. Plug the live price IDs into `src/lib/pricing.ts` (Starter $49, Pro $129) and flip the stubs.
+- 🟡 Clerk integration queued for the next batch — Google + Microsoft sign-in for managers. `user.clerk_user_id` already exists; migration is additive.
+- 🟡 Resend still on stub — `src/server/actions/shift-export.ts` already validates input, just needs `resend.emails.send()` swapped in. Will reuse the new plant-tz formatters for the email body.
 - 🟡 Loading/error/404 states + Sentry still pending.
 
 **To test the live app:**

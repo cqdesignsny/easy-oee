@@ -11,6 +11,7 @@ import {
   clearAdminCookie,
   verifyAdminPassword,
 } from "@/lib/auth/admin-session";
+import { DEFAULT_TIMEZONE, isValidTimezone } from "@/lib/time";
 
 export type AdminSignInState = { error?: string };
 export type SignUpState = { error?: string; ok?: boolean };
@@ -83,6 +84,7 @@ const SignUpSchema = z.object({
   password: z.string().min(8, "Password must be at least 8 characters."),
   plan: z.enum(["starter", "pro"]).default("pro"),
   lines: z.coerce.number().int().min(1).max(50).default(2),
+  timezone: z.string().max(80).optional(),
 });
 
 const TRIAL_DAYS = 7;
@@ -102,6 +104,7 @@ export async function signUpManager(
     password: formData.get("password"),
     plan: formData.get("plan"),
     lines: formData.get("lines"),
+    timezone: formData.get("timezone"),
   });
   if (!parsed.success) {
     return { error: parsed.error.issues[0]?.message ?? "Invalid input." };
@@ -132,6 +135,9 @@ export async function signUpManager(
 
   const trialEndsAt = new Date(Date.now() + TRIAL_DAYS * 24 * 3600 * 1000);
   const passwordHash = await bcrypt.hash(parsed.data.password, 10);
+  const timezone = isValidTimezone(parsed.data.timezone)
+    ? parsed.data.timezone
+    : DEFAULT_TIMEZONE;
 
   const [companyRow] = await db
     .insert(s.company)
@@ -142,6 +148,7 @@ export async function signUpManager(
       trialEndsAt,
       licensedLines: parsed.data.lines,
       subscriptionStatus: "trialing",
+      timezone,
     })
     .returning();
 

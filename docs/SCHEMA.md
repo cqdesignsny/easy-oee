@@ -192,6 +192,26 @@ preceded the auto-migration system.
 | `user` | `password_hash` | `text` (nullable) | bcrypt for manager email+password login. Null on operators. | `drizzle/0001_user_password_hash.sql` |
 | `shift` | `job_number` | `text` (nullable) | Optional work-order / job ticket number. Operator types or scans on shift setup; manager can edit later. Visible on live shift, summary, dashboards, CSV export. | `drizzle/0002_shift_job_number.sql` |
 
+## Recent additions (2026-05-01 — timezone overhaul)
+
+No new columns. The existing `company.timezone` field (added 2026-04-07,
+default `America/Toronto`) is now actually used everywhere:
+
+- **Writes**: `shift.shiftDate` is computed in plant-tz, not UTC, so a
+  10pm-EDT shift records as the local date instead of "tomorrow" UTC.
+- **Reads**: dashboard "today's OEE", live grid "today avg", line-state
+  "top stop today", daily digest "yesterday", and the shifts admin page
+  all filter by plant-tz `shiftDate` (text), not by UTC `startedAt`.
+- **Display**: CSV export, summary downtime table, dashboard recent shifts,
+  live-shift timer, and the TV board clock all format with `Intl.DateTimeFormat({ timeZone })`.
+- **Capture**: `/sign-up` auto-detects the browser zone via
+  `Intl.DateTimeFormat().resolvedOptions().timeZone` and stores it on the
+  new company. Manager can change it later at `/dashboard/settings`.
+
+All formatters live in `src/lib/time.ts`. Use `formatPlantDateTimeMachine`
+for CSV / email exports (`2026-04-30 10:26:00 EDT`) and
+`formatPlantDateTime` / `formatPlantDate` / `formatPlantTime` for UI.
+
 **Migration runner gotcha (fixed):** `scripts/migrate.mjs` previously
 filtered out any chunk starting with `--`, so SQL files that opened with
 a doc-block comment got silently skipped while still being recorded as

@@ -107,11 +107,11 @@ All prices are in **USD per month**, billed monthly or annually (annual
 gets a discount). Approximate Canadian dollar conversions are shown as
 a reference but customers are charged in USD.
 
-| Plan             | Price                | Production lines | Operators       | Data history |
-|------------------|----------------------|------------------|-----------------|--------------|
-| **Starter**      | **$49** USD/mo       | 1 line           | Up to 5         | 90 days      |
-| **Professional** | **$129** USD/mo      | Up to 5 lines    | Up to 25        | 1 year       |
-| **Enterprise**   | Custom               | Unlimited        | Unlimited       | Forever      |
+| Plan             | Price                | Production lines | Operators                 | Data history |
+|------------------|----------------------|------------------|---------------------------|--------------|
+| **Starter**      | **$49** USD/mo       | 1 line           | Up to 3                   | 30 days      |
+| **Professional** | **$129** USD/mo      | Up to 5 lines    | Up to 3 per line (15)     | 90 days      |
+| **Enterprise**   | Custom               | Unlimited        | Unlimited                 | Forever      |
 
 **You pay per machine, not per worker.** This is the right model because
 the value of OEE measurement scales with the number of machines being
@@ -119,16 +119,17 @@ measured, not with the number of people. A plant with 100 workers and
 2 machines pays the same as a plant with 10 workers and 2 machines —
 both get the same insight.
 
-**14-day free trial, no credit card required.**
+**7-day free trial, no credit card required.**
 
-There's a **line-count slider** on the pricing page so customers can
-see exactly what they'd pay for their setup before committing.
+Pricing is **flat per tier** — anyone needing more than 5 lines goes to
+Enterprise, where we quote based on plant size, line count, and
+integration needs.
 
 ### What's in each plan
 
 **Starter ($49/mo) includes:**
 - 1 production line
-- Up to 5 operator accounts
+- Up to 3 operator accounts
 - All 10 stop reason categories
 - Real-time OEE dashboard
 - Live shift tracking with timers
@@ -136,11 +137,11 @@ see exactly what they'd pay for their setup before committing.
 - Shift summary reports
 - CSV export
 - PDF / print export
-- 90-day data history
+- 30-day data history
 
 **Professional ($129/mo) includes everything in Starter, plus:**
 - Up to 5 production lines
-- Up to 25 operator accounts
+- Up to 3 operators per line (15 total)
 - Multi-line dashboard with shift comparison
 - 7-day Pareto chart of stop reasons
 - Calendar grid view of recent shifts
@@ -148,7 +149,7 @@ see exactly what they'd pay for their setup before committing.
 - Public TV Board mode for shop floor displays
 - Email shift summaries
 - Daily digest email (when wired to Resend)
-- 1-year data history
+- 90-day data history
 
 **Enterprise (custom pricing) includes everything in Professional, plus:**
 - Unlimited lines and operators

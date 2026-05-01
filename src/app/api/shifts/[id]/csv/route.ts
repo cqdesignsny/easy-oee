@@ -12,6 +12,11 @@ import * as s from "@/lib/db/schema";
 import { getOperatorSession } from "@/lib/auth/operator-session";
 import { getAdminSession } from "@/lib/auth/admin-session";
 import { stopReasonLabel } from "@/lib/stop-reasons";
+import {
+  formatPlantDate,
+  formatPlantDateTimeMachine,
+  safeTimezone,
+} from "@/lib/time";
 
 function csvEscape(value: unknown): string {
   if (value == null) return "";
@@ -49,6 +54,13 @@ export async function GET(
     return NextResponse.json({ error: "not_found" }, { status: 404 });
   }
 
+  const [companyRow] = await db
+    .select({ timezone: s.company.timezone })
+    .from(s.company)
+    .where(eq(s.company.id, shiftRow.companyId))
+    .limit(1);
+  const tz = safeTimezone(companyRow?.timezone);
+
   const [lineRow] = await db
     .select()
     .from(s.line)
@@ -78,21 +90,15 @@ export async function GET(
   lines.push("Easy OEE Shift Summary");
   lines.push("");
   lines.push(row("Shift ID", shiftRow.id));
-  lines.push(row("Date", shiftRow.shiftDate));
+  lines.push(row("Date", formatPlantDate(`${shiftRow.shiftDate}T12:00:00Z`, tz)));
   lines.push(row("Line", lineRow?.name ?? ""));
   lines.push(row("Operator", operator?.fullName ?? ""));
   lines.push(row("Shift Type", shiftRow.shiftType));
   lines.push(row("Product", shiftRow.product));
   lines.push(row("Job Number", shiftRow.jobNumber ?? ""));
-  lines.push(
-    row(
-      "Started At",
-      shiftRow.startedAt ? new Date(shiftRow.startedAt).toISOString() : "",
-    ),
-  );
-  lines.push(
-    row("Ended At", shiftRow.endedAt ? new Date(shiftRow.endedAt).toISOString() : ""),
-  );
+  lines.push(row("Timezone", tz));
+  lines.push(row("Started At", formatPlantDateTimeMachine(shiftRow.startedAt, tz)));
+  lines.push(row("Ended At", formatPlantDateTimeMachine(shiftRow.endedAt, tz)));
   lines.push(row("Status", shiftRow.status));
   lines.push("");
   lines.push("OEE Metrics");
@@ -116,8 +122,8 @@ export async function GET(
     lines.push(
       row(
         stopReasonLabel(stop.reason),
-        stop.startedAt ? new Date(stop.startedAt).toISOString() : "",
-        stop.endedAt ? new Date(stop.endedAt).toISOString() : "",
+        formatPlantDateTimeMachine(stop.startedAt, tz),
+        formatPlantDateTimeMachine(stop.endedAt, tz),
         stop.minutes ?? "",
         stop.notes ?? "",
       ),

@@ -69,10 +69,10 @@ Legend: 🟢 done · 🟡 in progress · ⚪ queued · 🔵 blocked
 
 ### Auth
 - 🟢 **Per-company HMAC manager auth (pre-Clerk)** — email + bcrypt `password_hash`, signed `eo_admin` cookie 14-day TTL with `userId` + `companyId`, legacy `ADMIN_PASSWORD` env var still resolves to seed tenant for backwards compat
-- 🟢 **Self-serve signup at `/sign-up`** — creates `company` + manager `user` with 7-day `trial_ends_at`, sets cookie, lands on `/dashboard`
+- 🟢 **Self-serve signup at `/sign-up`** — creates `company` + manager `user` with 7-day `trial_ends_at`, captures auto-detected plant timezone, sets cookie, lands on `/dashboard`
 - 🟢 **`/demo` no-login entrypoint** — sets admin + operator cookies on the seeded tenant + `eo_demo` marker cookie. Sticky DEMO MODE banner across all `(app)` routes with `Sign Up Free` CTA + per-route tip cards.
 - 🟢 Operator PIN flow (`/pin`, `eo_op` cookie, 12h TTL, `OPERATOR_SESSION_SECRET`)
-- ⚪ Migrate to Clerk for managers when growth demands it (schema already has `user.clerk_user_id`; migration is additive)
+- 🟡 **Clerk migration queued for next batch** — Google + Microsoft sign-in for managers. `user.clerk_user_id` already exists; migration is additive, won't break existing accounts.
 
 ### Polish
 - 🟢 App shell layout with sidebar nav for managers
@@ -98,13 +98,13 @@ Legend: 🟢 done · 🟡 in progress · ⚪ queued · 🔵 blocked
 
 ## Phase 2 — Sell
 
-- 🟡 Stripe billing scaffold (Starter $39 / Professional $99 USD/mo with line overage / Enterprise custom)
-  - 🟢 `src/lib/pricing.ts` config with USD prices and CAD reference
-  - 🟢 `/sign-up` page with plan + line count + email capture
+- 🟡 Stripe billing scaffold (Starter $49 / Professional $129 USD/mo flat / Enterprise custom)
+  - 🟢 `src/lib/pricing.ts` flat-pricing config with USD prices and CAD reference
+  - 🟢 `/sign-up` page with plan + line count + email + auto-detected timezone
   - 🟢 `/api/checkout/session` and `/api/webhooks/stripe` route stubs (return 501)
   - 🟢 Schema fields: company.stripe_subscription_id / stripe_price_id / licensed_lines / subscription_status
-  - ⚪ Wire actual Stripe SDK once Stripe account + price IDs are created
-  - ⚪ Trial countdown banner + plan limits enforcement
+  - 🟡 Wire actual Stripe SDK once Louis finishes the RBC + Stripe live-mode verification
+  - 🟢 Trial countdown banner; ⚪ plan limits enforcement (5-line cap on Pro, 3-ops cap on Starter, 15-ops on Pro)
 - ⚪ Manager invitation flow (invite teammate by email)
 - 🟡 Email notifications via Resend
   - 🟢 Server action scaffold (`src/server/actions/shift-export.ts`) — validates email + auth, ready for `resend.emails.send()` swap
@@ -142,6 +142,16 @@ Legend: 🟢 done · 🟡 in progress · ⚪ queued · 🔵 blocked
 - 🟢 **Job number** schema column (`shift.job_number`) + scan-or-type input on operator shift setup + manager edit-shift
 - 🟢 Job number displayed on live shift, summary, dashboard recent shifts, full shifts admin, per-shift CSV export
 - 🟢 Dashboard header **Scan code → clipboard** utility for ad-hoc reads with green "Copied!" toast
+
+### Plant timezone + time correctness (NEW — shipped 2026-05-01)
+- 🟢 `src/lib/time.ts` — single source of truth for plant-tz formatting (date, time, datetime, machine-readable, day-start UTC)
+- 🟢 `shift.shiftDate` writes use plant-tz date, not UTC (fixes the "tomorrow" bug after 8pm local)
+- 🟢 Dashboard "today's OEE" / "live shifts" / "top stop today" all use plant-tz day boundaries
+- 🟢 Daily digest cron computes "yesterday" in plant tz per company
+- 🟢 CSV export formatted in plant tz with explicit Timezone row (`2026-04-30 10:26:00 EDT`)
+- 🟢 Auto-detect timezone at signup via `Intl.DateTimeFormat().resolvedOptions().timeZone`
+- 🟢 Manager Settings page (`/dashboard/settings`) — change plant name + tz with live preview
+- 🟢 17 new unit tests in `src/lib/time.test.ts` covering plant-date math, formatters, DST edge cases
 
 ## Phase 4 — Hardware ingest
 

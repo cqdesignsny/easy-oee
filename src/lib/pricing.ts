@@ -37,10 +37,10 @@ export const PLANS: Record<PlanId, Plan> = {
   starter: {
     id: "starter",
     name: "Starter",
-    baseMonthlyUSD: 39,
+    baseMonthlyUSD: 49,
     includedLines: 1,
     extraLineUSD: 0,
-    maxOperators: 5,
+    maxOperators: 3,
     stripePriceId: null,
     stripeExtraLinePriceId: null,
     featureKeys: [
@@ -49,16 +49,16 @@ export const PLANS: Record<PlanId, Plan> = {
       "pricing.feature.stops",
       "pricing.feature.dash",
       "pricing.feature.reports",
-      "pricing.feature.history90",
+      "pricing.feature.history30",
     ],
   },
   pro: {
     id: "pro",
     name: "Professional",
-    baseMonthlyUSD: 99,
+    baseMonthlyUSD: 129,
     includedLines: 5,
-    extraLineUSD: 19,
-    maxOperators: 25,
+    extraLineUSD: 0,
+    maxOperators: 15,
     stripePriceId: null,
     stripeExtraLinePriceId: null,
     featureKeys: [
@@ -67,7 +67,7 @@ export const PLANS: Record<PlanId, Plan> = {
       "pricing.feature.compare",
       "pricing.feature.supervisor",
       "pricing.feature.csv",
-      "pricing.feature.history1y",
+      "pricing.feature.history90",
     ],
   },
   enterprise: {
@@ -105,10 +105,15 @@ export function fmtCAD(n: number): string {
 /**
  * Compute monthly cost for a plan + line count.
  * Returns USD; CAD is derived via usdToCad().
+ *
+ * Starter and Pro are flat-priced — anyone needing more than the included
+ * lines goes to Enterprise. There is no per-line surcharge. The lines
+ * argument is kept in the signature so callers (the sign-up slider, the
+ * pricing card) can keep their existing call sites; it has no effect today.
  */
 export function monthlyCostUSD(planId: PlanId, lines: number): number {
   const plan = PLANS[planId];
   if (planId === "enterprise") return 0;
-  const extra = Math.max(0, lines - plan.includedLines);
-  return plan.baseMonthlyUSD + extra * plan.extraLineUSD;
+  void lines;
+  return plan.baseMonthlyUSD;
 }
