@@ -212,6 +212,29 @@ All formatters live in `src/lib/time.ts`. Use `formatPlantDateTimeMachine`
 for CSV / email exports (`2026-04-30 10:26:00 EDT`) and
 `formatPlantDateTime` / `formatPlantDate` / `formatPlantTime` for UI.
 
+### 2026-05-08 — AI Coach storage + integrations
+
+Two columns added to `company` (migration `0003_ai_coach_columns.sql`):
+
+| Column | Type | Notes |
+|---|---|---|
+| `ai_coach_report` | `text` nullable | Latest weekly analysis as JSON. Refreshed by `/api/cron/ai-coach` (Mondays 11:00 UTC) or by the manager clicking Generate / Regenerate at `/dashboard/analytics/ai-coach`. JSON shape: `{ weekSummary, topInsight, oeeThisWeek, oeePrevWeek, oeeChange, actions: ActionPlan[3], generatedAt, locale }`. Action statuses (pending / approved / edited / rejected) live inside the JSON, not in a separate table. |
+| `ai_coach_generated_at` | `timestamptz` nullable | When the report was last refreshed. |
+
+Webhook-populated columns (existing, but worth flagging now that Stripe
+is wired):
+
+- `stripe_customer_id` — set by `/api/webhooks/stripe` on `checkout.session.completed`
+- `stripe_subscription_id` — same
+- `stripe_price_id` — set on subscription updates; resolved back to `plan` enum via `STRIPE_PRICE_STARTER` / `STRIPE_PRICE_PRO` env vars
+- `licensed_lines` — kept in sync with `subscription.items.data[0].quantity`
+- `subscription_status` — tracks Stripe status (`active`, `trialing`, `past_due`, `canceled`)
+
+Clerk integration uses the existing `user.clerk_user_id` column (added
+2026-04-07 baseline). The `/onboarding` action stores the Clerk
+user ID on the row at company-creation time; `/post-clerk-signin` looks
+up the local user by it.
+
 **Migration runner gotcha (fixed):** `scripts/migrate.mjs` previously
 filtered out any chunk starting with `--`, so SQL files that opened with
 a doc-block comment got silently skipped while still being recorded as

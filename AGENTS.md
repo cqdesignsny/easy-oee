@@ -25,18 +25,19 @@ Easy OEE is a SaaS app for SME manufacturers (Canada + US) to track Overall Equi
 
 ## Stack — non-negotiable defaults
 
-- **Next.js 16** App Router + **TypeScript** strict
+- **Next.js 16** App Router + **TypeScript** strict. Middleware lives at `src/proxy.ts` (Next.js 16 renamed `middleware.ts` → `proxy.ts`).
 - **Tailwind v4** + **shadcn/ui** for all UI primitives
-- **Drizzle ORM** + **Neon Postgres** (Vercel Marketplace)
-- **Clerk** planned for manager auth (currently a temporary HMAC-cookie admin password from `ADMIN_PASSWORD`); **custom PIN-login** for operators on shared tablets
-- **Stripe** for payments — scaffold ready in `src/lib/pricing.ts`, `/sign-up`, and `/api/checkout/session` and `/api/webhooks/stripe` route stubs (return 501 until wired)
+- **Drizzle ORM** + **Neon Postgres** (Marketplace integration on `easyoeepro` Vercel team)
+- **Clerk** for new manager signups (`@clerk/nextjs@7.3.2`) — `/auth/sign-up` + `/auth/sign-in` + `/onboarding` + `/post-clerk-signin` bridge. Legacy HMAC-cookie path (`/sign-in` + `/sign-up`) still active for trial users not yet migrated. Operator auth stays on the custom 4-digit PIN flow (Clerk is wrong for shared shop-floor tablets).
+- **Stripe** live mode wired against Louis's "Easy OEE Pro" account (`acct_1TRaMUBt1JkiFLKl`). `src/lib/stripe.ts` is the SDK entry. `/api/checkout/session` creates subscription Checkout Sessions with `quantity = lineCount`. `/api/webhooks/stripe` verifies signatures and handles the 5 subscription-lifecycle events.
+- **AI Gateway** for any LLM call. Use `@ai-sdk/gateway` + `ai`'s `generateText` / `generateObject`. Model strings use dots (`anthropic/claude-sonnet-4.6`, `anthropic/claude-haiku-4.5`). Do NOT add `@anthropic-ai/sdk` or call `api.anthropic.com` directly — OIDC handles auth via `vercel env pull`.
 - **i18n via React Context** — EN/ES/FR dictionaries in `src/components/i18n/dictionaries.ts`. Client components use `useT()`, server components use `await getServerT()`. Locale persisted in `eo-locale` cookie. **When adding user-facing copy, add the key in all 3 languages.**
 - **Server Actions** over API routes for mutations whenever possible
 - **Zod** for validation at all server boundaries
 - **pnpm** as the package manager (never npm/yarn)
-- Deploy to **Vercel**
+- Deploy to **Vercel** (`easyoeepro` team)
 
-Don't introduce alternatives (Prisma, NextAuth, Supabase, etc.) without an explicit ADR in `docs/decisions/`.
+Don't introduce alternatives (Prisma, NextAuth, Supabase, direct Anthropic SDK, etc.) without an explicit ADR in `docs/decisions/`.
 
 ## Code conventions
 

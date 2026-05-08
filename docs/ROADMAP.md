@@ -98,14 +98,28 @@ Legend: 🟢 done · 🟡 in progress · ⚪ queued · 🔵 blocked
 
 ## Phase 2 — Sell
 
-- 🟡 Stripe billing scaffold (Starter $49 / Professional $129 USD/mo flat / Enterprise custom)
-  - 🟢 `src/lib/pricing.ts` flat-pricing config with USD prices and CAD reference
-  - 🟢 `/sign-up` page with plan + line count + email + auto-detected timezone
-  - 🟢 `/api/checkout/session` and `/api/webhooks/stripe` route stubs (return 501)
-  - 🟢 Schema fields: company.stripe_subscription_id / stripe_price_id / licensed_lines / subscription_status
-  - 🟡 Wire actual Stripe SDK once Louis finishes the RBC + Stripe live-mode verification
-  - 🟢 Trial countdown banner; ⚪ plan limits enforcement (5-line cap on Pro, 3-ops cap on Starter, 15-ops on Pro)
-- ⚪ Manager invitation flow (invite teammate by email)
+- 🟢 **Stripe billing fully wired** (Starter $83/line/mo · Pro $129/line/mo · Enterprise custom — per-line model)
+  - 🟢 `src/lib/pricing.ts` per-line config — USD primary with CAD reference, slider drives `quantity` × per-line rate
+  - 🟢 `src/lib/stripe.ts` — lazy SDK client + `priceIdForPlan()` helper
+  - 🟢 `/api/checkout/session` POST creates a subscription Checkout Session with `quantity = lines`
+  - 🟢 `/api/webhooks/stripe` verifies `Stripe-Signature` and handles `checkout.session.completed`, `customer.subscription.{created,updated,deleted}`, `invoice.payment_failed`
+  - 🟢 `/dashboard/billing` page lets a manager pick plan + lines, click Subscribe, redirect to Stripe Checkout
+  - 🟢 Trial banner Upgrade button now points to `/dashboard/billing`
+  - 🟢 Stripe products on Louis's "Easy OEE Pro" account (`acct_1TRaMUBt1JkiFLKl`) — Starter $114 CAD, Pro $177 CAD recurring monthly
+  - 🟢 Webhook endpoint registered at `https://easy-oee.com/api/webhooks/stripe` listening to the 5 subscription-lifecycle events
+  - 🟢 Schema fields populated by webhook: `stripe_customer_id`, `stripe_subscription_id`, `stripe_price_id`, `licensed_lines`, `subscription_status`, `plan`
+  - 🟡 Smoke test end-to-end with a real card (refund after)
+  - ⚪ Plan-limit enforcement at use-time (e.g. block creating a 6th line on Starter)
+- 🟢 **Clerk wired alongside legacy HMAC** (additive migration, no breaking change)
+  - 🟢 `@clerk/nextjs@7.3.2` installed; `<ClerkProvider>` in root layout; `src/proxy.ts` runs `clerkMiddleware()`
+  - 🟢 `/auth/sign-up/[[...sign-up]]` Clerk hosted SignUp (Email + Google + Microsoft)
+  - 🟢 `/auth/sign-in/[[...sign-in]]` Clerk hosted SignIn
+  - 🟢 `/onboarding` collects company info post-Clerk-signup, creates company + local user with `clerk_user_id`, sets HMAC cookie
+  - 🟢 `/post-clerk-signin` bridge after Clerk sign-in — looks up local user, sets HMAC cookie, redirects to `/dashboard`
+  - 🟢 Legacy `/sign-in` `/sign-up` (HMAC password) still work for trial users; gradual migration
+  - ⚪ Backfill existing trial users into Clerk
+  - ⚪ Retire HMAC password code path + `ADMIN_PASSWORD` demo backdoor
+- ⚪ Manager invitation flow (invite teammate by email) — Clerk's invitation API
 - 🟡 Email notifications via Resend
   - 🟢 Server action scaffold (`src/server/actions/shift-export.ts`) — validates email + auth, ready for `resend.emails.send()` swap
   - 🟢 Inline "Email it" form on shift summary
@@ -132,6 +146,8 @@ Legend: 🟢 done · 🟡 in progress · ⚪ queued · 🔵 blocked
 - 🟢 **Analytics module at `/dashboard/analytics`** — overview (OEE/A/P/Q over 30 days, 14-day SVG sparkline, drill-in cards) + three deep-dives: by shift, by machine (vs-target bars), by operator (leaderboard cards + table). Multi-tenant, scoped via `getAdminSession` with seed fallback.
 - 🟢 **14-day OEE trend sparkline** (analytics overview)
 - 🟢 **Operator leaderboard** (`/dashboard/analytics/operators`) — ranked by avg OEE with full A/P/Q breakdown
+- 🟢 **Job Orders module** (`/dashboard/analytics/jobs` + detail) — rolls up shifts by `shift.job_number` over 90 days, per-operator timeline, Pareto stops per order, CSV export. Available to all plans.
+- 🟢 **AI Coach module** (`/dashboard/analytics/ai-coach`) — weekly Claude Sonnet 4.6 analysis via Vercel AI Gateway, 3 prioritized action plans per tenant, manager approves/edits/rejects each. Cron at Mondays 11:00 UTC. JSON stored on `company.ai_coach_report`. Available to all plans.
 - ⚪ Weekly + monthly OEE trend lines (longer windows than the 14-day sparkline)
 - ⚪ Per-line drill-down page (`/dashboard/analytics/machines/[id]` — currently the machines page is a flat list)
 - ⚪ Custom stop reason categories per company
@@ -178,13 +194,23 @@ See `docs/HARDWARE-INTEGRATION.md`.
 
 ## Open questions (also in `PROJECT.md`)
 
-- [ ] Final pricing model with Louis ($49/$129 vs $99/line)
+- [x] Final pricing model: **per-line $83 USD Starter / $129 USD Pro** (decided 2026-05-07, Stripe products created in CAD at $114 / $177 to match)
 - [ ] Domain split (`app.easy-oee.com` vs `/app` prefix)
-- [ ] Stripe vs Lemon Squeezy (LS handles Canadian sales tax)
+- [x] Stripe vs Lemon Squeezy: **Stripe** (live mode active under Louis's account, 2026-05-08)
 - [ ] Hardware target (Pi vs ESP32 vs industrial gateway)
 - [ ] French localization timing
 
 ## Recent activity
+
+- **2026-05-08** — Project transfer + integrations sprint:
+  - **Project transferred** from `cq-marketings-projects/easy-oee` to `easyoeepro/easy-oee` (Louis's new Vercel team, Pro plan). Cesar added as Member. Domain followed the project. New Neon DB provisioned via Marketplace; data migrated via `pg_dump`/`pg_restore` (row counts preserved 7/9/9/27/54/1/4). Old Neon on `cq-marketings-projects` left idle as safety net.
+  - **AI Gateway swap** (commit `01276db`): replaced `@anthropic-ai/sdk` direct calls in `src/lib/ai/coach.ts` and the daily-digest narrative in `src/server/actions/digest.ts` with `@ai-sdk/gateway`. AI Coach uses `anthropic/claude-sonnet-4.6` with prompt-cache control on the system message; daily digest uses `anthropic/claude-haiku-4.5`. Dropped `ANTHROPIC_API_KEY` env requirement — OIDC handles auth on Vercel deployments.
+  - **Stripe wiring** (commit `c30821b`): full checkout + webhook against Louis's "Easy OEE Pro" account. Per-line subscription via `quantity` field. New `/dashboard/billing` page, trial banner Upgrade button repointed there. Five subscription-lifecycle events handled: `checkout.session.completed`, `customer.subscription.created/updated/deleted`, `invoice.payment_failed`. Webhook endpoint registered in Stripe dashboard, signing secret in Vercel env.
+  - **Clerk auth** (commit `c4afa31`): added alongside legacy HMAC. New `/auth/sign-up` and `/auth/sign-in` use Clerk's hosted components (Email + Google + Microsoft). After Clerk sign-up, `/onboarding` collects company info and creates local DB rows. After Clerk sign-in, `/post-clerk-signin` bridges to HMAC cookie so existing `getAdminSession()` calls keep working. Legacy email/password still accepted at `/sign-in` `/sign-up` for trial users not yet migrated.
+  - **AI Coach + Job Orders modules** (commit `c0ed66d`): `/dashboard/analytics/jobs` rolls up shifts by `shift.job_number`. `/dashboard/analytics/ai-coach` runs weekly Claude analysis with manager approval flow. Both available to all plans.
+  - **Per-line pricing**: Starter $83 USD/line, Pro $129 USD/line (Stripe denominates in CAD at $114 / $177 to match what Louis sells locally). Stripe products on the live Easy OEE Pro account.
+  - **Verified clean:** typecheck / lint / vitest 30/30 / production build all green throughout.
+- **2026-04-29 (late)** — Light-mode polish + theme toggle redesign (commit on top of `a3427ab`):
 
 - **2026-04-29 (late)** — Light-mode polish + theme toggle redesign (commit on top of `a3427ab`):
   - Marketing nav now follows the theme. Replaced hardcoded dark-teal background and `--white` text with `--nav-bg` / `--nav-text` / `--nav-border` tokens that flip per theme. Tightened nav links to 15px with `white-space: nowrap` so they fit alongside the new toggle.

@@ -2,10 +2,11 @@
 
 > Real-time OEE tracking for smart manufacturers. Built for the shop floor. Up and running in one shift.
 
-**Live:** [easy-oee.vercel.app](https://easy-oee.vercel.app) · **Demo (no login):** [easy-oee.vercel.app/demo](https://easy-oee.vercel.app/demo) · **Sign up (7-day free trial):** [easy-oee.vercel.app/sign-up](https://easy-oee.vercel.app/sign-up)
-**Domain:** [easy-oee.com](https://easy-oee.com) (currently serving Louis's static marketing HTML — DNS cutover pending)
+**Live:** [easy-oee.com](https://easy-oee.com) · **Demo (no login):** [easy-oee.com/demo](https://easy-oee.com/demo) · **Sign up (7-day free trial):** [easy-oee.com/auth/sign-up](https://easy-oee.com/auth/sign-up)
 **GitHub:** https://github.com/cqdesignsny/easy-oee
-**Status:** Phase 1 + Phase 2-foundation + Phase 3 (Insights) shipped. Marketing site, operator flow, manager dashboard, admin pages, EN/ES/FR i18n, animated hero gauge, **live machines grid**, **/demo with banner + per-route tips**, **self-serve 7-day trial signup**, **barcode/QR scanner for job numbers**, **analytics module (overview + by shift / machine / operator)**, **light/dark theme toggle on every surface**, Tier 1-4 product upgrades. Stripe + Resend + Clerk on stubs.
+**Vercel team:** `easyoeepro` (Louis's account)
+**Stripe account:** "Easy OEE Pro" (Louis's, live mode)
+**Status:** Phases 1-3 shipped + integrations live: **Stripe billing**, **Clerk auth** (alongside legacy HMAC), **AI Gateway** (Claude Sonnet 4.6 + Haiku 4.5 via Vercel AI Gateway, no direct API keys). New modules **AI Coach** (`/dashboard/analytics/ai-coach`) and **Job Orders** (`/dashboard/analytics/jobs`) available to all plans. Per-line pricing $83 / $129 USD ($114 / $177 CAD). Resend wiring is the only major integration still pending.
 
 > **Picking this up on a new machine?** Start with [`docs/HANDOFF.md`](./docs/HANDOFF.md).
 
@@ -41,12 +42,15 @@ Operators tap-to-log shifts and machine stops on a tablet on the shop floor. Pla
 |-------------|-------------------------------------------------|
 | Framework   | Next.js 16 (App Router) + TypeScript strict     |
 | Styling     | Tailwind CSS v4 + custom CSS (ported design)    |
-| Database    | Neon Postgres (Vercel Marketplace)              |
+| Database    | Neon Postgres (Marketplace on `easyoeepro` team) |
 | ORM         | Drizzle                                         |
-| Auth        | Custom HMAC cookie sessions (admin + operator). Clerk integration planned. |
-| Payments    | Stripe (scaffold ready, not yet wired)          |
+| Manager auth| Clerk (`@clerk/nextjs@7.3.2`) for new signups + custom HMAC cookie for legacy trial users (dual-auth via `/post-clerk-signin` bridge) |
+| Operator auth | Custom 4-digit PIN + `eo_op` HMAC cookie (12h TTL) |
+| Payments    | Stripe live mode (`stripe@22.x`) — checkout + webhooks wired |
+| AI          | Vercel AI Gateway via `ai@6.x` + `@ai-sdk/gateway` — Sonnet 4.6 (AI Coach) + Haiku 4.5 (daily digest narrative) |
+| Email       | Resend (pending — `console.log` stub today)     |
 | i18n        | React Context + cookie + `useSyncExternalStore` (EN/ES/FR) |
-| Hosting     | Vercel                                          |
+| Hosting     | Vercel Pro (`easyoeepro` team, transferred 2026-05-08) |
 | Package mgr | pnpm                                            |
 | Domain      | easy-oee.com                                    |
 
@@ -64,8 +68,9 @@ See [`docs/ARCHITECTURE.md`](./docs/ARCHITECTURE.md) for the full rationale.
 - `/sign-up` — Stripe trial signup scaffold (plan + line count + email/company)
 
 ### App
-- `/sign-in` — manager login (email + bcrypt password lookup, falls back to legacy `ADMIN_PASSWORD` env var, Demo + Sign Up CTAs, language switcher)
-- `/sign-up` — **real self-serve signup** with 7-day trial: creates `company` + manager `user`, sets HMAC admin cookie, lands on `/dashboard`. No credit card. Stripe wires in later.
+- `/auth/sign-in` `/auth/sign-up` — **Clerk hosted** sign-in / sign-up (Email + Google + Microsoft). After sign-up, lands on `/onboarding` to create company info. After sign-in, `/post-clerk-signin` bridges Clerk → HMAC cookie → dashboard.
+- `/onboarding` — post-Clerk-signup form: company name + lines + auto-detected timezone. Creates company + local user with `clerk_user_id`, sets HMAC `eo_admin` cookie, redirects to `/dashboard`.
+- `/sign-in` `/sign-up` — **legacy HMAC** flows (email + bcrypt). Existing trial users keep working here. `/sign-in` also accepts the legacy `ADMIN_PASSWORD` demo backdoor.
 - `/demo` — **live sales demo**: pick "Enter as Manager" or "Enter as Operator" (no login). Both seed into the demo tenant. Sticky DEMO MODE banner with Sign Up Free CTA + per-route tip cards.
 - `/pin` — operator name picker + 4-digit keypad (bcrypt verify)
 - `/operator` — shift setup form with **optional Job Number** field (type or scan barcode/QR), redirects in-progress shifts
@@ -76,10 +81,13 @@ See [`docs/ARCHITECTURE.md`](./docs/ARCHITECTURE.md) for the full rationale.
 - `/dashboard/analytics/shifts` — per-shift-type comparison + Pareto stops broken out by shift
 - `/dashboard/analytics/machines` — per-line summary table, OEE-vs-target horizontal bars, Pareto stops per machine
 - `/dashboard/analytics/operators` — leaderboard cards (#1 highlighted), detail table sorted by OEE, Pareto stops per operator
-- `/dashboard/lines` `/dashboard/operators` `/dashboard/shifts` — admin CRUD pages. Shifts admin includes Job # column + edit-shift with scanner-enabled job number field.
+- `/dashboard/analytics/jobs` — **NEW: Job Orders module**. List of every work order tracked via `shift.job_number` over the last 90 days, with totals + unique operators + unique lines + avg OEE. Detail page rolls up shifts by job, per-operator timeline, shift breakdown, Pareto stops. CSV export at `/api/analytics/jobs/[jobNumber]/export`.
+- `/dashboard/analytics/ai-coach` — **NEW: AI Coach module**. Weekly 3-action analysis via Claude Sonnet 4.6 through Vercel AI Gateway. Manager approves / edits / rejects each action. Cron at Mondays 11:00 UTC. JSON stored on `company.ai_coach_report`.
+- `/dashboard/billing` — **NEW**. Pick plan + line count → POST `/api/checkout/session` → redirect to Stripe Checkout. Shows current plan + status + trial countdown.
+- `/dashboard/lines` `/dashboard/operators` `/dashboard/shifts` `/dashboard/settings` — admin CRUD pages. Shifts admin includes Job # column + edit-shift with scanner-enabled job number field.
 - `/board/[token]` — public TV board for shop-floor displays
 - **Shift export** — Download CSV / Print or save PDF / Email it (scaffold) buttons on `/shift/[id]/summary`. CSV via `/api/shifts/[id]/csv` route handler includes Job Number row.
-- API stubs at `/api/checkout/session` and `/api/webhooks/stripe` (return 501 until Stripe is wired)
+- `/api/checkout/session` + `/api/webhooks/stripe` — **fully wired** against Louis's live Stripe account.
 
 ### Internationalization
 - 3 locales: **English / Español / Français** with browser-language auto-detect

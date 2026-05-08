@@ -1,36 +1,54 @@
 # HANDOFF — Pick this up on a different machine
 
-> **You are switching machines mid-build.** Read this top-to-bottom before doing anything else. Everything you need to continue is in this repo. Last updated: 2026-05-01 (timezone overhaul + new pricing tiers + manager settings page).
+> **You are switching machines mid-build.** Read this top-to-bottom before doing anything else. Everything you need to continue is in this repo. Last updated: 2026-05-08 (project transfer to Louis's `easyoeepro` Vercel team + Stripe + Clerk + AI Gateway + Job Orders + AI Coach).
 
 ## State of the world right now
 
-- ✅ App is **deployed and working** at https://easy-oee.com (cutover from `vercel.app` complete) and https://easy-oee.vercel.app
-- ✅ **Time and dates are now plant-timezone correct everywhere.** Single source of truth in `src/lib/time.ts` (`plantDateString`, `formatPlantDate`, `formatPlantTime`, `formatPlantDateTime`, `formatPlantDateTimeMachine`, `plantDayStartUTC`). Every shift writes its `shiftDate` in plant-tz, not UTC, so a 10pm-EDT shift no longer shows up as "tomorrow." Dashboard "today" boundaries, daily digest "yesterday", line-state "top stop today", CSV export — all use the company's IANA `timezone` field. Auto-detected on signup via `Intl.DateTimeFormat().resolvedOptions().timeZone`, changeable in `/dashboard/settings`.
-- ✅ **CSV export now machine-readable in plant-tz.** Started At / Ended At / stop times all formatted as `YYYY-MM-DD HH:MM:SS TZ` (e.g. `2026-04-30 10:26:00 EDT`) with an explicit `Timezone` row at the top. No more ISO `Z` strings.
-- ✅ **Pricing updated** (2026-05-01): Starter $49 USD/mo (1 line, 3 operators, 30-day history) · Pro $129 USD/mo (5 lines, 3 ops/line / 15 total, 90-day history) · Enterprise (custom, anyone needing more lines). Flat pricing — no per-line surcharge. Stripe price IDs still pending Louis's RBC verification.
-- ✅ **Manager Settings page live** at `/dashboard/settings` — change plant name + IANA timezone, with a live "now" preview that updates as you switch zones, plus the saved value for comparison.
-- ✅ **Analytics module live** at `/dashboard/analytics` — overview (OEE / A / P / Q for last 30 days, 14-day sparkline, drill-in cards), plus three deep-dives: by shift type, by machine (with vs-target bars), by operator (leaderboard cards + table). Multi-tenant, scoped via `getAdminSession` with seed fallback. Adapted from Louis's spec into i18n + real theme tokens.
-- ✅ **Light / dark theme toggle** on every surface — manager sidebar, operator setup, sign-in, pin, demo landing, marketing nav (desktop + mobile). `eo-theme` cookie read SSR-side so first paint matches preference. Both themes share the brand teal accent; light theme flips background + text.
-- ✅ **Sales demo path live** at `/demo` — prospects pick "Enter as Manager" or "Enter as Operator" with no login. Sticky `DEMO MODE` banner across every app screen with `Sign Up Free` CTA + per-route tip cards (now including all four analytics routes).
-- ✅ **Self-serve signup live** at `/sign-up` — real flow creates company + manager user (bcrypt password) with a 7-day trial, lands on `/dashboard` with countdown banner. No credit card. Plant timezone is auto-detected from the browser at signup (e.g. "America/Toronto") and stored on `company.timezone`. Stripe billing wires in later.
-- ✅ **Live machines grid** at top of `/dashboard` — per-line cards with running/stopped pill, big OEE, current operator, parts, elapsed timer, top stop today. Auto-refreshes every 10s.
-- ✅ **Barcode/QR scanner** wired for **job numbers** — scan or type a work-order/job number on operator shift setup AND on manager edit-shift; visible on live shift, summary, dashboards, CSV export. Native `BarcodeDetector` API with `@zxing/browser` fallback. Plus a header "Scan code → clipboard" utility on the manager dashboard.
-- ✅ **Mobile audit complete** — fixed broken hamburger menu (backdrop-filter containing-block trap), dashboard header overlap on phones, manager sidebar bottom-row layout. Verified at 375×812 across all marketing + app routes.
-- ✅ **Style sweep done** — em-dash pause-breaks gone from user-facing strings (EN/ES/FR), JSDoc headers cleaned. No decoration emojis in user strings. `"—"` still used as null-data placeholder in tables (that's correct typography).
-- ✅ All Tier 1-4 product upgrades from the Apr 7 batch still live: live shift timers, downtime card, long-stop notes, hand-off, shift comparison, loss tree, calendar grid, edit-shift, TV Board, daily digest cron, weekly anomaly cron, PWA manifest.
-- ✅ Schema is **in sync with Neon** (auto-applied via `prebuild` migration runner; runner bug that silently skipped comment-headed migrations was fixed in `scripts/migrate.mjs`).
-- ✅ `pnpm test` 30/30 · `pnpm typecheck` clean · `pnpm lint` clean · `pnpm build` clean
-- 🟡 Stripe wiring queued for when Louis finishes RBC + Stripe live-mode verification — stubs at `/api/checkout/session` and `/api/webhooks/stripe` are 501. Plug the live price IDs into `src/lib/pricing.ts` (Starter $49, Pro $129) and flip the stubs.
-- 🟡 Clerk integration queued for the next batch — Google + Microsoft sign-in for managers. `user.clerk_user_id` already exists; migration is additive.
-- 🟡 Resend still on stub — `src/server/actions/shift-export.ts` already validates input, just needs `resend.emails.send()` swapped in. Will reuse the new plant-tz formatters for the email body.
+### Ownership and infrastructure
+- ✅ **Project lives on Louis's `easyoeepro` Vercel team** (transferred 2026-05-08 from `cq-marketings-projects`). Domain `easy-oee.com` followed the project. CI/CD auto-deploys from `main` on the new team.
+- ✅ **Cesar (`cqdesignsny@gmail.com`) is added as a Member** on `easyoeepro`. Use `vercel switch easyoeepro` then `vercel link --yes --project easy-oee` after pulling the SSD onto a new machine.
+- ✅ **Fresh Neon DB** provisioned via Marketplace on the new team (`easy-oee-db` on the `aws-us-east-1` host). All data migrated cleanly via `pg_dump`/`pg_restore` — row counts (7 companies / 9 users / 9 lines / 27 shifts / 54 stops / 1 demo_lead / 4 migrations) match the source DB exactly. The OLD Neon project on `cq-marketings-projects` is idle but still alive as a safety net — decommission via "Remove Integration" once you're 24-48h confident on the new one.
+- ✅ **Vercel Pro** active on `easyoeepro`. AI Gateway enabled with $5 free credits attached.
+- ✅ **Vercel CLI** at 53.2.0 (latest as of 2026-05-08).
+
+### Integrations live
+- ✅ **AI Gateway** — both AI call sites route through `@ai-sdk/gateway`. No more `ANTHROPIC_API_KEY` in env. AI Coach uses `anthropic/claude-sonnet-4.6` with prompt-cache control on the system message; daily digest narrative uses `anthropic/claude-haiku-4.5`. OIDC auth on Vercel; `vercel env pull` provides a 12h token for local.
+- ✅ **Stripe (live mode)** — fully wired against Louis's "Easy OEE Pro" account (`acct_1TRaMUBt1JkiFLKl`). `/api/checkout/session` creates a subscription Checkout Session with `quantity = lineCount`; `/api/webhooks/stripe` handles `checkout.session.completed`, `customer.subscription.{created,updated,deleted}`, and `invoice.payment_failed`. New `/dashboard/billing` lets a manager pick a plan + line count and start the checkout. Trial banner Upgrade button now points there.
+- ✅ **Clerk (test mode)** — alongside the legacy HMAC password flow. `/auth/sign-up` and `/auth/sign-in` use Clerk's hosted components (Email + Google + Microsoft). After sign-up, `/onboarding` collects company info and creates the local DB rows. After sign-in, `/post-clerk-signin` looks up the local user, sets the HMAC `eo_admin` cookie (so every existing `getAdminSession()` call keeps working), and forwards to `/dashboard`. Existing legacy `/sign-up` and `/sign-in` (HMAC password) still work — gradual migration.
+
+### Product modules
+- ✅ **AI Coach** at `/dashboard/analytics/ai-coach` — Mondays at 11:00 UTC the cron generates 3 prioritized action plans per tenant. Manager can also click Generate / Regenerate on demand. Approve / Edit / Reject each action. JSON stored on `company.ai_coach_report`. Available to all plans (no plan gate — it's the conversion hook).
+- ✅ **Job Orders** at `/dashboard/analytics/jobs` — list + per-order detail page, rolls up shifts by `shift.job_number`. CSV export at `/api/analytics/jobs/[jobNumber]/export`. Available to all plans.
+- ✅ **Per-line pricing**: Starter **$83 USD / line / month** (≈ $114 CAD), Pro **$129 USD / line / month** (≈ $177 CAD). Enterprise custom. AI Coach + Job Orders included on every tier; Pro adds analytics deep-dives + 90-day history + 5 ops/line vs 3 ops/line.
+- ✅ **Plant-timezone correctness everywhere** — `src/lib/time.ts` is the single source of truth (`plantDateString`, `formatPlantDate`, `formatPlantTime`, `formatPlantDateTime`, `formatPlantDateTimeMachine`, `plantDayStartUTC`).
+- ✅ **CSV export** machine-readable in plant-tz with explicit Timezone row.
+- ✅ **Manager Settings page** at `/dashboard/settings` — change plant name + IANA timezone with live "now" preview.
+- ✅ **Analytics module** at `/dashboard/analytics` — overview + by shift / machine / operator / job / AI Coach.
+- ✅ **Light / dark theme toggle** on every surface (segmented control with both labels visible).
+- ✅ **Sales demo** at `/demo` — Manager + Operator no-login entry into the seeded Maple Manufacturing tenant.
+- ✅ **Live machines grid** on `/dashboard` — auto-refresh 10s.
+- ✅ **Barcode/QR scanner** for job numbers + clipboard utility.
+- ✅ **All Tier 1-4 product upgrades** still live: live shift timers, downtime card, long-stop notes, hand-off, shift comparison, loss tree, calendar grid, edit-shift, TV Board, daily digest cron, weekly anomaly cron, PWA manifest.
+- ✅ Schema is in sync with Neon (auto-applied via `prebuild` migration runner). 4 migrations applied: 0000 baseline, 0001 user.password_hash, 0002 shift.job_number, 0003 ai_coach columns.
+- ✅ Verification suite: `pnpm test` 30/30, typecheck clean, lint clean, full production build clean.
+
+### Pending
+- 🟡 **Smoke-test Stripe end-to-end** — sign up a test tenant, click Upgrade, complete Stripe Checkout with a real card, verify webhook flips `subscription_status=active`, refund yourself.
+- 🟡 **Smoke-test Clerk sign-up** — `/auth/sign-up`, complete, land on `/onboarding`, fill form, end up on `/dashboard`.
+- 🟡 **Rotate the Stripe secret + Stripe webhook secret + Clerk secret** — all four were visible in chat at some point during wiring. Roll them in their respective dashboards (Stripe → API keys → Roll; Stripe → Webhooks → ⋯ Roll signing secret; Clerk → API Keys → Regenerate). Paste new values back; they get pushed to Vercel and a redeploy picks them up.
+- 🟡 **Resend** — `src/server/actions/shift-export.ts` is still the `console.log` stub. Need to verify `easy-oee.com` sending domain in Resend, grab API key, install SDK, write `src/emails/ShiftSummary.tsx` template, swap the `console.log`.
+- 🟡 **Decommission old Neon** on `cq-marketings-projects` once 24-48h confidence on the new DB is reached.
+- 🟡 **Migrate legacy HMAC trial users to Clerk** — currently both auth paths coexist. Eventually retire the HMAC code path and the `ADMIN_PASSWORD` demo backdoor.
 - 🟡 Loading/error/404 states + Sentry still pending.
 
-**To test the live app:**
+### To test the live app
 
-1. **Quickest demo (no login):** visit https://easy-oee.vercel.app/demo → pick **Enter as Manager** for the dashboard or **Enter as Operator** for the tablet flow. The DEMO MODE banner has a Sign Up Free CTA at the top.
-2. **Real signup (creates a tenant):** https://easy-oee.vercel.app/sign-up → fill form → land on `/dashboard` with a 7-day trial banner.
-3. **Legacy demo password (still works for backwards compat):** https://easy-oee.vercel.app/sign-in with any email + `EasyOEE2026Admin` lands you in the seeded Maple Manufacturing tenant.
-4. **Operator tablet flow:** https://easy-oee.vercel.app/pin → pick **Pierre Lavoie**, PIN `1234`.
+1. **Quickest demo (no login):** https://easy-oee.com/demo → pick Manager or Operator
+2. **New Clerk sign-up:** https://easy-oee.com/auth/sign-up → email/Google/Microsoft → onboarding → dashboard
+3. **Legacy sign-up (HMAC password):** https://easy-oee.com/sign-up → email + password → trial dashboard
+4. **Legacy demo password:** https://easy-oee.com/sign-in with any email + `EasyOEE2026Admin` → seeded Maple Manufacturing tenant
+5. **Stripe checkout test:** sign up any way, click Upgrade in trial banner → `/dashboard/billing` → Subscribe with Stripe → real card, refund after
+6. **Operator tablet flow:** https://easy-oee.com/pin → Pierre Lavoie, PIN `1234`
 
 ---
 
@@ -126,12 +144,13 @@ Once the toolchain is up, everything in `package.json` Just Works.
 | | |
 |---|---|
 | **Product** | Easy OEE — real-time OEE tracking SaaS for Canadian SME manufacturers |
-| **Domain (live marketing)** | https://easy-oee.com (still serving Louis's static HTML) |
-| **GitHub** | https://github.com/cqdesignsny/easy-oee (private) |
-| **Vercel project** | `cq-marketings-projects/easy-oee` |
+| **Domain (live)** | https://easy-oee.com (DNS cutover complete, app behind it) |
+| **GitHub** | https://github.com/cqdesignsny/easy-oee (private, still under cqdesignsny) |
+| **Vercel project** | `easyoeepro/easy-oee` (transferred from cq-marketings-projects on 2026-05-08) |
 | **Vercel prod URL** | https://easy-oee.vercel.app |
-| **GitHub account** | cqdesignsny |
-| **Vercel account** | cqdesignsny |
+| **Vercel team owner** | Louis (easy-oee.com email), Cesar added as Member |
+| **Stripe account** | "Easy OEE Pro" (`acct_1TRaMUBt1JkiFLKl`) — Louis's |
+| **Clerk app** | `bold-dolphin-70.clerk.accounts.dev` (test mode for now) |
 | **Founder** | Louis (CQ's cousin) |
 | **Engineering lead** | CQ |
 
@@ -139,8 +158,10 @@ Once the toolchain is up, everything in `package.json` Just Works.
 
 - **Next.js 16.2.2** App Router + **TypeScript strict** + **Turbopack**
 - **Tailwind v4**
-- **Drizzle ORM** + **Neon Postgres** (not yet provisioned — see "Open work" below)
-- **Clerk** (managers) + custom **PIN login** (operators) — not yet wired
+- **Drizzle ORM** + **Neon Postgres** (Marketplace integration on `easyoeepro` team, host `ep-purple-surf-aq3bj8go.c-8.us-east-1.aws.neon.tech`)
+- **Clerk** for new manager auth (`@clerk/nextjs@7.3.2`) + custom **HMAC cookie** for legacy trial users + **PIN login** for operators
+- **Stripe** for billing (`stripe@22.x`) — `/api/checkout/session` + `/api/webhooks/stripe` both live
+- **AI Gateway** via `ai@6.x` + `@ai-sdk/gateway@3.x` — no direct provider keys, OIDC auto-injected
 - **pnpm** package manager (never npm/yarn)
 - **Vercel** hosting, GitHub auto-deploys on push to `main`
 

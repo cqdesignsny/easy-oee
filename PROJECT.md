@@ -29,15 +29,18 @@ We make it $49–$129/month, web-only, and live within one shift.
 | Asset | Status |
 |---|---|
 | Brand + name | ✅ Easy OEE |
-| Domain `easy-oee.com` | ✅ Purchased, **live** with marketing site |
-| Marketing site (3 HTML pages) | ✅ Live at easy-oee.com (built by Louis) |
-| Bubble prototype | ⚠️ Built but buggy — being **abandoned** in favor of Next.js |
-| Next.js production app | 🚧 In progress (this repo) |
-| Postgres (Neon) | 🚧 To provision via Vercel Marketplace |
-| Clerk auth | 🚧 To provision |
-| Vercel project | 🚧 To create + link |
-| Stripe billing | ⏳ Phase 3 |
+| Domain `easy-oee.com` | ✅ Live, app deployed behind it |
+| Next.js production app | ✅ Phases 1-3 shipped, on Louis's Vercel team `easyoeepro` |
+| Postgres (Neon) | ✅ Live on `easyoeepro` Marketplace integration |
+| Clerk auth | ✅ Live (test mode) at `/auth/sign-in` and `/auth/sign-up`, alongside legacy HMAC |
+| Vercel project | ✅ `easyoeepro/easy-oee` (Pro plan, transferred 2026-05-08) |
+| Stripe billing | ✅ Live mode wired against Louis's "Easy OEE Pro" account (`acct_1TRaMUBt1JkiFLKl`) |
+| AI Gateway | ✅ Enabled with $5 free credits; both AI call sites route through `@ai-sdk/gateway` |
+| AI Coach module | ✅ Live at `/dashboard/analytics/ai-coach`, weekly cron Mondays 11:00 UTC |
+| Job Orders module | ✅ Live at `/dashboard/analytics/jobs` (list + detail + CSV export) |
+| Resend email | 🚧 Domain verification pending |
 | Hardware ingest | ⏳ Phase 4 (R&D) |
+| Bubble prototype | ⚠️ Abandoned — kept as reference only |
 
 ## 5. Why we abandoned Bubble
 
@@ -52,17 +55,17 @@ These are all fixable in Bubble, but the roadmap (multi-tenant SaaS, Stripe, das
 
 ## 6. Business model
 
-**Pricing** (CAD, monthly, with 20% annual discount):
+**Pricing** — per-line monthly (decided 2026-05-07, locked in Stripe 2026-05-08):
 
-| Plan | Monthly | Annual/mo | Includes |
+| Plan | USD per line | CAD per line | Includes |
 |---|---|---|---|
-| Starter | $49 | $39 | 1 line, 5 operators, 90-day history |
-| Professional | $129 | $99 | 5 lines, 25 operators, 1-year history, multi-line dashboard, CSV export |
-| Enterprise | Custom | Custom | Unlimited, multi-plant, custom stop reasons, SLA |
+| Starter | $83 | $114 | 3 operators per line, 30-day history, AI Coach, Job Orders, live OEE dashboard, 1-tap stop logging, shift reports |
+| Professional | $129 | $177 | 5 operators per line, 90-day history, everything in Starter + analytics deep-dives (by shift / machine / operator), Pareto charts, OEE-vs-target bars, multi-line comparison |
+| Enterprise | Custom | Custom | Unlimited lines + operators, multi-plant, custom stop reasons, SLA, dedicated onboarding, unlimited history |
 
-**Note:** The live marketing site shows `$99/line/month` flat — that's a more recent positioning Louis tested. We'll need to reconcile pricing copy before launch. **TODO: confirm pricing model with Louis.**
+**Differentiation logic:** AI Coach + Job Orders are included on every paid plan because they're the conversion hook. Pro tier earns its delta via analytics depth + history retention + ops/line capacity, not via gating the headline AI feature.
 
-**Trial:** 14-day free, no credit card.
+**Trial:** 7-day free, no credit card.
 
 **CAC target:** < $200 (demo-led sales + LinkedIn outreach to plant managers).
 **LTV target (Pro, 24mo):** ~$3,096.
