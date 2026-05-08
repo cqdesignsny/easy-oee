@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Bebas_Neue, DM_Sans, DM_Mono } from "next/font/google";
+import { ClerkProvider } from "@clerk/nextjs";
 import "./globals.css";
 import { LanguageProvider } from "@/components/i18n/LanguageProvider";
 import { getServerTheme } from "@/lib/theme";
@@ -59,7 +60,9 @@ export default async function RootLayout({
       className={`${bebasNeue.variable} ${dmSans.variable} ${dmMono.variable}`}
     >
       <body>
-        <LanguageProvider>{children}</LanguageProvider>
+        <ClerkProvider>
+          <LanguageProvider>{children}</LanguageProvider>
+        </ClerkProvider>
       </body>
     </html>
   );

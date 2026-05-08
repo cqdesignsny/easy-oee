@@ -668,6 +668,17 @@ export const dictionaries: Record<Locale, Dictionary> = {
     "billing.status.canceled": "canceled",
     "billing.status.incomplete": "incomplete",
 
+    "onboarding.tag": "Welcome",
+    "onboarding.title": "ONE LAST STEP",
+    "onboarding.subtitle": "Tell us about your plant so we can set up your dashboard.",
+    "onboarding.companyName": "Company / plant name",
+    "onboarding.companyNamePlaceholder": "Maple Manufacturing",
+    "onboarding.lines": "How many production lines?",
+    "onboarding.linesHint": "You can change this later from billing.",
+    "onboarding.timezoneDetected": "Plant timezone (auto-detected)",
+    "onboarding.creating": "Creating your account...",
+    "onboarding.create": "Create my plant",
+
     // DEMO
     "nav.tryDemo": "See it Live",
     "demo.tag": "Live Demo",
@@ -1549,6 +1560,17 @@ export const dictionaries: Record<Locale, Dictionary> = {
     "billing.status.canceled": "cancelada",
     "billing.status.incomplete": "incompleta",
 
+    "onboarding.tag": "Bienvenido",
+    "onboarding.title": "UN ÚLTIMO PASO",
+    "onboarding.subtitle": "Cuéntenos sobre su planta para configurar su panel.",
+    "onboarding.companyName": "Nombre de la empresa / planta",
+    "onboarding.companyNamePlaceholder": "Maple Manufacturing",
+    "onboarding.lines": "¿Cuántas líneas de producción?",
+    "onboarding.linesHint": "Puede cambiarlo luego desde facturación.",
+    "onboarding.timezoneDetected": "Zona horaria de la planta (detectada)",
+    "onboarding.creating": "Creando su cuenta...",
+    "onboarding.create": "Crear mi planta",
+
     // DEMO
     "nav.tryDemo": "Ver en Vivo",
     "demo.tag": "Demo en Vivo",
@@ -2427,6 +2449,17 @@ export const dictionaries: Record<Locale, Dictionary> = {
     "billing.status.past_due": "en retard de paiement",
     "billing.status.canceled": "annulée",
     "billing.status.incomplete": "incomplète",
+
+    "onboarding.tag": "Bienvenue",
+    "onboarding.title": "UNE DERNIÈRE ÉTAPE",
+    "onboarding.subtitle": "Parlez-nous de votre usine pour configurer votre tableau de bord.",
+    "onboarding.companyName": "Nom de l'entreprise / usine",
+    "onboarding.companyNamePlaceholder": "Maple Manufacturing",
+    "onboarding.lines": "Combien de lignes de production?",
+    "onboarding.linesHint": "Vous pourrez modifier cela plus tard depuis la facturation.",
+    "onboarding.timezoneDetected": "Fuseau horaire de l'usine (détecté)",
+    "onboarding.creating": "Création de votre compte...",
+    "onboarding.create": "Créer mon usine",
 
     // DEMO
     "nav.tryDemo": "Voir en Direct",
