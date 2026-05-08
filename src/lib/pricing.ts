@@ -1,17 +1,16 @@
 /**
  * Easy OEE pricing — single source of truth.
  *
- * Prices are in USD. CAD is shown as a converted reference.
+ * Per-line model. Every plan charges a flat per-line price; lines scale
+ * linearly. Both tiers ship with the same per-line operator allowance and
+ * the AI Coach + Job Orders modules. Pro adds the analytics deep-dives,
+ * Pareto charts, vs-target bars, and the longer history retention.
  *
- * The slider on /pricing and /sign-up drives a real per-line scale:
- * - Starter scales 1→4 lines: $49 base + $34 per extra line.
- *   By 4 lines you're at $151 — making Pro at $129 the obvious upsell.
- * - Pro is flat $129 for 5 lines, then $30 per extra line up to 20.
- *   Past 20, it's a custom Enterprise quote.
+ * Prices are USD primary with a CAD reference shown alongside.
  *
- * The per-line surcharge isn't shown as a "+$X/line" line on the cards —
- * the slider just makes the price react. Users see the real number for
- * their actual line count instead of "from $49".
+ * The slider on /pricing and /sign-up multiplies the per-line price by
+ * the selected line count, so users see the real number for their actual
+ * plant size instead of "from $83".
  */
 
 export const USD_TO_CAD = 1.37;
@@ -24,17 +23,19 @@ export type PlanId = "starter" | "pro" | "enterprise";
 export type Plan = {
   id: PlanId;
   name: string;
-  /** Monthly price in USD at `includedLines`. */
+  /** Monthly price in USD per production line. */
   baseMonthlyUSD: number;
-  /** Lines included in the base price. */
+  /** Lines bundled into the base price. With a per-line model this is 1. */
   includedLines: number;
-  /** Per-line surcharge above the included allowance, USD/month. */
+  /** Each line above the bundled allowance costs this much. Equal to base in
+   *  the per-line model so price scales linearly. */
   extraLineUSD: number;
-  /** Hard cap on lines for this tier. Sliding past forces the next tier up. */
+  /** Hard cap on lines for this tier. Above the cap the slider snaps to
+   *  Enterprise. */
   maxLines: number;
-  /** Up to N operators included. null = unlimited. */
+  /** Per-line operator allowance. `lines * maxOperators` = total cap. */
   maxOperators: number | null;
-  /** Stripe price ID — fill in after creating the product in Stripe. */
+  /** Stripe price ID. Filled in once the live products are created. */
   stripePriceId: string | null;
   /** Stripe metered price ID for extra lines, if any. */
   stripeExtraLinePriceId: string | null;
@@ -46,17 +47,19 @@ export const PLANS: Record<PlanId, Plan> = {
   starter: {
     id: "starter",
     name: "Starter",
-    baseMonthlyUSD: 49,
+    baseMonthlyUSD: 83,
     includedLines: 1,
-    extraLineUSD: 34,
+    extraLineUSD: 83,
     maxLines: 4,
     maxOperators: 3,
     stripePriceId: null,
     stripeExtraLinePriceId: null,
     featureKeys: [
-      "pricing.feature.stops",
       "pricing.feature.dash",
+      "pricing.feature.stops",
       "pricing.feature.reports",
+      "pricing.feature.jobOrders",
+      "pricing.feature.aiCoach",
       "pricing.feature.history30",
     ],
   },
@@ -64,13 +67,14 @@ export const PLANS: Record<PlanId, Plan> = {
     id: "pro",
     name: "Professional",
     baseMonthlyUSD: 129,
-    includedLines: 5,
-    extraLineUSD: 30,
+    includedLines: 1,
+    extraLineUSD: 129,
     maxLines: MAX_SELF_SERVE_LINES,
-    maxOperators: 15,
+    maxOperators: 5,
     stripePriceId: null,
     stripeExtraLinePriceId: null,
     featureKeys: [
+      "pricing.feature.everythingStarter",
       "pricing.feature.compare",
       "pricing.feature.supervisor",
       "pricing.feature.csv",
@@ -80,7 +84,7 @@ export const PLANS: Record<PlanId, Plan> = {
   enterprise: {
     id: "enterprise",
     name: "Enterprise",
-    baseMonthlyUSD: 0, // custom quote
+    baseMonthlyUSD: 0,
     includedLines: 0,
     extraLineUSD: 0,
     maxLines: Number.POSITIVE_INFINITY,
@@ -139,8 +143,7 @@ export function fitsTier(planId: PlanId, lines: number): boolean {
 
 /**
  * Operator allowance for a given line count on a tier.
- * Each extra line above the tier's bundled minimum adds 2 operators on
- * top of the base cap (so Pro at 5 lines = 15 ops, 6 = 17, ..., 20 = 45).
+ * Per-line model: each line gets the tier's per-line operator quota.
  * Returns null for Enterprise or when the line count exceeds the tier cap.
  */
 export function operatorCap(planId: PlanId, lines: number): number | null {
@@ -148,8 +151,7 @@ export function operatorCap(planId: PlanId, lines: number): number | null {
   if (planId === "enterprise") return null;
   if (plan.maxOperators == null) return null;
   if (lines > plan.maxLines) return null;
-  const extra = Math.max(0, lines - plan.includedLines);
-  return plan.maxOperators + extra * 2;
+  return plan.maxOperators * lines;
 }
 
 /**

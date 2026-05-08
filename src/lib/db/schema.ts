@@ -57,6 +57,10 @@ export const company = pgTable("company", {
   subscriptionStatus: text("subscription_status"), // trialing | active | past_due | canceled
   /** IANA timezone string (e.g. "America/Toronto"). Drives "today" boundaries. */
   timezone: text("timezone").notNull().default("America/Toronto"),
+  /** Latest AI Coach analysis as JSON. Refreshed weekly by the cron or
+   *  on-demand by the manager. Includes the action plans + their statuses. */
+  aiCoachReport: text("ai_coach_report"),
+  aiCoachGeneratedAt: timestamp("ai_coach_generated_at", { withTimezone: true }),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
 });

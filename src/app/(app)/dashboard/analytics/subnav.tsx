@@ -9,6 +9,8 @@ const LINKS: ReadonlyArray<{ href: string; key: string; exact?: boolean }> = [
   { href: "/dashboard/analytics/shifts", key: "analytics.subnav.byShift" },
   { href: "/dashboard/analytics/machines", key: "analytics.subnav.byMachine" },
   { href: "/dashboard/analytics/operators", key: "analytics.subnav.byOperator" },
+  { href: "/dashboard/analytics/jobs", key: "analytics.subnav.byJob" },
+  { href: "/dashboard/analytics/ai-coach", key: "analytics.subnav.aiCoach" },
 ];
 
 export function AnalyticsSubnav() {
