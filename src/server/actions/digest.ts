@@ -11,6 +11,8 @@
  */
 
 import { and, eq, gte, lt, sql, desc } from "drizzle-orm";
+import { generateText } from "ai";
+import { gateway } from "@ai-sdk/gateway";
 import { db } from "@/lib/db/client";
 import * as s from "@/lib/db/schema";
 import { formatPercent } from "@/lib/oee";
@@ -36,7 +38,8 @@ export type DigestPayload = {
   worstLine: DigestLine | null;
   lines: DigestLine[];
   topStops: DigestStop[]; // top 3
-  /** AI-generated one-paragraph summary, if ANTHROPIC_API_KEY is set. */
+  /** AI-generated one-paragraph summary via the Vercel AI Gateway. Null if
+   *  the gateway isn't reachable or the model returns nothing. */
   summary: string | null;
 };
 
@@ -184,20 +187,18 @@ export async function buildDailyDigest(companyId: string): Promise<DigestPayload
     summary: null,
   };
 
-  // Optional AI summary via Anthropic — gracefully no-op if no key.
-  if (process.env.ANTHROPIC_API_KEY) {
-    try {
-      payload.summary = await generateSummary(payload);
-    } catch (e) {
-      console.warn("digest: AI summary failed", e);
-    }
+  // One-paragraph AI summary via the Vercel AI Gateway. Skipped silently if
+  // the gateway isn't reachable from this runtime (e.g. no OIDC token in dev).
+  try {
+    payload.summary = await generateSummary(payload);
+  } catch (e) {
+    console.warn("digest: AI summary failed", e);
   }
 
   return payload;
 }
 
 async function generateSummary(p: DigestPayload): Promise<string> {
-  // Tiny structured prompt → 1 paragraph plain text. Uses Haiku for speed/cost.
   const prompt = `You are an expert OEE analyst writing one-paragraph daily summaries for plant managers. Be specific, concrete, and direct. Never use emojis or em dashes. Focus on what the manager should pay attention to first.
 
 Plant: ${p.companyName}
@@ -216,26 +217,11 @@ Per line: ${p.lines
 
 Write 2-3 sentences. No greeting, no signoff, no markdown, no lists.`;
 
-  const res = await fetch("https://api.anthropic.com/v1/messages", {
-    method: "POST",
-    headers: {
-      "x-api-key": process.env.ANTHROPIC_API_KEY!,
-      "anthropic-version": "2023-06-01",
-      "content-type": "application/json",
-    },
-    body: JSON.stringify({
-      model: "claude-haiku-4-5-20251001",
-      max_tokens: 220,
-      messages: [{ role: "user", content: prompt }],
-    }),
+  const { text } = await generateText({
+    model: gateway("anthropic/claude-haiku-4.5"),
+    maxOutputTokens: 220,
+    prompt,
   });
-  if (!res.ok) throw new Error(`Anthropic ${res.status}`);
-  const json = (await res.json()) as { content: { type: string; text: string }[] };
-  const txt = json.content
-    .filter((b) => b.type === "text")
-    .map((b) => b.text)
-    .join("")
-    .trim();
-  return txt;
+  return text.trim();
 }
 

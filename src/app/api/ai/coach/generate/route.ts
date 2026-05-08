@@ -30,13 +30,6 @@ export async function POST() {
     return NextResponse.json({ error: "unauthorized" }, { status: 401 });
   }
 
-  if (!process.env.ANTHROPIC_API_KEY) {
-    return NextResponse.json(
-      { error: "AI Coach is not configured. ANTHROPIC_API_KEY is missing." },
-      { status: 503 },
-    );
-  }
-
   try {
     const ctx = await getWeeklyContextForAI(session.companyId);
     if (!ctx) {

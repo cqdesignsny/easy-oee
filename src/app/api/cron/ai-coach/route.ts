@@ -35,13 +35,6 @@ export async function GET(req: Request) {
     return NextResponse.json({ error: "unauthorized" }, { status: 401 });
   }
 
-  if (!process.env.ANTHROPIC_API_KEY) {
-    return NextResponse.json(
-      { error: "ANTHROPIC_API_KEY missing" },
-      { status: 503 },
-    );
-  }
-
   // Skip canceled companies; everything else gets a fresh report.
   const companies = await db
     .select({ id: s.company.id, name: s.company.name })

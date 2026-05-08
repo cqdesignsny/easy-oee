@@ -1,19 +1,22 @@
 /**
- * AI Coach — Anthropic-powered weekly OEE analysis.
+ * AI Coach — weekly OEE analysis via Vercel AI Gateway.
  *
- * Reads the rolled-up week of plant data (from `getWeeklyContextForAI`)
- * and asks Claude Sonnet 4.6 to produce three prioritized action plans.
- * Output is structured JSON, parsed and stored on `company.ai_coach_report`.
+ * Routes through `@ai-sdk/gateway` so the call goes through the project's
+ * AI Gateway: unified billing on the Vercel team, automatic OIDC auth on
+ * deployments, and provider failover if Anthropic has a hiccup. Uses
+ * Claude Sonnet 4.6 with prompt-cache control on the stable system prompt
+ * so the cron's per-tenant fan-out reuses the cached prefix.
  *
- * The system prompt is marked with `cache_control: ephemeral` so we get
- * a cache hit across the weekly cron's per-company iterations and any
- * manual re-runs in the same window.
+ * Output is validated against a Zod schema by `generateObject`, so we get
+ * a typed object back without hand-rolling a JSON parser.
  */
 
-import Anthropic from "@anthropic-ai/sdk";
+import { generateObject } from "ai";
+import { gateway } from "@ai-sdk/gateway";
+import { z } from "zod";
 import type { WeeklyContext } from "@/lib/db/queries/ai-context";
 
-export const COACH_MODEL = "claude-sonnet-4-6";
+export const COACH_MODEL = "anthropic/claude-sonnet-4.6";
 
 export type CoachActionStatus = "pending" | "approved" | "edited" | "rejected";
 
@@ -98,36 +101,44 @@ function pct(v: number | null): string {
   return `${(v * 100).toFixed(1)}%`;
 }
 
-function getClient(): Anthropic {
-  const apiKey = process.env.ANTHROPIC_API_KEY;
-  if (!apiKey) {
-    throw new Error("ANTHROPIC_API_KEY not set — cannot run AI Coach.");
-  }
-  return new Anthropic({ apiKey });
-}
-
-const SYSTEM_PROMPT_BASE = `You are the AI Coach for Easy OEE, an expert manufacturing assistant focused on improving Overall Equipment Effectiveness (OEE) for small and medium plants.
+const SYSTEM_PROMPT = `You are the AI Coach for Easy OEE, an expert manufacturing assistant focused on improving Overall Equipment Effectiveness (OEE) for small and medium plants.
 
 Your job: read a week of plant data and return THREE prioritized, concrete action plans the plant manager can execute this week. Each plan must be data-grounded — refer to specific numbers from the input. Never invent details.
 
 Output rules:
-- Return ONLY a JSON object matching the schema below. No prose before or after, no markdown fences.
 - Priorities are 1, 2, 3. Order them by estimated OEE impact, highest first.
 - Titles must be short and actionable, max 12 words.
 - Each detail field: 2 sentences max, with the specific data point that triggered the recommendation.
 - "responsible" should match a real plant role (e.g. maintenance lead, night-shift supervisor, ops manager).
-- "estimatedOeeImpact" format: "+X.X% OEE" using a realistic estimate based on the loss size.
+- "estimatedOeeImpact" format: "+X.X% OEE" using a realistic estimate based on the loss size.`;
 
-Schema:
-{
-  "weekSummary": "2-3 sentences. Mention the week's OEE, the change vs. prior week, and the principal issue.",
-  "topInsight": "Single most important takeaway, one sentence.",
-  "actions": [
-    { "id": "action-1", "priority": 1, "title": "...", "detail": "...", "responsible": "...", "estimatedOeeImpact": "+X.X% OEE" },
-    { "id": "action-2", "priority": 2, ... },
-    { "id": "action-3", "priority": 3, ... }
-  ]
-}`;
+const actionSchema = z.object({
+  id: z.string().describe("Stable identifier like action-1, action-2, action-3."),
+  priority: z
+    .union([z.literal(1), z.literal(2), z.literal(3)])
+    .describe("Ranking 1 (highest impact) to 3."),
+  title: z.string().max(120).describe("Short actionable title, max 12 words."),
+  detail: z
+    .string()
+    .max(800)
+    .describe("Two sentences max, must cite specific numbers from the input."),
+  responsible: z.string().max(120).describe("A real plant role to own this action."),
+  estimatedOeeImpact: z.string().describe("Format: +X.X% OEE"),
+});
+
+const analysisSchema = z.object({
+  weekSummary: z
+    .string()
+    .max(800)
+    .describe(
+      "2-3 sentences. Mention the week's OEE, the change vs. prior week, and the principal issue.",
+    ),
+  topInsight: z
+    .string()
+    .max(280)
+    .describe("Single most important takeaway, one sentence."),
+  actions: z.array(actionSchema).length(3),
+});
 
 function buildUserMessage(ctx: WeeklyContext, locale: CoachLocale): string {
   const stops = STOP_LABELS[locale];
@@ -193,98 +204,50 @@ ${shiftLines}
 OEE by operator (lowest first, top 5):
 ${operatorLines}
 
-Generate the JSON action plan in ${LANGUAGE_NAME[locale]}. Begin response with the opening JSON brace.`;
-}
-
-function parseJsonResponse(text: string): unknown {
-  // The prefill should make this clean. Strip code fences just in case.
-  const stripped = text.replace(/```json\n?|```\n?/g, "").trim();
-  // If the model continues after a complete JSON object (extra prose),
-  // truncate at the last balanced brace.
-  const start = stripped.indexOf("{");
-  if (start === -1) throw new Error("AI Coach: no JSON object in response");
-  let depth = 0;
-  let end = -1;
-  for (let i = start; i < stripped.length; i++) {
-    const c = stripped[i];
-    if (c === "{") depth++;
-    else if (c === "}") {
-      depth--;
-      if (depth === 0) {
-        end = i;
-        break;
-      }
-    }
-  }
-  if (end === -1) throw new Error("AI Coach: unbalanced JSON in response");
-  return JSON.parse(stripped.slice(start, end + 1));
+Generate the action plan in ${LANGUAGE_NAME[locale]}.`;
 }
 
 export async function generateWeeklyAnalysis(
   ctx: WeeklyContext,
   locale: CoachLocale = "en",
 ): Promise<CoachAnalysis> {
-  const client = getClient();
-
-  const message = await client.messages.create({
-    model: COACH_MODEL,
-    max_tokens: 1500,
-    system: [
+  const { object } = await generateObject({
+    model: gateway(COACH_MODEL),
+    schema: analysisSchema,
+    maxOutputTokens: 1500,
+    messages: [
       {
-        type: "text",
-        text: SYSTEM_PROMPT_BASE,
-        cache_control: { type: "ephemeral" },
+        role: "system",
+        content: SYSTEM_PROMPT,
+        providerOptions: {
+          anthropic: { cacheControl: { type: "ephemeral" } },
+        },
+      },
+      {
+        role: "user",
+        content: buildUserMessage(ctx, locale),
       },
     ],
-    messages: [
-      { role: "user", content: buildUserMessage(ctx, locale) },
-      { role: "assistant", content: "{" },
-    ],
-  });
-
-  const text = message.content
-    .filter((b) => b.type === "text")
-    .map((b) => (b as { type: "text"; text: string }).text)
-    .join("");
-
-  // Re-attach the prefill brace so the JSON parser sees a complete object.
-  const parsed = parseJsonResponse("{" + text);
-
-  if (typeof parsed !== "object" || parsed === null) {
-    throw new Error("AI Coach: parsed payload is not an object");
-  }
-  const p = parsed as Record<string, unknown>;
-
-  const actionsIn = Array.isArray(p.actions) ? p.actions : [];
-  const actions: ActionPlan[] = actionsIn.slice(0, 3).map((rawAction, idx) => {
-    const a = (rawAction ?? {}) as Record<string, unknown>;
-    const priorityRaw = Number(a.priority);
-    const priority: 1 | 2 | 3 =
-      priorityRaw === 1 || priorityRaw === 2 || priorityRaw === 3
-        ? priorityRaw
-        : ((idx + 1) as 1 | 2 | 3);
-    return {
-      id: typeof a.id === "string" && a.id ? a.id : `action-${idx + 1}`,
-      priority,
-      title: typeof a.title === "string" ? a.title : "",
-      detail: typeof a.detail === "string" ? a.detail : "",
-      responsible: typeof a.responsible === "string" ? a.responsible : "",
-      estimatedOeeImpact:
-        typeof a.estimatedOeeImpact === "string" ? a.estimatedOeeImpact : "",
-      status: "pending" as const,
-    };
   });
 
   const oeeThis = ctx.thisWeek.avgOee;
   const oeePrev = ctx.prevWeekOee;
 
   return {
-    weekSummary: typeof p.weekSummary === "string" ? p.weekSummary : "",
-    topInsight: typeof p.topInsight === "string" ? p.topInsight : "",
+    weekSummary: object.weekSummary,
+    topInsight: object.topInsight,
     oeeThisWeek: oeeThis,
     oeePrevWeek: oeePrev,
     oeeChange: oeeThis != null && oeePrev != null ? oeeThis - oeePrev : null,
-    actions,
+    actions: object.actions.map((a) => ({
+      id: a.id,
+      priority: a.priority,
+      title: a.title,
+      detail: a.detail,
+      responsible: a.responsible,
+      estimatedOeeImpact: a.estimatedOeeImpact,
+      status: "pending" as const,
+    })),
     generatedAt: new Date().toISOString(),
     locale,
   };
