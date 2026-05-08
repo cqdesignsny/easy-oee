@@ -28,7 +28,7 @@ export async function TrialBanner({
             {companyName ? `· ${companyName}` : ""}
           </span>
         </div>
-        <Link href="/pricing" className="btn">
+        <Link href="/dashboard/billing" className="btn">
           {t("trial.upgrade")} →
         </Link>
       </div>
@@ -43,7 +43,7 @@ export async function TrialBanner({
         </strong>{" "}
         <span style={{ color: "var(--muted2)" }}>{t("trial.tagline")}</span>
       </div>
-      <Link href="/pricing" className="btn btn-ghost">
+      <Link href="/dashboard/billing" className="btn btn-ghost">
         {t("trial.upgrade")}
       </Link>
     </div>
