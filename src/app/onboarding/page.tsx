@@ -25,7 +25,7 @@ export const dynamic = "force-dynamic";
 export default async function OnboardingPage() {
   const { userId } = await auth();
   if (!userId) {
-    redirect("/auth/sign-in");
+    redirect("/sign-in");
   }
 
   // If we've already onboarded this Clerk user, skip straight to the dash.

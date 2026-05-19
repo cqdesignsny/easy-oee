@@ -4,6 +4,7 @@ import { z } from "zod";
 import bcrypt from "bcryptjs";
 import { and, eq } from "drizzle-orm";
 import { redirect } from "next/navigation";
+import { clerkClient } from "@clerk/nextjs/server";
 import { db } from "@/lib/db/client";
 import * as s from "@/lib/db/schema";
 import {
@@ -13,7 +14,10 @@ import {
 } from "@/lib/auth/admin-session";
 import { DEFAULT_TIMEZONE, isValidTimezone } from "@/lib/time";
 
-export type AdminSignInState = { error?: string };
+export type AdminSignInState =
+  | { error: string }
+  | { ok: true; redirect: string }
+  | Record<string, never>;
 export type SignUpState = { error?: string; ok?: boolean };
 
 const SignInSchema = z.object({
@@ -22,10 +26,15 @@ const SignInSchema = z.object({
 });
 
 /**
- * Manager sign-in. Looks up the user by email and verifies their bcrypt
- * password hash. Falls back to the legacy `ADMIN_PASSWORD` env var that
- * grants access to the seeded demo tenant — used by Louis for the existing
- * password demo flow before per-company signup.
+ * Manager sign-in via legacy HMAC bcrypt. Called by the branded /sign-in
+ * page when Clerk reports the email doesn't exist there yet (existing
+ * trial users). On a successful bcrypt match we ALSO migrate the user
+ * to Clerk in the background (eager invisible migration) so the next
+ * sign-in goes through Clerk natively.
+ *
+ * Returns either `{ ok, redirect }` or `{ error }` — the client decides
+ * what to do. No `redirect()` thrown here so the action can be called
+ * from a regular client handler, not just `useActionState`.
  */
 export async function signInAdmin(
   _prev: AdminSignInState,
@@ -45,8 +54,13 @@ export async function signInAdmin(
     .limit(1);
 
   if (u && u.passwordHash && (await bcrypt.compare(parsed.data.password, u.passwordHash))) {
+    // Eager migration to Clerk if this user hasn't been linked yet.
+    // Best-effort: failure to migrate must not block sign-in.
+    if (!u.clerkUserId) {
+      await migrateUserToClerk(u.id, parsed.data.email, parsed.data.password, u.fullName);
+    }
     await setAdminCookie(u.id, u.companyId);
-    redirect("/dashboard");
+    return { ok: true, redirect: "/dashboard" };
   }
 
   // 2. Legacy fallback: shared ADMIN_PASSWORD env var → seed tenant manager
@@ -65,11 +79,39 @@ export async function signInAdmin(
       .limit(1);
     if (seedManager) {
       await setAdminCookie(seedManager.id, seedManager.companyId);
-      redirect("/dashboard");
+      return { ok: true, redirect: "/dashboard" };
     }
   }
 
   return { error: "Wrong email or password." };
+}
+
+async function migrateUserToClerk(
+  localUserId: string,
+  email: string,
+  password: string,
+  fullName: string,
+): Promise<void> {
+  try {
+    const cc = await clerkClient();
+    const [firstName, ...rest] = fullName.split(" ");
+    const clerkUser = await cc.users.createUser({
+      emailAddress: [email],
+      password,
+      firstName: firstName || undefined,
+      lastName: rest.join(" ") || undefined,
+      publicMetadata: { migratedFromHmac: true },
+    });
+    await db
+      .update(s.user)
+      .set({ clerkUserId: clerkUser.id })
+      .where(eq(s.user.id, localUserId));
+  } catch (err) {
+    console.warn("[admin-auth] Clerk eager migration skipped", {
+      localUserId,
+      message: err instanceof Error ? err.message : String(err),
+    });
+  }
 }
 
 export async function signOutAdmin() {

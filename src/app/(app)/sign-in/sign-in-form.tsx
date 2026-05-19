@@ -1,24 +1,113 @@
 "use client";
 
-import { useActionState, useState } from "react";
-import { signInAdmin, type AdminSignInState } from "@/server/actions/admin-auth";
+import { useState, type FormEvent } from "react";
+import { useRouter } from "next/navigation";
+import { useSignIn } from "@clerk/nextjs/legacy";
+import { signInAdmin } from "@/server/actions/admin-auth";
 import { useT } from "@/components/i18n/LanguageProvider";
+
+type OAuthStrategy = "oauth_google" | "oauth_microsoft";
 
 export function SignInForm() {
   const t = useT();
+  const router = useRouter();
+  const { isLoaded, signIn, setActive } = useSignIn();
   const [email, setEmail] = useState("");
-  const [state, formAction, pending] = useActionState<AdminSignInState, FormData>(
-    signInAdmin,
-    {},
-  );
+  const [error, setError] = useState<string | null>(null);
+  const [pending, setPending] = useState(false);
+  const [oauthPending, setOauthPending] = useState<OAuthStrategy | null>(null);
+
+  async function startOAuth(strategy: OAuthStrategy) {
+    if (!isLoaded || !signIn) return;
+    setError(null);
+    setOauthPending(strategy);
+    try {
+      await signIn.authenticateWithRedirect({
+        strategy,
+        redirectUrl: "/post-clerk-signin",
+        redirectUrlComplete: "/post-clerk-signin",
+      });
+    } catch (e) {
+      setOauthPending(null);
+      setError(extractClerkError(e) ?? t("signin.errWrong"));
+    }
+  }
+
+  async function onSubmit(e: FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    if (!isLoaded || !signIn) return;
+    setError(null);
+    setPending(true);
+
+    const formEl = e.currentTarget;
+    const formData = new FormData(formEl);
+    const emailVal = String(formData.get("email") || "").trim().toLowerCase();
+    const password = String(formData.get("password") || "");
+
+    if (!emailVal || !password) {
+      setError(t("signin.errEmpty"));
+      setPending(false);
+      return;
+    }
+
+    try {
+      const result = await signIn.create({ identifier: emailVal, password });
+      if (result.status === "complete") {
+        await setActive({ session: result.createdSessionId });
+        router.push("/post-clerk-signin");
+        return;
+      }
+      setError(t("signin.errWrong"));
+      setPending(false);
+      return;
+    } catch (clerkErr) {
+      const code = firstClerkErrorCode(clerkErr);
+      const knownUserSoStop =
+        code === "form_password_incorrect" ||
+        code === "form_password_pwned" ||
+        code === "session_exists" ||
+        code === "strategy_for_user_invalid";
+      if (knownUserSoStop) {
+        setError(extractClerkError(clerkErr) ?? t("signin.errWrong"));
+        setPending(false);
+        return;
+      }
+    }
+
+    const hmacResult = await signInAdmin({}, formData);
+    if ("ok" in hmacResult && hmacResult.ok) {
+      router.push(hmacResult.redirect);
+      return;
+    }
+    if ("error" in hmacResult) {
+      setError(hmacResult.error);
+    } else {
+      setError(t("signin.errWrong"));
+    }
+    setPending(false);
+  }
+
+  const disableOAuth = !isLoaded || oauthPending !== null || pending;
 
   return (
     <div>
       <div style={{ display: "grid", gap: 12, marginBottom: 24 }}>
-        <button type="button" disabled title="Coming soon" className="sso-btn">
+        <button
+          type="button"
+          className="sso-btn"
+          onClick={() => startOAuth("oauth_google")}
+          disabled={disableOAuth}
+          style={{ opacity: disableOAuth ? 0.6 : 1 }}
+        >
           <GoogleIcon /> {t("signin.continueGoogle")}
         </button>
-        <button type="button" disabled title="Coming soon" className="sso-btn">
+        <button
+          type="button"
+          className="sso-btn"
+          onClick={() => startOAuth("oauth_microsoft")}
+          disabled={disableOAuth}
+          style={{ opacity: disableOAuth ? 0.6 : 1 }}
+        >
           <MicrosoftIcon /> {t("signin.continueMicrosoft")}
         </button>
       </div>
@@ -27,7 +116,7 @@ export function SignInForm() {
         <span>{t("signin.orEmail")}</span>
       </div>
 
-      <form action={formAction} style={{ marginTop: 24 }}>
+      <form onSubmit={onSubmit} style={{ marginTop: 24 }}>
         <label className="field-label">{t("signin.email")}</label>
         <input
           className="field"
@@ -51,32 +140,35 @@ export function SignInForm() {
           style={{ marginBottom: 18 }}
         />
 
-        {state.error && (
-          <p style={{ color: "#ff7a7a", marginBottom: 16, fontSize: 15 }}>{state.error}</p>
+        {error && (
+          <p style={{ color: "#ff7a7a", marginBottom: 16, fontSize: 15 }}>{error}</p>
         )}
 
         <button
           type="submit"
           className="btn"
-          disabled={pending}
-          style={{ width: "100%", opacity: pending ? 0.6 : 1 }}
+          disabled={pending || !isLoaded || oauthPending !== null}
+          style={{ width: "100%", opacity: pending || !isLoaded ? 0.6 : 1 }}
         >
           {pending ? t("signin.submitting") : t("signin.submit")}
         </button>
 
-        <div style={{ marginTop: 16, textAlign: "center" }}>
-          <a
-            href="#"
-            onClick={(e) => e.preventDefault()}
-            style={{ color: "var(--muted2)", fontSize: 14, textDecoration: "none" }}
-            title="Coming soon"
-          >
-            {t("signin.forgot")}
-          </a>
-        </div>
       </form>
     </div>
   );
+}
+
+function firstClerkErrorCode(err: unknown): string | undefined {
+  if (typeof err !== "object" || err === null) return undefined;
+  const errors = (err as { errors?: Array<{ code?: string }> }).errors;
+  return errors?.[0]?.code;
+}
+
+function extractClerkError(err: unknown): string | null {
+  if (typeof err !== "object" || err === null) return null;
+  const errors = (err as { errors?: Array<{ message?: string; longMessage?: string }> })
+    .errors;
+  return errors?.[0]?.longMessage ?? errors?.[0]?.message ?? null;
 }
 
 function GoogleIcon() {

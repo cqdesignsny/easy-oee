@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useActionState, useEffect, useMemo, useState } from "react";
+import { useSignUp } from "@clerk/nextjs/legacy";
 import {
   PLANS,
   fmtCAD,
@@ -15,6 +16,8 @@ import { useT } from "@/components/i18n/LanguageProvider";
 import { signUpManager, type SignUpState } from "@/server/actions/admin-auth";
 import { COMMON_TIMEZONES, DEFAULT_TIMEZONE, detectBrowserTimezone } from "@/lib/time";
 
+type OAuthStrategy = "oauth_google" | "oauth_microsoft";
+
 export function SignUpClient({
   initialPlan,
   initialLines,
@@ -23,14 +26,36 @@ export function SignUpClient({
   initialLines: number;
 }) {
   const t = useT();
+  const { isLoaded: clerkLoaded, signUp } = useSignUp();
   const [plan, setPlan] = useState<PlanId>(initialPlan);
   const [lines, setLines] = useState(initialLines);
   const [timezone, setTimezone] = useState<string>(DEFAULT_TIMEZONE);
   const [tzEdit, setTzEdit] = useState(false);
+  const [oauthPending, setOauthPending] = useState<OAuthStrategy | null>(null);
+  const [oauthError, setOauthError] = useState<string | null>(null);
   const [state, formAction, pending] = useActionState<SignUpState, FormData>(
     signUpManager,
     {},
   );
+
+  async function startOAuth(strategy: OAuthStrategy) {
+    if (!clerkLoaded || !signUp) return;
+    setOauthError(null);
+    setOauthPending(strategy);
+    try {
+      await signUp.authenticateWithRedirect({
+        strategy,
+        redirectUrl: "/post-clerk-signin",
+        redirectUrlComplete: "/post-clerk-signin",
+      });
+    } catch (e) {
+      setOauthPending(null);
+      const errors = (e as { errors?: Array<{ longMessage?: string; message?: string }> }).errors;
+      setOauthError(errors?.[0]?.longMessage ?? errors?.[0]?.message ?? "Could not start sign-up.");
+    }
+  }
+
+  const oauthDisabled = !clerkLoaded || oauthPending !== null || pending;
 
   // Auto-detect plant timezone on mount.
   useEffect(() => {
@@ -60,6 +85,33 @@ export function SignUpClient({
 
   return (
     <form action={formAction} className="card" style={{ padding: 36 }}>
+      <div style={{ display: "grid", gap: 12, marginBottom: 20 }}>
+        <button
+          type="button"
+          className="sso-btn"
+          onClick={() => startOAuth("oauth_google")}
+          disabled={oauthDisabled}
+          style={{ opacity: oauthDisabled ? 0.6 : 1 }}
+        >
+          <GoogleIcon /> {t("signup.continueGoogle")}
+        </button>
+        <button
+          type="button"
+          className="sso-btn"
+          onClick={() => startOAuth("oauth_microsoft")}
+          disabled={oauthDisabled}
+          style={{ opacity: oauthDisabled ? 0.6 : 1 }}
+        >
+          <MicrosoftIcon /> {t("signup.continueMicrosoft")}
+        </button>
+      </div>
+      {oauthError && (
+        <p style={{ color: "#ff7a7a", marginBottom: 16, fontSize: 14 }}>{oauthError}</p>
+      )}
+      <div className="sso-divider" style={{ marginBottom: 24 }}>
+        <span>{t("signup.orEmail")}</span>
+      </div>
+
       {/* Plan toggle */}
       <label className="field-label">{t("signup.plan")}</label>
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 24 }}>
@@ -250,5 +302,27 @@ export function SignUpClient({
         {t("signup.disclaimer")}
       </p>
     </form>
+  );
+}
+
+function GoogleIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 18 18" xmlns="http://www.w3.org/2000/svg">
+      <path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844a4.14 4.14 0 0 1-1.796 2.716v2.259h2.908c1.702-1.567 2.684-3.875 2.684-6.615z" />
+      <path fill="#34A853" d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 0 0 9 18z" />
+      <path fill="#FBBC05" d="M3.964 10.71A5.41 5.41 0 0 1 3.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 0 0 0 9c0 1.452.348 2.827.957 4.042l3.007-2.332z" />
+      <path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 0 0 .957 4.958L3.964 7.29C4.672 5.163 6.656 3.58 9 3.58z" />
+    </svg>
+  );
+}
+
+function MicrosoftIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 21 21" xmlns="http://www.w3.org/2000/svg">
+      <rect x="1" y="1" width="9" height="9" fill="#F25022" />
+      <rect x="11" y="1" width="9" height="9" fill="#7FBA00" />
+      <rect x="1" y="11" width="9" height="9" fill="#00A4EF" />
+      <rect x="11" y="11" width="9" height="9" fill="#FFB900" />
+    </svg>
   );
 }
