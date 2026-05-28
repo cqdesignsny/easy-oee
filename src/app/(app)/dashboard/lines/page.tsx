@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { eq } from "drizzle-orm";
 import { db } from "@/lib/db/client";
 import * as s from "@/lib/db/schema";
@@ -8,6 +9,7 @@ import {
   regenerateBoardToken,
   updateLine,
 } from "@/server/actions/manager";
+import { effectiveCaps } from "@/lib/db/queries/subscription";
 
 export const metadata = { title: "Lines | Easy OEE" };
 export const dynamic = "force-dynamic";
@@ -15,6 +17,18 @@ export const dynamic = "force-dynamic";
 export default async function LinesPage() {
   const companyId = await getManagerCompanyId();
   const lines = await db.select().from(s.line).where(eq(s.line.companyId, companyId));
+  const [planRow] = await db
+    .select({
+      plan: s.company.plan,
+      subscriptionStatus: s.company.subscriptionStatus,
+      licensedLines: s.company.licensedLines,
+      slug: s.company.slug,
+    })
+    .from(s.company)
+    .where(eq(s.company.id, companyId))
+    .limit(1);
+  const caps = planRow ? effectiveCaps(planRow) : null;
+  const atLineCap = caps !== null && lines.length >= caps.lineCap;
 
   return (
     <main className="app-wrap">
@@ -28,30 +42,67 @@ export default async function LinesPage() {
 
       {/* Create */}
       <form action={createLine} className="card" style={{ marginTop: 24 }}>
-        <div className="kpi-label" style={{ marginBottom: 16 }}>Add a line</div>
-        <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr 1fr auto", gap: 12 }}>
-          <input className="field" name="name" placeholder="Machine 3" required />
-          <input
-            className="field"
-            name="idealRate"
-            type="number"
-            step="0.01"
-            min="0.01"
-            placeholder="ideal rate (parts/min)"
-            required
-          />
-          <input
-            className="field"
-            name="targetOee"
-            type="number"
-            step="0.01"
-            min="0"
-            max="1"
-            defaultValue="0.85"
-            placeholder="target OEE (0-1)"
-          />
-          <button className="btn" type="submit">ADD</button>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "baseline",
+            marginBottom: 16,
+            flexWrap: "wrap",
+            gap: 8,
+          }}
+        >
+          <div className="kpi-label">Add a line</div>
+          {caps && Number.isFinite(caps.lineCap) ? (
+            <div style={{ fontSize: 12, color: "var(--muted2)" }}>
+              {lines.length} of {caps.lineCap} lines used
+            </div>
+          ) : null}
         </div>
+        {atLineCap ? (
+          <div
+            style={{
+              padding: 14,
+              borderRadius: 8,
+              background: "rgba(251,191,36,0.08)",
+              border: "1px solid rgba(251,191,36,0.3)",
+              color: "var(--white)",
+              fontSize: 14,
+            }}
+          >
+            You&apos;re at your line cap.{" "}
+            <Link
+              href="/dashboard/billing"
+              style={{ color: "var(--accent)", fontWeight: 600 }}
+            >
+              Add lines on the billing page →
+            </Link>
+          </div>
+        ) : (
+          <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr 1fr auto", gap: 12 }}>
+            <input className="field" name="name" placeholder="Machine 3" required />
+            <input
+              className="field"
+              name="idealRate"
+              type="number"
+              step="0.01"
+              min="0.01"
+              placeholder="ideal rate (parts/min)"
+              required
+            />
+            <input
+              className="field"
+              name="targetOee"
+              type="number"
+              step="0.01"
+              min="0"
+              max="1"
+              defaultValue="0.85"
+              placeholder="target OEE (0-1)"
+            />
+            <button className="btn" type="submit">ADD</button>
+          </div>
+        )}
       </form>
 
       {/* List */}

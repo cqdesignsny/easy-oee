@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { and, eq } from "drizzle-orm";
 import { db } from "@/lib/db/client";
 import * as s from "@/lib/db/schema";
@@ -7,6 +8,7 @@ import {
   getManagerCompanyId,
   updateOperator,
 } from "@/server/actions/manager";
+import { effectiveCaps } from "@/lib/db/queries/subscription";
 
 export const metadata = { title: "Operators | Easy OEE" };
 export const dynamic = "force-dynamic";
@@ -17,6 +19,18 @@ export default async function OperatorsPage() {
     .select()
     .from(s.user)
     .where(and(eq(s.user.companyId, companyId), eq(s.user.role, "operator")));
+  const [planRow] = await db
+    .select({
+      plan: s.company.plan,
+      subscriptionStatus: s.company.subscriptionStatus,
+      licensedLines: s.company.licensedLines,
+      slug: s.company.slug,
+    })
+    .from(s.company)
+    .where(eq(s.company.id, companyId))
+    .limit(1);
+  const caps = planRow ? effectiveCaps(planRow) : null;
+  const atOperatorCap = caps !== null && operators.length >= caps.operatorCap;
 
   return (
     <main className="app-wrap">
@@ -28,20 +42,57 @@ export default async function OperatorsPage() {
 
       {/* Create */}
       <form action={createOperator} className="card" style={{ marginTop: 24 }}>
-        <div className="kpi-label" style={{ marginBottom: 16 }}>Add an operator</div>
-        <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr auto", gap: 12 }}>
-          <input className="field" name="fullName" placeholder="Full name" required />
-          <input
-            className="field"
-            name="pin"
-            inputMode="numeric"
-            pattern="[0-9]{4}"
-            maxLength={4}
-            placeholder="4-digit PIN"
-            required
-          />
-          <button className="btn" type="submit">ADD</button>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "baseline",
+            marginBottom: 16,
+            flexWrap: "wrap",
+            gap: 8,
+          }}
+        >
+          <div className="kpi-label">Add an operator</div>
+          {caps && Number.isFinite(caps.operatorCap) ? (
+            <div style={{ fontSize: 12, color: "var(--muted2)" }}>
+              {operators.length} of {caps.operatorCap} operators used
+            </div>
+          ) : null}
         </div>
+        {atOperatorCap ? (
+          <div
+            style={{
+              padding: 14,
+              borderRadius: 8,
+              background: "rgba(251,191,36,0.08)",
+              border: "1px solid rgba(251,191,36,0.3)",
+              color: "var(--white)",
+              fontSize: 14,
+            }}
+          >
+            You&apos;re at your operator cap.{" "}
+            <Link
+              href="/dashboard/billing"
+              style={{ color: "var(--accent)", fontWeight: 600 }}
+            >
+              Add lines on the billing page to grow it →
+            </Link>
+          </div>
+        ) : (
+          <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr auto", gap: 12 }}>
+            <input className="field" name="fullName" placeholder="Full name" required />
+            <input
+              className="field"
+              name="pin"
+              inputMode="numeric"
+              pattern="[0-9]{4}"
+              maxLength={4}
+              placeholder="4-digit PIN"
+              required
+            />
+            <button className="btn" type="submit">ADD</button>
+          </div>
+        )}
       </form>
 
       {/* List */}

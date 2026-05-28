@@ -16,7 +16,11 @@ import { db } from "@/lib/db/client";
 import * as s from "@/lib/db/schema";
 import { getAdminSession } from "@/lib/auth/admin-session";
 import { isValidTimezone } from "@/lib/time";
-import { requireWriteAccess } from "@/lib/db/queries/subscription";
+import {
+  requireWriteAccess,
+  requireLineCapacity,
+  requireOperatorCapacity,
+} from "@/lib/db/queries/subscription";
 
 export async function getManagerCompanyId(): Promise<string> {
   const session = await getAdminSession();
@@ -42,6 +46,7 @@ const LineSchema = z.object({
 export async function createLine(formData: FormData) {
   const companyId = await getManagerCompanyId();
   await requireWriteAccess(companyId);
+  await requireLineCapacity(companyId);
   const parsed = LineSchema.parse({
     name: formData.get("name"),
     idealRate: formData.get("idealRate"),
@@ -117,6 +122,7 @@ const OperatorSchema = z.object({
 export async function createOperator(formData: FormData) {
   const companyId = await getManagerCompanyId();
   await requireWriteAccess(companyId);
+  await requireOperatorCapacity(companyId);
   const parsed = OperatorSchema.parse({
     fullName: formData.get("fullName"),
     pin: formData.get("pin"),
