@@ -22,6 +22,8 @@
     "@ai-sdk/gateway": "^3.0.111",
     "@clerk/nextjs": "^7.3.2",
     "@neondatabase/serverless": "^1.0.2",
+    "@react-email/components": "^1.0.12",
+    "@react-email/render": "^2.0.8",
     "@zxing/browser": "^0.2.0",
     "ai": "^6.0.176",
     "bcryptjs": "^3.0.3",
@@ -29,6 +31,7 @@
     "next": "16.2.2",
     "react": "19.2.4",
     "react-dom": "19.2.4",
+    "resend": "^6.12.4",
     "stripe": "^22.1.1",
     "zod": "^4.3.6"
   },

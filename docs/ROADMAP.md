@@ -123,10 +123,12 @@ Legend: 🟢 done · 🟡 in progress · ⚪ queued · 🔵 blocked
 - 🟡 Email notifications via Resend
   - 🟢 Server action scaffold (`src/server/actions/shift-export.ts`) — validates email + auth, ready for `resend.emails.send()` swap
   - 🟢 Inline "Email it" form on shift summary
-  - ⚪ Wire actual Resend SDK (need RESEND_API_KEY + EASY_OEE_FROM_EMAIL env vars)
-  - ⚪ React Email template at `src/emails/ShiftSummary.tsx`
+  - 🟢 Resend SDK + React Email template (`src/emails/ShiftSummary.tsx`) wired into `shift-export.ts`. Gated on `isResendConfigured()` so dev is safe with no key. Needs `RESEND_API_KEY` + `EASY_OEE_FROM_EMAIL` in Vercel env to actually send.
+  - ⚪ Verify `easy-oee.com` sending domain in Resend + push the two env vars
   - ⚪ Automatic on-shift-end delivery (manager opt-in via settings page)
-  - ⚪ Daily/weekly digest cron
+  - ⚪ Daily/weekly digest cron actually emails (currently logs)
+  - ⚪ Welcome email on sign-up
+  - ⚪ Trial-ending nudge emails (3d / 1d / expired)
 - 🟢 CSV export of shift data (`/api/shifts/[id]/csv` route handler, downloads a full per-shift CSV)
 - 🟢 Print or save as PDF (browser print + dedicated print stylesheet)
 - 🟢 PWA manifest (`src/app/manifest.ts`) — operators can Add to Home Screen on a tablet, launches /pin standalone with no chrome
