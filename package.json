@@ -24,6 +24,8 @@
     "@neondatabase/serverless": "^1.0.2",
     "@react-email/components": "^1.0.12",
     "@react-email/render": "^2.0.8",
+    "@vercel/analytics": "^2.0.1",
+    "@vercel/speed-insights": "^2.0.0",
     "@zxing/browser": "^0.2.0",
     "ai": "^6.0.176",
     "bcryptjs": "^3.0.3",

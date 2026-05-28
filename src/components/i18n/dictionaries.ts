@@ -442,6 +442,18 @@ export const dictionaries: Record<Locale, Dictionary> = {
     "legal.terms.title": "TERMS OF SERVICE",
     "legal.back": "Back home",
 
+    // 404 + ERROR
+    "notFound.title": "PAGE NOT FOUND",
+    "notFound.body": "The page you're looking for doesn't exist, or it's been moved.",
+    "notFound.home": "Back to home",
+    "notFound.dashboard": "Open the dashboard",
+    "error.tag": "Error",
+    "error.title": "SOMETHING BROKE",
+    "error.body": "We hit a snag on our end. Try again, or head back to the dashboard and pick up where you left off.",
+    "error.ref": "Reference",
+    "error.retry": "Try again",
+    "error.home": "Back to home",
+
     // SIGN IN
     "signin.tag": "Manager Sign In",
     "signin.title": "SIGN IN",
@@ -1349,6 +1361,17 @@ export const dictionaries: Record<Locale, Dictionary> = {
     "legal.terms.title": "TÉRMINOS DE SERVICIO",
     "legal.back": "Volver al inicio",
 
+    "notFound.title": "PÁGINA NO ENCONTRADA",
+    "notFound.body": "La página que buscas no existe o ha sido movida.",
+    "notFound.home": "Volver al inicio",
+    "notFound.dashboard": "Abrir el panel",
+    "error.tag": "Error",
+    "error.title": "ALGO FALLÓ",
+    "error.body": "Tuvimos un problema de nuestro lado. Intenta de nuevo o vuelve al panel para continuar donde lo dejaste.",
+    "error.ref": "Referencia",
+    "error.retry": "Reintentar",
+    "error.home": "Volver al inicio",
+
     "signin.tag": "Acceso del Gerente",
     "signin.title": "INICIAR SESIÓN",
     "signin.subtitle":
@@ -2246,6 +2269,17 @@ export const dictionaries: Record<Locale, Dictionary> = {
     "legal.privacy.title": "POLITIQUE DE CONFIDENTIALITÉ",
     "legal.terms.title": "CONDITIONS D'UTILISATION",
     "legal.back": "Retour à l'accueil",
+
+    "notFound.title": "PAGE INTROUVABLE",
+    "notFound.body": "La page que tu cherches n'existe pas ou a été déplacée.",
+    "notFound.home": "Retour à l'accueil",
+    "notFound.dashboard": "Ouvrir le tableau de bord",
+    "error.tag": "Erreur",
+    "error.title": "UN PROBLÈME EST SURVENU",
+    "error.body": "Quelque chose a bloqué de notre côté. Réessaie ou reviens au tableau de bord pour continuer là où tu étais.",
+    "error.ref": "Référence",
+    "error.retry": "Réessayer",
+    "error.home": "Retour à l'accueil",
 
     "signin.tag": "Connexion Directeur",
     "signin.title": "CONNEXION",
