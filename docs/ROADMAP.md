@@ -27,9 +27,10 @@ Legend: 🟢 done · 🟡 in progress · ⚪ queued · 🔵 blocked
   - 🟢 `/contact` — demo request form with Server Action → `demo_lead` table + Zod validation
   - 🟢 Bebas Neue / DM Sans / DM Mono via `next/font/google`
   - 🟢 Fade-in scroll observer (single client component)
-- ⚪ `/how-it-works` page (linked from nav, doesn't exist yet)
-- ⚪ `/roi-calculator` page (linked from nav, doesn't exist yet)
-- ⚪ `/privacy` and `/terms` pages
+- 🟢 `/how-it-works` page (3-step explainer + 10-stop reference + 5 FAQs, EN/ES/FR)
+- 🟢 `/roi-calculator` page (interactive calculator with A/P/Q loss breakdown, EN/ES/FR)
+- 🟢 `/privacy` page (Easy OEE Inc. policy covering Clerk + Neon + Vercel + Stripe data flow)
+- 🟢 `/terms` page (Easy OEE Inc. ToS)
 - ⚪ Vercel Analytics
 - ⚪ OG images
 - ⚪ Cutover `easy-oee.com` DNS to Vercel (DON'T do until app is ready — Louis's prospects use the static HTML)
