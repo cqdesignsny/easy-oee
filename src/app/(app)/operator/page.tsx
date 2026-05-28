@@ -11,6 +11,7 @@ import { LanguageSwitcher } from "@/components/i18n/LanguageSwitcher";
 import { ThemeToggle } from "@/components/theme/ThemeToggle";
 import { getServerT } from "@/components/i18n/server";
 import { ScanButton } from "@/components/scanner/ScanButton";
+import { getAccessState } from "@/lib/db/queries/subscription";
 
 export const metadata = { title: "Start Shift | Easy OEE" };
 export const dynamic = "force-dynamic";
@@ -45,6 +46,42 @@ export default async function OperatorPage() {
     .orderBy(desc(s.shift.startedAt))
     .limit(1);
   if (openShift) redirect(`/shift/${openShift.id}`);
+
+  const access = await getAccessState(session.companyId);
+
+  if (!access.allowed) {
+    return (
+      <main className="op-shell" style={{ maxWidth: 880, margin: "0 auto", width: "100%" }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 28 }}>
+          <Link href="/"><Logo height={48} /></Link>
+          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+            <LanguageSwitcher />
+            <ThemeToggle />
+          </div>
+        </div>
+        <div className="card card-lg">
+          <div className="app-tag" style={{ color: "var(--red)" }}>
+            {t("operator.locked.tag")}
+          </div>
+          <h1 className="app-h1" style={{ marginTop: 4 }}>
+            {access.reason === "expired_trial"
+              ? t("operator.locked.expiredTrial")
+              : access.reason === "past_due"
+              ? t("operator.locked.pastDue")
+              : t("operator.locked.canceled")}
+          </h1>
+          <p style={{ color: "var(--muted2)", marginTop: 12, fontSize: 16 }}>
+            {t("operator.locked.body")}
+          </p>
+          <form action={logoutOperator} style={{ marginTop: 20 }}>
+            <button className="btn btn-ghost" type="submit">
+              {t("operator.signOut")}
+            </button>
+          </form>
+        </div>
+      </main>
+    );
+  }
 
   return (
     <main className="op-shell" style={{ maxWidth: 880, margin: "0 auto", width: "100%" }}>

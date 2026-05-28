@@ -21,6 +21,7 @@ import { requireOperator, setOperatorCookie } from "@/lib/auth/operator-session"
 import { computeOEE } from "@/lib/oee";
 import { STOP_REASON_VALUES, type StopReasonValue } from "@/lib/stop-reasons";
 import { getCompanyTimezone } from "@/lib/db/queries/company";
+import { requireWriteAccess } from "@/lib/db/queries/subscription";
 import { plantDateString } from "@/lib/time";
 
 const StartShiftSchema = z.object({
@@ -33,6 +34,7 @@ const StartShiftSchema = z.object({
 
 export async function startShift(formData: FormData) {
   const session = await requireOperator();
+  await requireWriteAccess(session.companyId);
   const parsed = StartShiftSchema.parse({
     lineId: formData.get("lineId"),
     shiftType: formData.get("shiftType"),
